@@ -1,10 +1,14 @@
 Package: fastfrechet
-Title: What the Package Does (One Line, Title Case)
+Title: Fast Implementation of Fréchet Regression and Related Functions
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    c(person("Alexander", "Coulter", , "coultera@tamu.edu", role = c("aut"),
+           comment = c(ORCID = "0009-0001-9116-6588")),
+      person("Rebecca", "Lee", , "llrebecca21@tamu.edu", role = c("aut"),
+           comment = c(ORCID = "0000-0001-8162-6555")),
+      person("Irina", "Gaynanova", , "irinagn@umich.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-4116-0268")))
+Description: Fast implementation of Fréchet regression associated functionalities for univariate distribution responses equipped with 2-Wasserstein metric, including weighted Fréchet means and Fréchet Ridge Selection Operator (FRiSO).
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

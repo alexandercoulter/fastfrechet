@@ -229,9 +229,9 @@ arma::colvec hW_solver_Thomas(const arma::uvec& W,
 //' @export
 // [[Rcpp::export]]
 arma::mat Custom_Active_Set(const arma::mat& Yhat,
-                                     const arma::mat& L,
-                                     const arma::mat& U,
-                                     const double& eps = 1e-8){
+                            const arma::mat& L,
+                            const arma::mat& U,
+                            const double& eps = 1e-8){
   
   // Create constraint matrix:
   arma::mat C = (arma::join_rows(Yhat, U) - arma::join_rows(L, Yhat)).t();

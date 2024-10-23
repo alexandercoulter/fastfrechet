@@ -4,13 +4,13 @@
 #' A short description...
 #' 
 #'
-#' @param X A `(n x p)` matrix with no missing, all finite entries.
-#' @param Y A `(n x m)` matrix that is row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
-#' @param Z An optional `(z x p)` matrix (default `NULL`) with no missing, all finite entries.
-#' @param lambda An optional `(p x 1)` long vector with non-negative entries and sum across entries is strictly positive.
-#' @param lower An optional numeric scalar (default `-Inf`) that must be strictly less than `upper`.
-#' @param upper An optional numeric scalar (default `Inf`) that must be strictly greater than `lower`.
-#' @param eps An optional numeric scalar (default `1e-10`) that must be strictly positive.
+#' @param X A `(n x p)` "input" covariate matrix with no missing, all finite entries.
+#' @param Y A `(n x m)` matrix of observed quantile functions, row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
+#' @param Z An optional `(z x p)` "output" covariate matrix (default `NULL`) with no missing, all finite entries.
+#' @param lambda An optional `(p x 1)` vector with non-negative entries whose sum is strictly positive.
+#' @param lower An optional numeric scalar (default `-Inf`) lower box constraint; must be strictly less than `upper`.
+#' @param upper An optional numeric scalar (default `Inf`) upper box constraint; must be strictly greater than `lower`.
+#' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
 #' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are skipped.
 #'
 #'

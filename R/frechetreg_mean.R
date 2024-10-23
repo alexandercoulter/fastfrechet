@@ -1,4 +1,4 @@
-#' frechetreg_mean
+#' Fréchet Regression Mean Calculator
 #'
 #' @param X 
 #' @param Y 
@@ -157,8 +157,7 @@ frechetreg_mean = function(X,
                               U = cbind(rep(upper, nrow(Yhat))),
                               eps = eps)
       Qhat = Yhat + (Eta[ , -ncol(Eta)] - Eta[ , -1])
-      
-      
+
     }
     
     # Return Qhat value:

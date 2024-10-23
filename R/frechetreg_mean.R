@@ -4,9 +4,9 @@
 #' A short description...
 #' 
 #'
-#' @param X A `(n x p)` matrix where all entries are non-`NA`, non-`NaN`, and finite.
-#' @param Y A `(n x m)` matrix that is row-wise monotone non-decreasing. This matrix has entries that obey the user-specified box contraints given by the `lower` and `upper` parameters.
-#' @param Z An optional `(z x p)` matrix (default `NULL`). 
+#' @param X A `(n x p)` matrix with no missing, all finite entries.
+#' @param Y A `(n x m)` matrix that is row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
+#' @param Z An optional `(z x p)` matrix (default `NULL`) with no missing, all finite entries.
 #' @param lambda An optional `(p x 1)` long vector with non-negative entries and sum across entries is strictly positive.
 #' @param lower An optional numeric scalar (default `-Inf`) that must be strictly less than `upper`.
 #' @param upper An optional numeric scalar (default `Inf`) that must be strictly greater than `lower`.

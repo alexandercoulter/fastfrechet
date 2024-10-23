@@ -10,6 +10,8 @@
 #' @param nudge A non-negative numeric value to offset warm starts to avoid spurious boundary values
 #' @param alpha A non-negative dampening parameter (used for 'GSS' and 'SSCG' methods)
 #' @param maxIter An integer giving the maximum number of iterations for the algorithm to run; default is 1000.
+#' @param max_theta 
+#' @param bet 
 #'
 #' @return A p by length(tauseq) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
 #' @export

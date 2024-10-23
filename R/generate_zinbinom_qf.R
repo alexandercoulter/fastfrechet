@@ -8,6 +8,7 @@
 #' @param size 
 #'
 #' @return
+#' @import stats
 #' @export
 #'
 #' @examples

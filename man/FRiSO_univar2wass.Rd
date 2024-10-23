@@ -39,6 +39,10 @@ FRiSO_univar2wass(
 \item{alpha}{A non-negative dampening parameter (used for 'GSS' and 'SSCG' methods)}
 
 \item{maxIter}{An integer giving the maximum number of iterations for the algorithm to run; default is 1000.}
+
+\item{max_theta}{}
+
+\item{bet}{}
 }
 \value{
 A p by length(tauseq) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.

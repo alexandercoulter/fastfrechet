@@ -1,7 +1,7 @@
 #' (Global) Fréchet Regression for Univariate Distributions with 2-Wasserstein Metric
 #' 
 #' @description
-#' A short description...
+#' This function calculates global Fréchet regression mean objects (Petersen et al. 2019), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced `m`-grid in (0, 1). Options for user-specified output covariate matrix, generalized ridge sparsity vector (Tucker et al. 2023), and box constraints. The Fréchet regression problem in this context is reducible to a quadratic programming problem; the workhorse of this function is a custom active set method based on Arnström et al. 2022.
 #' 
 #'
 #' @param X A `(n x p)` "input" covariate matrix with no missing, all finite entries.
@@ -18,14 +18,14 @@
 #' @export
 #'
 #' @examples
-FR_unidist_2wass = function(X,
-                            Y,
-                            Z = NULL,
-                            lambda = NULL,
-                            lower = -Inf,
-                            upper = Inf,
-                            eps = 1e-10,
-                            skip_checks = FALSE){
+frechetreg_univar2wass = function(X,
+                                  Y,
+                                  Z = NULL,
+                                  lambda = NULL,
+                                  lower = -Inf,
+                                  upper = Inf,
+                                  eps = 1e-10,
+                                  skip_checks = FALSE){
   
   # Compatibility and dimension checks:
   if(!skip_checks){

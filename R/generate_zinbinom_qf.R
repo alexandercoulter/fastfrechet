@@ -19,9 +19,9 @@ generate_zinbinom_qf = function(n,
                                 size = 10){
   
   # Dimension and compatibility checks:
-  if(p < 4) stop('Must specify at least 4 covariate columns (p).')
-  if(n < 1) stop('Must specify n ≥ 1.')
-  if(m < 1) stop('Must specify m ≥ 1.')
+  if(p < 4) stop('Must specify at least 4 covariate columns (\'p\').')
+  if(n < 1) stop('Must specify sample size \'n\' greater than 0.')
+  if(m < 1) stop('Must specify quantile function length \'m\' greater than 0.')
   if((zero_inflation <= 0) | (zero_inflation >= 1)) stop('\'zero_inflation\' must be strictly in (0, 1).')
   if((prob <= 0) | (prob >= 1)) stop('\'prob\' must be strictly in (0, 1).')
   if(size <= 0) stop('\'size\' must be positive.')

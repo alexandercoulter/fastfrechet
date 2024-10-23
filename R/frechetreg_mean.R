@@ -18,7 +18,7 @@ frechetreg_mean = function(X,
                            metric_space = c('uni_dist_2wass')[1],
                            mean_options = list('skipchecks' = FALSE,
                                                'dist_lower' = -Inf,
-                                               'dist_upper'= Inf,
+                                               'dist_upper' = Inf,
                                                'eps' = 1e-10)){
   
   # Check metric space for Fréchet mean:

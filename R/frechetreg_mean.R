@@ -122,7 +122,8 @@ frechetreg_mean = function(X,
         if(is.null(lambda)){
           
           S = svd(Xc)
-          Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + S$u %*% crossprod(S$u, Y)
+          g = S$d > 1e-10
+          Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + S$u[ , g] %*% crossprod(S$u[ , g], Y)
           
         } else {
           

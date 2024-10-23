@@ -1,9 +1,9 @@
 #' Fréchet Regression Mean Calculator
 #'
-#' @param X 
-#' @param Y 
-#' @param Z 
-#' @param lambda 
+#' @param X (n x p) matrix 
+#' @param Y (n x m) matrix
+#' @param Z (z x p) matrix. Optional
+#' @param lambda (p x 1) long vector with non-negative entries and sum across entries is strictly positive.
 #' @param metric_space 
 #' @param mean_options 
 #'

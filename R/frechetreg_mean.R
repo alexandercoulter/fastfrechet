@@ -1,11 +1,18 @@
 #' Fréchet Regression Mean Calculator
+#' 
+#' @description
+#' A short description...
+#' 
 #'
-#' @param X (n x p) matrix 
-#' @param Y (n x m) matrix
-#' @param Z (z x p) matrix. Optional
-#' @param lambda (p x 1) long vector with non-negative entries and sum across entries is strictly positive.
-#' @param metric_space 
-#' @param mean_options 
+#' @param X A `(n x p)` matrix where all entries are non-`NA`, non-`NaN`, and finite.
+#' @param Y A `(n x m)` matrix that is row-wise monotone non-decreasing. This matrix has entries that obey the user-specified box contraints given by the `lower` and `upper` parameters.
+#' @param Z An optional `(z x p)` matrix (default `NULL`). 
+#' @param lambda An optional `(p x 1)` long vector with non-negative entries and sum across entries is strictly positive.
+#' @param lower An optional numeric scalar (default `-Inf`) that must be strictly less than `upper`.
+#' @param upper An optional numeric scalar (default `Inf`) that must be strictly greater than `lower`.
+#' @param eps An optional numeric scalar (default `1e-10`) that must be strictly positive.
+#' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are run on `X`, `Y`, `Z`,`lambda`, `lower`, `upper`, and `eps` arguments.
+#'
 #'
 #' @return
 #' @export
@@ -15,8 +22,10 @@ frechetreg_mean = function(X,
                            Y,
                            Z = NULL,
                            lambda = NULL,
-                           metric_space = c('uni_dist_2wass')[1],
-                           mean_options = list()){
+                           lower = -Inf,
+                           upper = Inf,
+                           eps = 1e-10,
+                           skip_checks = FALSE){
   
   # Check metric space for Fréchet mean:
   metric_space = match.arg(metric_space, c('uni_dist_2wass'))

@@ -1,0 +1,63 @@
+#' Fréchet Ridge Selection Operator (FRiSO)
+#'
+#' @param X An n by p matrix column-wise consisting of predictor vectors
+#' @param Y An n by m matrix row-wise consisting of empirical quantile functions, each evaluated on an equispaced m-grid on (0, 1)
+#' @param lower Lower box constraint on quantile functions; default is -Inf, i.e. unbounded
+#' @param upper Upper box constraint on quantile functions; default is +Inf, i.e. unbounded
+#' @param tauseq A p-length vector containing 'tau' values at which to solve FRiSO problem
+#' @param lambda_init An optional p-length vector giving the initial 'allowance vector' lambda for FRiSO algorithm; will be scaled to sit on tau-simplex for first entry of tauseq
+#' @param eps A non-negative error tolerance parameter
+#' @param nudge A non-negative numeric value to offset warm starts to avoid spurious boundary values
+#' @param alpha A non-negative dampening parameter (used for 'GSS' and 'SSCG' methods)
+#' @param maxIter An integer giving the maximum number of iterations for the algorithm to run; default is 1000.
+#'
+#' @return A p by length(tauseq) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
+#' @export
+#'
+#' @examples
+FRiSO_univar2wass = function(X,
+                             Y,
+                             lower = -Inf,
+                             upper = Inf,
+                             tauseq,
+                             lambda_init = NULL,
+                             eps = 1e-5,
+                             nudge = 0,
+                             alpha = 0.9,
+                             maxIter = 1000,
+                             max_theta = pi / 4,
+                             bet = 1.0){
+  
+  # Grab dimensions:
+  n = nrow(X)
+  m = ncol(Y)
+  p = ncol(X)
+  
+  # Compatibility checks:
+  if(n != nrow(Y)) stop("\'X\' and \'Y\' should have the same number of rows.")
+  if(lower > upper) stop('Lower bound should be strictly less than upper bound.')
+  
+  if(is.null(lambda_init)) lambda_init = rep(tauseq[1] / p, p)
+  if(length(lambda_init) != p) stop("\'lambda_init\' length and ncol(X) should match.")
+  if(eps < 0) stop("\'eps\' should be non-negative.")
+  
+  # Center and scale inputs:
+  Xc = scaleX_cpp(X)
+  
+  # Run FRiSO:
+  friso = FRiSO_GSD(X = Xc,
+                    Y = Y,
+                    gamma_init = sqrt(lambda_init),
+                    tauseq = tauseq,
+                    lower = lower,
+                    upper = upper,
+                    alpha = alpha,
+                    nudge = nudge * tauseq,
+                    eps = eps,
+                    J = maxIter,
+                    max_theta = max_theta,
+                    bet = bet)
+  
+  return(friso$LAMBDA)
+  
+}

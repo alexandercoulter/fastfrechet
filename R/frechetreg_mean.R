@@ -16,10 +16,7 @@ frechetreg_mean = function(X,
                            Z = NULL,
                            lambda = NULL,
                            metric_space = c('uni_dist_2wass')[1],
-                           mean_options = list('skipchecks' = FALSE,
-                                               'dist_lower' = -Inf,
-                                               'dist_upper' = Inf,
-                                               'eps' = 1e-10)){
+                           mean_options = list()){
   
   # Check metric space for Fréchet mean:
   metric_space = match.arg(metric_space, c('uni_dist_2wass'))
@@ -27,12 +24,14 @@ frechetreg_mean = function(X,
   # Metric space options:
   if(metric_space == 'uni_dist_2wass'){
     
-    # Get box constraints:
-    lower = mean_options$dist_lower
-    upper = mean_options$dist_upper
+    # Set missing mean_options arguments:
+    skip_checks = c(mean_options$skip_checks, FALSE)[1]
+    lower = c(mean_options$lower, -Inf)[1]
+    upper = c(mean_options$upper, Inf)[1]
+    eps = c(mean_options$eps, 1e-10)[1]
     
     # Compatibility and dimension checks:
-    if(!mean_options$skipchecks){
+    if(!skip_checks){
       
       # Check for matrix inputs (X and Y; Z if provided):
       if(!(is.matrix(X) & is.matrix(Y))) stop('Y and X should be matrices.')
@@ -47,7 +46,7 @@ frechetreg_mean = function(X,
       
       # Check for mean_options compatibility:
       if(lower >= upper) stop('Lower bound should be strictly less than upper bound.')
-      if(mean_options$eps <= 0) stop('Error tolerance should be strictly positive.')
+      if(eps <= 0) stop('Error tolerance should be strictly positive.')
       
       # Check for column matching between X and Z, if provided:
       if(!is.null(Z)) if(ncol(X) != ncol(Z)) stop('X and Z must have the same number of columns.')
@@ -156,7 +155,7 @@ frechetreg_mean = function(X,
       Eta = Custom_Active_Set(Y = Yhat,
                               L = cbind(rep(lower, nrow(Yhat))),
                               U = cbind(rep(upper, nrow(Yhat))),
-                              eps = mean_options$eps)
+                              eps = eps)
       Qhat = Yhat + (Eta[ , -ncol(Eta)] - Eta[ , -1])
       
       

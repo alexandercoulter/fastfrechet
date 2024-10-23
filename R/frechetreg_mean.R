@@ -11,7 +11,7 @@
 #' @param lower An optional numeric scalar (default `-Inf`) that must be strictly less than `upper`.
 #' @param upper An optional numeric scalar (default `Inf`) that must be strictly greater than `lower`.
 #' @param eps An optional numeric scalar (default `1e-10`) that must be strictly positive.
-#' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are run on `X`, `Y`, `Z`,`lambda`, `lower`, `upper`, and `eps` arguments.
+#' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are skipped.
 #'
 #'
 #' @return

@@ -9,8 +9,7 @@ Authors@R:
       person("Irina", "Gaynanova", , "irinagn@umich.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-4116-0268")))
 Description: Fast implementation of Fréchet regression associated functionalities for univariate distribution responses equipped with 2-Wasserstein metric, including weighted Fréchet means and Fréchet Ridge Selection Operator (FRiSO).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

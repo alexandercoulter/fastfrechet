@@ -69,6 +69,7 @@ frechetreg_univar2wass = function(X,
       Xc = output$Xc
       Zc = output$Zc
       
+      # Grab dimensions:
       n = nrow(Xc)
       p = ncol(Xc)
       nz = nrow(Zc)
@@ -142,9 +143,9 @@ frechetreg_univar2wass = function(X,
         # 
         # which involves inverting an (n x n) matrix. When n is large, we use
         # 
-        # ( 1/n J + ZB(BX'XB + I)^{-1}BX' )Y,
+        # ( 1/n J + ZB(BX'XB + I)^{-1}BX' )Y
         # 
-        # where B = D^{1/2}.
+        # where B = D^{1/2}, which involves inverting a (p x p) matrix.
         if(p > (1.1 * n)){
           
           # Calculate DX':
@@ -175,15 +176,61 @@ frechetreg_univar2wass = function(X,
       
     } else {
       
+      # Center and scale X matrix:
       Xc = scaleX_cpp(X)
+      
+      # Grab dimensions:
       n = nrow(Xc)
       p = ncol(Xc)
+      m = ncol(Y)
       
+      # If lambda is not present (i.e. non-regularized regression)...
       if(is.null(lambda)){
         
-        S = svd(Xc)
-        g = S$d > 1e-10
-        Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + S$u[ , g] %*% crossprod(S$u[ , g], Y)
+        # For simplicity in comments, let X = Xc. The following  evaluates
+        # 
+        # ( 1/n J + X( X'X )^{+}X' )Y
+        # 
+        # i.e. the projection of Y onto ColSpace(1, X). This requires either
+        # inverting X'X (if possible) or finding the right singular vectors of
+        # X.
+        # 
+        # We re-write the expression of interest as
+        # 
+        # ( 1/n J + ZM )Y,
+        # 
+        # and compare p vs. n. If p is at least as large as n, we immediately
+        # skip to the SVD method. If it is less than n, we try to invert X'X,
+        # and if that fails then we do the SVD method.
+        if(p >= n){
+          
+          # Immediately calculate SVD of Xc = USV':
+          S = svd(Xc)
+          g = S$d > 1e-10
+          
+          # Evaluate UU'Y, ordering the multiplication based on n > m:
+          M = if(n > m) S$u[ , g] %*% crossprod(S$u[ , g], Y) else tcrossprod(S$u[ , g]) %*% Y
+          
+          # Calculate Yhat:
+          Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
+          
+        } else {
+          
+          # Try to solve X(X'X)^{-1}X'Y through inversion method:
+          M = tryCatch(Xc %*% solve(crossprod(Xc), crossprod(Xc, Y)),
+                       error = function(e){
+                         
+                         # If inversion fails, calculate SVD of Xc = USV':
+                         S = svd(Xc)
+                         g = S$d > 1e-10
+                         
+                         # Evaluate UU'Y, ordering the multiplication based on n > m:
+                         if(n > m) S$u[ , g] %*% crossprod(S$u[ , g], Y) else tcrossprod(S$u[ , g]) %*% Y
+                         
+                       })
+          
+          # Calculate Yhat:
+          Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
         
       } else {
         

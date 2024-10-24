@@ -73,39 +73,100 @@ frechetreg_univar2wass = function(X,
       p = ncol(Xc)
       nz = nrow(Zc)
       
+      # If lambda is not present (i.e. non-regularized regression)...
       if(is.null(lambda)){
         
+        # For simplicity in comments, let X = Xc. The following  evaluates
+        # 
+        # ( 1/n J + Z( X'X )^{+}X' )Y
+        # 
+        # which requires either inverting X'X (if possible) or finding the
+        # right singular vectors of X. In case X'X is not invertible, the
+        # SVD of X or the SVD of X'X (both through which the right singular
+        # vectors can be found) should be selected by comparing n vs. p.
+        # 
+        # We re-write the expression of interest as
+        # 
+        # ( 1/n J + ZM )Y,
+        # 
+        # and try first to invert X'X. If it fails, we take an SVD route.
         if(p > (0.9 * n)){
           
-          S = svd(Xc)
-          g = S$d > 1e-10
-          Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% S$v[ , g] %*% (crossprod(S$v[ , g], crossprod(Xc, Y)) / (S$d[g]^2))
+          # In case p out-scales n, SVD on X is faster than SVD on X'X:
+          M = tryCatch(solve(crossprod(Xc), crossprod(Xc, Y)),
+                       error = function(e){
+                         
+                         S = svd(Xc)
+                         g = S$d > 1e-10
+                         return(list(S$v[ , g], crossprod(S$v[ , g], crossprod(Xc, Y)) / (S$d[g]^2)))
+
+                       })
+          
+          # Calculate Yhat, preferring to first multiply Z by the right
+          # singular vector matrix V[ , g] under the assumption n ~ nz:
+          Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + (Zc %*% M[[1]]) %*% M[[2]]
           
         } else {
           
-          S = svd(crossprod(Xc))
-          g = S$d > 1e-10
-          Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% S$v[ , g] %*% (crossprod(S$v[ , g], crossprod(Xc, Y)) / (S$d[g]))
+          # In case n out-scales p, SVD on X'X is faster than SVD on X:
+          M = tryCatch(solve(crossprod(Xc), crossprod(Xc, Y)),
+                       error = function(e){
+                         
+                         S = svd(crossprod(Xc))
+                         g = S$d > 1e-10
+                         return(list(S$v[ , g], crossprod(S$v[ , g], crossprod(Xc, Y)) / (S$d[g])))
+                         
+                       })
+          
+          # Calculate Yhat, preferring to first multiply the matrices from M's
+          # output under the assumption n ~ nz:
+          Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% (M[[1]] %*% M[[2]])
           
         }
         
       } else {
         
+        # Scale Xc and Zc by sqrt(n) to simplify algebra with ridge penalty:
         Xcn = Xc / sqrt(n)
         Zcn = Zc / sqrt(n)
         
+        # For simplicity in comments, let X = Xcn and Z = Zcn. The following
+        # evaluates
+        # 
+        # ( 1/n J + Z( X'X + D^{-1} )^{-1}X' )Y
+        # 
+        # which requires inverting a matrix. When p is large in comparison to
+        # n, we can rewrite the above expression
+        # 
+        # ( 1/n J + ZDX'(XDX' + I)^{-1} )Y
+        # 
+        # which involves inverting an (n x n) matrix. When n is large, we use
+        # 
+        # ( 1/n J + ZB(BX'XB + I)^{-1}BX' )Y,
+        # 
+        # where B = D^{1/2}.
         if(p > (1.1 * n)){
           
+          # Calculate DX':
           DX = t(Xcn) * lambda
+          
+          # Calculate XDX' + I:
           G = Xcn %*% DX
           diag(G) = diag(G) + 1
+          
+          # Calculate Yhat:
           Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + (Zcn %*% DX) %*% solve(G, Y)
           
         } else {
           
+          # Find b = sqrt(d), implicitly giving B = D^{1/2}:
           root_lambda = sqrt(lambda)
+          
+          # Calculate BX'XB + I:
           G = crossprod(Xcn) * tcrossprod(root_lambda)
           diag(G) = diag(G) + 1
+          
+          # Calculate Yhat:
           Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zcn %*% (root_lambda * solve(G, root_lambda * crossprod(Xcn, Y)))
           
         }

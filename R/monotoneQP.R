@@ -6,7 +6,7 @@
 #' @param Y 
 #' @param lower 
 #' @param upper 
-#' @param eps 
+#' @param eps tolerance level
 #'
 #' @return
 #' @export

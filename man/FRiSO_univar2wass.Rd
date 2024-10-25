@@ -20,13 +20,13 @@ FRiSO_univar2wass(
 )
 }
 \arguments{
-\item{X}{An n by p matrix column-wise consisting of predictor vectors}
+\item{X}{A \verb{(n x p)} "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{An n by m matrix row-wise consisting of empirical quantile functions, each evaluated on an equispaced m-grid on (0, 1)}
+\item{Y}{A \verb{(n x m)} matrix of observed quantile functions, row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
-\item{lower}{Lower box constraint on quantile functions; default is -Inf, i.e. unbounded}
+\item{lower}{An optional numeric scalar (default \code{-Inf}) lower box constraint; must be strictly less than \code{upper}.}
 
-\item{upper}{Upper box constraint on quantile functions; default is +Inf, i.e. unbounded}
+\item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint; must be strictly greater than \code{lower}.}
 
 \item{tauseq}{A p-length vector containing 'tau' values at which to solve FRiSO problem}
 

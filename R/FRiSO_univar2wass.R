@@ -1,9 +1,6 @@
 #' Fréchet Ridge Selection Operator (FRiSO)
 #'
-#' @param X An n by p matrix column-wise consisting of predictor vectors
-#' @param Y An n by m matrix row-wise consisting of empirical quantile functions, each evaluated on an equispaced m-grid on (0, 1)
-#' @param lower Lower box constraint on quantile functions; default is -Inf, i.e. unbounded
-#' @param upper Upper box constraint on quantile functions; default is +Inf, i.e. unbounded
+#' @inheritParams frechetreg_univar2wass
 #' @param tauseq A p-length vector containing 'tau' values at which to solve FRiSO problem
 #' @param lambda_init An optional p-length vector giving the initial 'allowance vector' lambda for FRiSO algorithm; will be scaled to sit on tau-simplex for first entry of tauseq
 #' @param eps A non-negative error tolerance parameter

@@ -256,15 +256,21 @@ frechetreg_univar2wass = function(X,
         # which involves inverting a (p x p) matrix.
         if(p > n){
           
+          # Calculate XDX' + I:
           G = Xcn %*% (lambda * t(Xcn))
           diag(G) = diag(G) + 1
+          
+          # Calculate Yhat:
           Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + Y - solve(G, Y)
           
         } else {
           
+          # Calculate DX'X + I:
           S = crossprod(Xcn)
           G = lambda * S
           diag(G) = diag(G) + 1
+          
+          # Calculate Yhat:
           Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + Xcn %*% solve(G, lambda * crossprod(Xcn, Y))
           
         }

@@ -232,10 +232,28 @@ frechetreg_univar2wass = function(X,
           # Calculate Yhat:
           Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
         
+        }
+        
       } else {
         
+        # Scale Xc sqrt(n) to simplify algebra with ridge penalty:
         Xcn = Xc / sqrt(n)
         
+        # For simplicity in comments, let X = Xcn. The following evaluates
+        # 
+        # ( 1/n J + X( X'X + D^{-1} )^{+}X' )Y
+        # 
+        # which can be rewritten based on the size of n vs. p. If p is larger
+        # than n, a helpful equivalent representation is
+        # 
+        # ( 1/n J + I - (XDX' + I)^{-1} )Y
+        # 
+        # which involves inverting an (n x n) matrix. If n is larger than p,
+        # a helpful equivalent representation is
+        # 
+        # ( 1/n J + X(DX'X + I)^{-1}DX' )Y
+        # 
+        # which involves inverting a (p x p) matrix.
         if(p > n){
           
           G = Xcn %*% (lambda * t(Xcn))
@@ -260,10 +278,13 @@ frechetreg_univar2wass = function(X,
   # Solve for Qhat (i.e. constrained weighted mean):
   {
     
+    # Lagrange multiplier from custom active set method:
     Eta = Custom_Active_Set(Y = Yhat,
                             L = cbind(rep(lower, nrow(Yhat))),
                             U = cbind(rep(upper, nrow(Yhat))),
                             eps = eps)
+    
+    # Calculate Qhat from stability optimality condition:
     Qhat = Yhat + (Eta[ , -ncol(Eta)] - Eta[ , -1])
     
   }

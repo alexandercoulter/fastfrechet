@@ -16,7 +16,7 @@ FRiSO_univar2wass(
   alpha = 0.9,
   maxIter = 1000,
   max_theta = pi/4,
-  bet = 1
+  impulse = 1
 )
 }
 \arguments{
@@ -28,25 +28,25 @@ FRiSO_univar2wass(
 
 \item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint; must be strictly greater than \code{lower}.}
 
-\item{tauseq}{A p-length vector containing 'tau' values at which to solve FRiSO problem}
+\item{tauseq}{A (\code{p} \eqn{\times} \code{1}) vector containing 'tau' values at which to solve FRiSO problem.}
 
-\item{lambda_init}{An optional p-length vector giving the initial 'allowance vector' lambda for FRiSO algorithm; will be scaled to sit on tau-simplex for first entry of tauseq}
+\item{lambda_init}{An optional (\code{p} \eqn{\times} \code{1}) vector giving the initial 'allowance vector' lambda for FRiSO algorithm (default \code{NULL}); will be scaled to sit on tau-simplex for first entry of \code{tauseq}.}
 
-\item{eps}{A non-negative error tolerance parameter}
+\item{eps}{A non-negative error tolerance parameter (default \code{1e-5}).}
 
-\item{nudge}{A non-negative numeric value to offset warm starts to avoid spurious boundary values}
+\item{nudge}{A non-negative numeric scalar to offset warm starts to avoid spurious boundary values (default \code{0}).}
 
-\item{alpha}{A non-negative dampening parameter (used for 'GSS' and 'SSCG' methods)}
+\item{alpha}{A non-negative dampening parameter (default \code{0.9}).}
 
-\item{maxIter}{An integer giving the maximum number of iterations for the algorithm to run; default is 1000.}
+\item{maxIter}{An integer giving the maximum number of iterations for the algorithm to run (default \code{1000}).}
 
-\item{max_theta}{}
+\item{max_theta}{A step-size scalar parameter no larger than \code{pi / 4} (default \code{pi / 4}).}
 
-\item{bet}{}
+\item{impulse}{A scalar between \code{0} and \code{1} which controls the "impulse" in gradient descent with momentum (default \code{1}). \code{impulse} equal to \code{1} means no momentum and \code{impulse <1} means with momentum.}
 }
 \value{
-A p by length(tauseq) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
+A (\code{p} \eqn{\times} \code{length(tauseq)}) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
 }
 \description{
-Fréchet Ridge Selection Operator (FRiSO)
+A short description...
 }

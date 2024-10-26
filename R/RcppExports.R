@@ -42,7 +42,7 @@ projA0 <- function(v, h) {
 }
 
 #' @export
-FRiSO_GSD <- function(X, Y, gamma_init, tauseq, nudge, lower = 0, upper = 1, alpha = 1, eps = 0.0001, max_theta = 0.78539816, bet = 0.8, J = 1000L) {
-    .Call(`_fastfrechet_FRiSO_GSD`, X, Y, gamma_init, tauseq, nudge, lower, upper, alpha, eps, max_theta, bet, J)
+FRiSO_GSD <- function(X, Y, gamma_init, tauseq, nudge, lower = 0, upper = 1, alpha = 1, eps = 0.0001, max_theta = 0.78539816, impulse = 1, maxIter = 1000L) {
+    .Call(`_fastfrechet_FRiSO_GSD`, X, Y, gamma_init, tauseq, nudge, lower, upper, alpha, eps, max_theta, impulse, maxIter)
 }
 

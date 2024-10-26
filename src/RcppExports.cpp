@@ -111,8 +111,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // FRiSO_GSD
-Rcpp::List FRiSO_GSD(const arma::mat& X, const arma::mat& Y, const arma::colvec& gamma_init, const arma::colvec& tauseq, const arma::colvec& nudge, const double& lower, const double& upper, const double& alpha, const double& eps, const double& max_theta, const double& bet, const int& J);
-RcppExport SEXP _fastfrechet_FRiSO_GSD(SEXP XSEXP, SEXP YSEXP, SEXP gamma_initSEXP, SEXP tauseqSEXP, SEXP nudgeSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP alphaSEXP, SEXP epsSEXP, SEXP max_thetaSEXP, SEXP betSEXP, SEXP JSEXP) {
+Rcpp::List FRiSO_GSD(const arma::mat& X, const arma::mat& Y, const arma::colvec& gamma_init, const arma::colvec& tauseq, const arma::colvec& nudge, const double& lower, const double& upper, const double& alpha, const double& eps, const double& max_theta, const double& impulse, const int& maxIter);
+RcppExport SEXP _fastfrechet_FRiSO_GSD(SEXP XSEXP, SEXP YSEXP, SEXP gamma_initSEXP, SEXP tauseqSEXP, SEXP nudgeSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP alphaSEXP, SEXP epsSEXP, SEXP max_thetaSEXP, SEXP impulseSEXP, SEXP maxIterSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -126,9 +126,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double& >::type alpha(alphaSEXP);
     Rcpp::traits::input_parameter< const double& >::type eps(epsSEXP);
     Rcpp::traits::input_parameter< const double& >::type max_theta(max_thetaSEXP);
-    Rcpp::traits::input_parameter< const double& >::type bet(betSEXP);
-    Rcpp::traits::input_parameter< const int& >::type J(JSEXP);
-    rcpp_result_gen = Rcpp::wrap(FRiSO_GSD(X, Y, gamma_init, tauseq, nudge, lower, upper, alpha, eps, max_theta, bet, J));
+    Rcpp::traits::input_parameter< const double& >::type impulse(impulseSEXP);
+    Rcpp::traits::input_parameter< const int& >::type maxIter(maxIterSEXP);
+    rcpp_result_gen = Rcpp::wrap(FRiSO_GSD(X, Y, gamma_init, tauseq, nudge, lower, upper, alpha, eps, max_theta, impulse, maxIter));
     return rcpp_result_gen;
 END_RCPP
 }

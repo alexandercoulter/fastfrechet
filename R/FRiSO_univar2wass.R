@@ -8,7 +8,7 @@
 #' @param alpha A non-negative dampening parameter (used for 'GSS' and 'SSCG' methods)
 #' @param maxIter An integer giving the maximum number of iterations for the algorithm to run; default is 1000.
 #' @param max_theta A step-size scalar parameter no larger than `pi / 4`.
-#' @param bet A scalar between `0` and `1` which controls the "impulse" in gradient descent with momentum. `bet` equal to `1` means no momentum and `bet <1` means with momentum.
+#' @param impulse A scalar between `0` and `1` which controls the "impulse" in gradient descent with momentum (default `1`). `impulse` equal to `1` means no momentum and `impulse <1` means with momentum.
 #'
 #' @return A p by length(tauseq) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
 #' @export
@@ -25,7 +25,7 @@ FRiSO_univar2wass = function(X,
                              alpha = 0.9,
                              maxIter = 1000,
                              max_theta = pi / 4,
-                             bet = 1.0){
+                             impulse = 1.0){
   
   # Grab dimensions:
   n = nrow(X)
@@ -55,7 +55,7 @@ FRiSO_univar2wass = function(X,
                     eps = eps,
                     J = maxIter,
                     max_theta = max_theta,
-                    bet = bet)
+                    impulse = impulse)
   
   return(friso$LAMBDA)
   

@@ -520,7 +520,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
                      const double& alpha = 1,
                      const double& eps = 0.0001,
                      const double& max_theta = 0.78539816,
-                     const double& bet = 0.8,
+                     const double& impulse = 1,
                      const int& J = 1000){
   
   // Grab dimensions:
@@ -747,11 +747,11 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
           
           // t2 is the old line segment determined by the old gradient.
           // tc is the linear combination of these.
-          //  - If bet = 1, then we are entirely using the local gradient.
-          //  - If bet = 0, then we are an "immovable object" (though the
+          //  - If impulse = 1, then we are entirely using the local gradient.
+          //  - If impulse = 0, then we are an "immovable object" (though the
           //    initial momentum from t2 is zero, so we are in fact an
           //    "unmoving object").
-          tc = bet * t1 + (1 - bet) * t2;
+          tc = impulse * t1 + (1 - impulse) * t2;
           
           // The corresponding angle of rotation is given by theta = L / r:
           theta = arma::norm(tc) / tau_root;
@@ -957,10 +957,10 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
           
           // t2 is the old line segment determined by the old gradient.
           // tc is the linear combination of these.
-          //  - If bet = 1, then we are entirely using the local gradient.
-          //  - If bet = 0, then we are an "immovable object" (though the
+          //  - If impulse = 1, then we are entirely using the local gradient.
+          //  - If impulse = 0, then we are an "immovable object" (though the
           //    initial momentum is zero).
-          tc = bet * t1 + (1 - bet) * t2;
+          tc = impulse * t1 + (1 - impulse) * t2;
           
           // The corresponding angle of rotation is given by theta = L / r:
           theta = arma::norm(tc) / tau_root;

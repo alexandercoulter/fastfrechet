@@ -53,7 +53,7 @@ FRiSO_univar2wass = function(X,
                     alpha = alpha,
                     nudge = nudge * tauseq,
                     eps = eps,
-                    J = maxIter,
+                    maxIter = as.integer(maxIter),
                     max_theta = max_theta,
                     impulse = impulse)
   

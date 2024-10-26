@@ -521,7 +521,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
                      const double& eps = 0.0001,
                      const double& max_theta = 0.78539816,
                      const double& impulse = 1,
-                     const int& J = 1000){
+                     const int& maxIter = 1000){
   
   // Grab dimensions:
   double n = Y.n_rows;
@@ -623,7 +623,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
       int j = 0;
       bool continueLoop = true;
       
-      while(continueLoop & (j < J)){
+      while(continueLoop & (j < maxIter)){
         
         ///////////////////////////////////////////////////////////////////////////
         // Set old values:
@@ -825,7 +825,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
       int j = 0;
       bool continueLoop = true;
       
-      while(continueLoop & (j < J)){
+      while(continueLoop & (j < maxIter)){
         
         ///////////////////////////////////////////////////////////////////////////
         // Set old values:

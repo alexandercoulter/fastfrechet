@@ -1,4 +1,8 @@
 #' Fréchet Ridge Selection Operator (FRiSO)
+#' 
+#' @description
+#' A short description...
+#' 
 #'
 #' @inheritParams frechetreg_univar2wass
 #' @param tauseq A (`p` \eqn{\times} `1`) vector containing 'tau' values at which to solve FRiSO problem.

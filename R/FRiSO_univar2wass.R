@@ -1,16 +1,16 @@
 #' Fréchet Ridge Selection Operator (FRiSO)
 #'
 #' @inheritParams frechetreg_univar2wass
-#' @param tauseq A p-length vector containing 'tau' values at which to solve FRiSO problem
-#' @param lambda_init An optional p-length vector giving the initial 'allowance vector' lambda for FRiSO algorithm; will be scaled to sit on tau-simplex for first entry of tauseq
-#' @param eps A non-negative error tolerance parameter
-#' @param nudge A non-negative numeric value to offset warm starts to avoid spurious boundary values
-#' @param alpha A non-negative dampening parameter (used for 'GSS' and 'SSCG' methods)
-#' @param maxIter An integer giving the maximum number of iterations for the algorithm to run; default is 1000.
-#' @param max_theta A step-size scalar parameter no larger than `pi / 4`.
+#' @param tauseq A (`p` \eqn{\times} `1`) vector containing 'tau' values at which to solve FRiSO problem.
+#' @param lambda_init An optional (`p` \eqn{\times} `1`) vector giving the initial 'allowance vector' lambda for FRiSO algorithm (default `NULL`); will be scaled to sit on tau-simplex for first entry of `tauseq`.
+#' @param eps A non-negative error tolerance parameter (default `1e-5`).
+#' @param nudge A non-negative numeric scalar to offset warm starts to avoid spurious boundary values (default `0`).
+#' @param alpha A non-negative dampening parameter (default `0.9`).
+#' @param maxIter An integer giving the maximum number of iterations for the algorithm to run (default `1000`).
+#' @param max_theta A step-size scalar parameter no larger than `pi / 4` (default `pi / 4`).
 #' @param impulse A scalar between `0` and `1` which controls the "impulse" in gradient descent with momentum (default `1`). `impulse` equal to `1` means no momentum and `impulse <1` means with momentum.
 #'
-#' @return A p by length(tauseq) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
+#' @return A (`p` \eqn{\times} `length(tauseq)`) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
 #' @export
 #'
 #' @examples

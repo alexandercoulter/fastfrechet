@@ -99,7 +99,7 @@ frechetreg_univar2wass = function(X,
                          
                          S = svd(Xc)
                          g = S$d > 1e-10
-                         return(list(S$v[ , g], crossprod(S$v[ , g], crossprod(Xc, Y)) / (S$d[g]^2)))
+                         return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g]^2)))
 
                        })
           
@@ -115,7 +115,7 @@ frechetreg_univar2wass = function(X,
                          
                          S = svd(crossprod(Xc))
                          g = S$d > 1e-10
-                         return(list(S$v[ , g], crossprod(S$v[ , g], crossprod(Xc, Y)) / (S$d[g])))
+                         return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g])))
                          
                        })
           
@@ -209,7 +209,7 @@ frechetreg_univar2wass = function(X,
           g = S$d > 1e-10
           
           # Evaluate UU'Y, ordering the multiplication based on n > m:
-          M = if(n > m) S$u[ , g] %*% crossprod(S$u[ , g], Y) else tcrossprod(S$u[ , g]) %*% Y
+          M = if(n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
           
           # Calculate Yhat:
           Yhat = rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
@@ -225,7 +225,7 @@ frechetreg_univar2wass = function(X,
                          g = S$d > 1e-10
                          
                          # Evaluate UU'Y, ordering the multiplication based on n > m:
-                         if(n > m) S$u[ , g] %*% crossprod(S$u[ , g], Y) else tcrossprod(S$u[ , g]) %*% Y
+                         if(n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
                          
                        })
           

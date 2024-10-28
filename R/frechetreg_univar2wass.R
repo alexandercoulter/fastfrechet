@@ -103,9 +103,18 @@ frechetreg_univar2wass = function(X,
 
                        })
           
-          # Calculate Yhat, preferring to first multiply Z by the right
-          # singular vector matrix V[ , g] under the assumption n ~ nz:
-          Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + (Zc %*% M[[1]]) %*% M[[2]]
+          if(!is.list(M)){
+            
+            # Calculate Yhat:
+            Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% M
+            
+          } else {
+            
+            # Calculate Yhat, preferring to first multiply Z by the right
+            # singular vector matrix V[ , g] under the assumption n ~ nz:
+            Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + (Zc %*% M[[1]]) %*% M[[2]]
+            
+          }
           
         } else {
           
@@ -119,10 +128,19 @@ frechetreg_univar2wass = function(X,
                          
                        })
           
-          # Calculate Yhat, preferring to first multiply the matrices from M's
-          # output under the assumption n ~ nz:
-          Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% (M[[1]] %*% M[[2]])
-          
+          if(!is.list(M)){
+            
+            # Calculate Yhat:
+            Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% M
+            
+          } else {
+            
+            # Calculate Yhat, preferring to first multiply the matrices from
+            # M's output under the assumption n ~ nz:
+            Yhat = rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% (M[[1]] %*% M[[2]])
+            
+          }
+
         }
         
       } else {

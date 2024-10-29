@@ -1,7 +1,7 @@
 #' Fréchet Ridge Selection Operator (FRiSO)
 #' 
 #' @description
-#' A short description...
+#' This function calculates the Fréchet Ridge Selection Operator (FRiSO; Tucker et al. 2023), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. This implements with the geodesic gradient descent method of Coulter et al. (2024). Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced `m`-grid in (0, 1). Options include user-specified total penalty "tauseq", which can take a vector input (recommended decreasing sequence) where FRiSO is solved at each entry with warm starts; initial sparsity vector; box constraints; and gradient descent tuning parameters, including adjustable impulse parameter to utilize gradient descent with momentum.
 #' 
 #'
 #' @inheritParams frechetreg_univar2wass
@@ -10,7 +10,7 @@
 #' @param eps A non-negative error tolerance parameter (default `1e-5`).
 #' @param nudge A non-negative numeric scalar to offset warm starts to avoid spurious boundary values (default `0`).
 #' @param alpha A non-negative dampening parameter (default `0.9`).
-#' @param maxIter An integer giving the maximum number of iterations for the algorithm to run (default `1000`).
+#' @param max_iter An integer giving the maximum number of iterations for the algorithm to run (default `1000`).
 #' @param max_theta A step-size scalar parameter no larger than `pi / 4` (default `pi / 4`).
 #' @param impulse A scalar between `0` and `1` which controls the "impulse" in gradient descent with momentum (default `1`). `impulse` equal to `1` means no momentum and `impulse <1` means with momentum.
 #'
@@ -27,7 +27,7 @@ FRiSO_univar2wass = function(X,
                              eps = 1e-5,
                              nudge = 0,
                              alpha = 0.9,
-                             maxIter = 1000,
+                             max_iter = 1000,
                              max_theta = pi / 4,
                              impulse = 1.0){
   
@@ -57,7 +57,7 @@ FRiSO_univar2wass = function(X,
                     alpha = alpha,
                     nudge = nudge * tauseq,
                     eps = eps,
-                    maxIter = as.integer(maxIter),
+                    max_iter = as.integer(max_iter),
                     max_theta = max_theta,
                     impulse = impulse)
   

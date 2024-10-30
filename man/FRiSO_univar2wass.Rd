@@ -14,7 +14,7 @@ FRiSO_univar2wass(
   eps = 1e-05,
   nudge = 0,
   alpha = 0.9,
-  maxIter = 1000,
+  max_iter = 1000,
   max_theta = pi/4,
   impulse = 1
 )
@@ -38,7 +38,7 @@ FRiSO_univar2wass(
 
 \item{alpha}{A non-negative dampening parameter (default \code{0.9}).}
 
-\item{maxIter}{An integer giving the maximum number of iterations for the algorithm to run (default \code{1000}).}
+\item{max_iter}{An integer giving the maximum number of iterations for the algorithm to run (default \code{1000}).}
 
 \item{max_theta}{A step-size scalar parameter no larger than \code{pi / 4} (default \code{pi / 4}).}
 
@@ -48,5 +48,10 @@ FRiSO_univar2wass(
 A (\code{p} \eqn{\times} \code{length(tauseq)}) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
 }
 \description{
-A short description...
+This function calculates the Fréchet Ridge Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. This implements with the geodesic gradient descent method of \insertCite{coulter_fast_2024}{fastfrechet}. Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced \code{m}-grid in (0, 1). Options include user-specified total penalty "tauseq", which can take a vector input (recommended decreasing sequence) where FRiSO is solved at each entry with warm starts; initial sparsity vector; box constraints; and gradient descent tuning parameters, including adjustable impulse parameter to utilize gradient descent with momentum.
+}
+\references{
+\insertRef{coulter_fast_2024}{fastfrechet}
+
+\insertRef{tucker_variable_2023}{fastfrechet}
 }

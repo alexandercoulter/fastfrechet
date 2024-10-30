@@ -33,5 +33,12 @@ frechetreg_univar2wass(
 \item{skip_checks}{An optional logical argument (default \code{FALSE}). When \code{TRUE} compatibility and dimension checks are skipped.}
 }
 \description{
-This function calculates global Fréchet regression mean objects (Petersen et al. 2019), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced \code{m}-grid in (0, 1). Options for user-specified output covariate matrix, generalized ridge sparsity vector (Tucker et al. 2023), and box constraints. The Fréchet regression problem in this context is reducible to a quadratic programming problem; the workhorse of this function is a custom active set method based on Arnström et al. 2022.
+This function calculates global Fréchet regression mean objects \insertCite{petersen_frechet_2019}{fastfrechet}, for the space of univariate distribution responses equipped with the 2-Wasserstein metric. Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced \code{m}-grid in (0, 1). Options include user-specified output covariate matrix, generalized ridge sparsity vector \insertCite{tucker_variable_2023}{fastfrechet}, and box constraints. The Fréchet regression problem in this context is reducible to a quadratic programming problem; the workhorse of this function is a custom active set method based on \insertCite{arnstrom_dual_2022}{fastfrechet}.
+}
+\references{
+\insertRef{arnstrom_dual_2022}{fastfrechet}
+
+\insertRef{petersen_frechet_2019}{fastfrechet}
+
+\insertRef{tucker_variable_2023}{fastfrechet}
 }

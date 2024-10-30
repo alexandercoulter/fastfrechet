@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_zinbinom_qf.R
 \name{generate_zinbinom_qf}
 \alias{generate_zinbinom_qf}
-\title{Title}
+\title{Generate Random Zero-Inflated Negative Binomial Quantile Functions}
 \usage{
 generate_zinbinom_qf(n, p, m, zero_inflation = 0.2, prob = 0.5, size = 10)
 }
@@ -20,5 +20,8 @@ generate_zinbinom_qf(n, p, m, zero_inflation = 0.2, prob = 0.5, size = 10)
 \item{size}{}
 }
 \description{
-Title
+This function generates random zero-inflated negative binomial (zinbinom) quantile functions, as functions of covariates X1, X2, X3, and X4. Quantile functions are generated from \code{X} parameters as in Experiment B in \insertCite{coulter_fast_2024}{fastfrechet}, and are evaluated on a common, equally spaced \code{m}-grid in (0, 1). Options include number of samples (covariate vectors, and response quantile functions), number of total covariates (at least 4; generated iid from N(0, 1)), grid density \code{m}, and baseline zinbinom parameters.
+}
+\references{
+\insertRef{coulter_fast_2024}{fastfrechet}
 }

@@ -14,6 +14,12 @@
 #' @param max_theta A step-size scalar parameter no larger than `pi / 4` (default `pi / 4`).
 #' @param impulse A scalar between `0` and `1` which controls the "impulse" in gradient descent with momentum (default `1`). `impulse` equal to `1` means no momentum and `impulse <1` means with momentum.
 #'
+#'
+#' @references 
+#' \insertRef{coulter_fast_2024}{fastfrechet}
+#' 
+#' \insertRef{tucker_variable_2023}{fastfrechet}
+#' 
 #' @return A (`p` \eqn{\times} `length(tauseq)`) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
 #' @export
 #'

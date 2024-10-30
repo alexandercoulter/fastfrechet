@@ -9,7 +9,10 @@
 #' @param zero_inflation 
 #' @param prob 
 #' @param size 
-#'
+#' 
+#' @references 
+#' \insertRef{coulter_fast_2024}{fastfrechet}
+#' 
 #' @return
 #' @import stats
 #' @export

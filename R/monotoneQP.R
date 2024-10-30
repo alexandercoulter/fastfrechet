@@ -12,14 +12,15 @@
 #'  decompositions and other costly matrix product operations.
 #'
 #' @param Y 
-#' @param lower 
-#' @param upper 
+#' @param lower An optional numeric scalar (default `-Inf`) lower box constraint;
+#'  must be less than or equal to `upper`.
+#' @param upper An optional numeric scalar (default `Inf`) upper box constraint;
+#'  must be greater than or equal to `lower`.
 #' @param eps tolerance level
 #' 
 #' @references 
 #' \insertRef{arnstrom_dual_2022}{fastfrechet}
 #' 
-#'
 #' @return
 #' @export
 #'

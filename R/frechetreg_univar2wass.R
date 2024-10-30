@@ -13,6 +13,14 @@
 #' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
 #' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are skipped.
 #'
+#' @references 
+#' \insertRef{arnstrom_dual_2022}{fastfrechet}
+#' 
+#' \insertRef{petersen_frechet_2019}{fastfrechet}
+#' 
+#' \insertRef{tucker_variable_2023}{fastfrechet}
+#' 
+#' 
 #'
 #' @return
 #' @export

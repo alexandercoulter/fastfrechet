@@ -7,6 +7,10 @@
 #' @param lower 
 #' @param upper 
 #' @param eps tolerance level
+#' 
+#' @references 
+#' \insertRef{arnstrom_dual_2022}{fastfrechet}
+#' 
 #'
 #' @return
 #' @export

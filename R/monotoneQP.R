@@ -1,7 +1,7 @@
 #' R Wrapper for Custom QP Solver for Nearest Empirical Quantile Function in Frobenius Norm
 #' 
 #' @description
-#' This function wraps an Rcpp implementation of a custom active set method for solving a specific quadratic programming (QP) problem, of finding the nearest vector in Frobenius norm to an input vector, with the constraints that the output vector should be monotone non-decreasing across its entries, and obey user-specified box constraints. The function permits a matrix input, where this QP problem is solved row-wise. Implementation is based on the dual-active set method of Arnström et al. 2022, taking advantage of simplifications in this setting which avoid LDL' decompositions and other costly matrix product operations.
+#' This function wraps an Rcpp implementation of a custom active set method for solving a specific quadratic programming (QP) problem, of finding the nearest vector in Frobenius norm to an input vector, with the constraints that the output vector should be monotone non-decreasing across its entries, and obey user-specified box constraints. The function permits a matrix input, where this QP problem is solved row-wise. Implementation is based on the dual-active set method of \insertCite{arnstrom_dual_2022}{fastfrechet}, taking advantage of simplifications in this setting which avoid LDL' decompositions and other costly matrix product operations.
 #'
 #' @param Y 
 #' @param lower 

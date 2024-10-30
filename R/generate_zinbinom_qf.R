@@ -1,5 +1,8 @@
-#' Title
+#' Generate Random Zero-Inflated Negative Binomial Quantile Functions
 #'
+#' @description
+#' This function generates random zero-inflated negative binomial (zinbinom) quantile functions, as functions of covariates X1, X2, X3, and X4. Quantile functions are generated from `X` parameters as in Experiment B in Coulter et al. (2024), and are evaluated on a common, equally spaced `m`-grid in (0, 1). Options include number of samples (covariate vectors, and response quantile functions), number of total covariates (at least 4; generated iid from N(0, 1)), grid density `m`, and baseline zinbinom parameters.
+#' 
 #' @param n 
 #' @param p 
 #' @param m 

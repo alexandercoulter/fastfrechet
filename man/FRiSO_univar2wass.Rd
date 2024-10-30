@@ -22,7 +22,8 @@ FRiSO_univar2wass(
 \arguments{
 \item{X}{A \verb{(n x p)} "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{A \verb{(n x m)} matrix of observed quantile functions, row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
+\item{Y}{A \verb{(n x m)} matrix of observed quantile functions, row-wise monotone non-decreasing.
+Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
 \item{lower}{An optional numeric scalar (default \code{-Inf}) lower box constraint; must be strictly less than \code{upper}.}
 

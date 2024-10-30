@@ -18,11 +18,13 @@ frechetreg_univar2wass(
 \arguments{
 \item{X}{A \verb{(n x p)} "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{A \verb{(n x m)} matrix of observed quantile functions, row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
+\item{Y}{A \verb{(n x m)} matrix of observed quantile functions, row-wise monotone non-decreasing.
+Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
 \item{Z}{An optional \verb{(z x p)} "output" covariate matrix (default \code{NULL}) with no missing, all finite entries.}
 
-\item{lambda}{An optional \verb{(p x 1)} vector with non-negative entries whose sum is strictly positive.}
+\item{lambda}{An optional \verb{(p x 1)} vector with non-negative entries whose sum is strictly positive.
+If \code{NULL} a non-regularized regression is performed (the default).}
 
 \item{lower}{An optional numeric scalar (default \code{-Inf}) lower box constraint; must be strictly less than \code{upper}.}
 
@@ -33,7 +35,16 @@ frechetreg_univar2wass(
 \item{skip_checks}{An optional logical argument (default \code{FALSE}). When \code{TRUE} compatibility and dimension checks are skipped.}
 }
 \description{
-This function calculates global Fréchet regression mean objects \insertCite{petersen_frechet_2019}{fastfrechet}, for the space of univariate distribution responses equipped with the 2-Wasserstein metric. Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced \code{m}-grid in (0, 1). Options include user-specified output covariate matrix, generalized ridge sparsity vector \insertCite{tucker_variable_2023}{fastfrechet}, and box constraints. The Fréchet regression problem in this context is reducible to a quadratic programming problem; the workhorse of this function is a custom active set method based on \insertCite{arnstrom_dual_2022}{fastfrechet}.
+\code{frechetreg_univar2wass()} calculates global Fréchet regression mean
+objects \insertCite{petersen_frechet_2019}{fastfrechet},
+for the space of univariate distribution responses equipped
+with the 2-Wasserstein metric. Observed distributions are assumed
+to be quantile functions evaluated on a common, equally spaced \code{m}-grid
+in (0, 1). Options include user-specified output covariate matrix,
+generalized ridge sparsity vector \insertCite{tucker_variable_2023}{fastfrechet},
+and box constraints. The Fréchet regression problem in this context is reducible
+to a quadratic programming problem; the workhorse of this function is a custom
+active set method based on \insertCite{arnstrom_dual_2022}{fastfrechet}.
 }
 \references{
 \insertRef{arnstrom_dual_2022}{fastfrechet}

@@ -24,7 +24,7 @@
 #' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
 #' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are skipped.
 #'
-#' @return An `(n x m)` matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
+#' @return A `(n x m)` matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
 #'  The solution has rows that are monotone decreasing that are bounded between the `lower` and `upper` arguments.
 #' 
 #' @references 

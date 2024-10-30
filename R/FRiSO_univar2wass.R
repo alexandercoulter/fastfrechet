@@ -1,7 +1,7 @@
 #' Fréchet Ridge Selection Operator (FRiSO)
 #' 
 #' @description
-#' This function calculates the Fréchet Ridge Selection Operator (FRiSO; Tucker et al. 2023), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. This implements with the geodesic gradient descent method of Coulter et al. (2024). Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced `m`-grid in (0, 1). Options include user-specified total penalty "tauseq", which can take a vector input (recommended decreasing sequence) where FRiSO is solved at each entry with warm starts; initial sparsity vector; box constraints; and gradient descent tuning parameters, including adjustable impulse parameter to utilize gradient descent with momentum.
+#' This function calculates the Fréchet Ridge Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. This implements with the geodesic gradient descent method of \insertCite{coulter_fast_2024}{fastfrechet}. Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced `m`-grid in (0, 1). Options include user-specified total penalty "tauseq", which can take a vector input (recommended decreasing sequence) where FRiSO is solved at each entry with warm starts; initial sparsity vector; box constraints; and gradient descent tuning parameters, including adjustable impulse parameter to utilize gradient descent with momentum.
 #' 
 #'
 #' @inheritParams frechetreg_univar2wass

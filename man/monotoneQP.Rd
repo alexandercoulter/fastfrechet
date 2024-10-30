@@ -7,16 +7,31 @@
 monotoneQP(Y, lower = -Inf, upper = Inf, eps = 1e-10)
 }
 \arguments{
-\item{Y}{}
+\item{Y}{A numeric vector or matrix.}
 
-\item{lower}{}
+\item{lower}{An optional numeric scalar (default \code{-Inf}) lower box constraint;
+must be less than or equal to \code{upper}.}
 
-\item{upper}{}
+\item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint;
+must be greater than or equal to \code{lower}.}
 
-\item{eps}{tolerance level}
+\item{eps}{tolerance level (default \code{1e-10}).}
+}
+\value{
+A list with components:
+* Lagrange_Multiplier
+* Solution
 }
 \description{
-This function wraps an Rcpp implementation of a custom active set method for solving a specific quadratic programming (QP) problem, of finding the nearest vector in Frobenius norm to an input vector, with the constraints that the output vector should be monotone non-decreasing across its entries, and obey user-specified box constraints. The function permits a matrix input, where this QP problem is solved row-wise. Implementation is based on the dual-active set method of \insertCite{arnstrom_dual_2022}{fastfrechet}, taking advantage of simplifications in this setting which avoid LDL' decompositions and other costly matrix product operations.
+\code{monotoneQP()} wraps an \link{Rcpp} implementation of a custom active set method for
+solving a specific quadratic programming (QP) problem, of finding the nearest
+vector in Frobenius norm to an input vector, with the constraints that the
+output vector should be monotone non-decreasing across its entries,
+and obey user-specified box constraints. The function permits a matrix input,
+where this QP problem is solved row-wise. Implementation is based on the
+dual-active set method of \insertCite{arnstrom_dual_2022}{fastfrechet},
+taking advantage of simplifications in this setting which avoid LDL'
+decompositions and other costly matrix product operations.
 }
 \references{
 \insertRef{arnstrom_dual_2022}{fastfrechet}

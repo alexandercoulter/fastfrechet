@@ -34,6 +34,10 @@ If \code{NULL} a non-regularized regression is performed (the default).}
 
 \item{skip_checks}{An optional logical argument (default \code{FALSE}). When \code{TRUE} compatibility and dimension checks are skipped.}
 }
+\value{
+A \verb{(n x m)} matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
+The solution has rows that are monotone decreasing that are bounded between the \code{lower} and \code{upper} arguments.
+}
 \description{
 \code{frechetreg_univar2wass()} calculates global Fréchet regression mean
 objects \insertCite{petersen_frechet_2019}{fastfrechet},

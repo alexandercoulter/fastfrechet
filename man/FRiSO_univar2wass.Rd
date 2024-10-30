@@ -29,27 +29,46 @@ Entries must obey user-specified box constraints given by \code{lower} and \code
 
 \item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint; must be strictly greater than \code{lower}.}
 
-\item{tauseq}{A (\code{p} \eqn{\times} \code{1}) vector containing 'tau' values at which to solve FRiSO problem.}
+\item{tauseq}{A (\code{p} \eqn{\times} \code{1}) vector containing 'tau' values at
+which to solve FRiSO problem.}
 
-\item{lambda_init}{An optional (\code{p} \eqn{\times} \code{1}) vector giving the initial 'allowance vector' lambda for FRiSO algorithm (default \code{NULL}); will be scaled to sit on tau-simplex for first entry of \code{tauseq}.}
+\item{lambda_init}{An optional (\code{p} \eqn{\times} \code{1}) vector giving the
+initial allowance vector' lambda for FRiSO algorithm (default \code{NULL});
+will be scaled to sit on tau-simplex for first entry of \code{tauseq}.}
 
 \item{eps}{A non-negative error tolerance parameter (default \code{1e-5}).}
 
-\item{nudge}{A non-negative numeric scalar to offset warm starts to avoid spurious boundary values (default \code{0}).}
+\item{nudge}{A non-negative numeric scalar to offset warm starts to avoid
+spurious boundary values (default \code{0}).}
 
 \item{alpha}{A non-negative dampening parameter (default \code{0.9}).}
 
-\item{max_iter}{An integer giving the maximum number of iterations for the algorithm to run (default \code{1000}).}
+\item{max_iter}{An integer giving the maximum number of iterations for the
+algorithm to run (default \code{1000}).}
 
-\item{max_theta}{A step-size scalar parameter no larger than \code{pi / 4} (default \code{pi / 4}).}
+\item{max_theta}{A step-size scalar parameter no larger than \code{pi / 4}
+(default \code{pi / 4}).}
 
-\item{impulse}{A scalar between \code{0} and \code{1} which controls the "impulse" in gradient descent with momentum (default \code{1}). \code{impulse} equal to \code{1} means no momentum and \code{impulse <1} means with momentum.}
+\item{impulse}{A scalar between \code{0} and \code{1} which controls the "impulse" in
+gradient descent with momentum (default \code{1}). \code{impulse} equal to \code{1} means
+no momentum and \code{impulse <1} means with momentum.}
 }
 \value{
-A (\code{p} \eqn{\times} \code{length(tauseq)}) matrix column-wise containing fitted 'allowance vectors' lambda per 'tau' in tauseq.
+A (\code{p} \eqn{\times} \code{length(tauseq)}) matrix column-wise containing
+fitted 'allowance vectors' lambda per 'tau' in \code{tauseq}.
 }
 \description{
-This function calculates the Fréchet Ridge Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. This implements with the geodesic gradient descent method of \insertCite{coulter_fast_2024}{fastfrechet}. Observed distributions are assumed to be quantile functions evaluated on a common, equally spaced \code{m}-grid in (0, 1). Options include user-specified total penalty "tauseq", which can take a vector input (recommended decreasing sequence) where FRiSO is solved at each entry with warm starts; initial sparsity vector; box constraints; and gradient descent tuning parameters, including adjustable impulse parameter to utilize gradient descent with momentum.
+This function calculates the Fréchet Ridge Selection Operator
+(FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}), for the space of
+univariate distribution responses equipped with the 2-Wasserstein metric.
+This implements with the geodesic gradient descent method of
+\insertCite{coulter_fast_2024}{fastfrechet}. Observed distributions are
+assumed to be quantile functions evaluated on a common, equally spaced
+\code{m}-grid in \eqn{(0, 1)}. Options include user-specified total penalty \code{tauseq},
+which can take a vector input (recommended decreasing sequence) where FRiSO
+is solved at each entry with warm starts; initial sparsity vector; box
+constraints; and gradient descent tuning parameters, including adjustable
+impulse parameter to utilize gradient descent with momentum.
 }
 \references{
 \insertRef{coulter_fast_2024}{fastfrechet}

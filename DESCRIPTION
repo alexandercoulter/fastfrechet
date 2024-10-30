@@ -21,3 +21,7 @@ Imports:
     Rcpp,
     stats,
     Rdpack
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

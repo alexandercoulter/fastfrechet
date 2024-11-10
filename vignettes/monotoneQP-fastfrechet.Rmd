@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 library(fastfrechet)
 ```
 
+## Background
+
 The Fréchet mean problem for univariate distribution responses equipped with the
 2-Wasserstein metric is an orthogonal projection problem. In the sample setting
 where distribution responses are represented by quantile functions
@@ -41,10 +43,71 @@ $$
    0 &  0 &  0 &  0 & \cdots &  0 & +1 & -1
 \end{pmatrix}.
 $$
-The final vector $\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e.
-$q_i \leq q_j$ for $i \leq j$) and obeys the same box constraints as
-$\mathbf{y}$. This is a quadratic programming (QP) problem, for which several
-approaches and solvers exist. We introduce a modification of the dual active
-set method of Arnström et al. (2022) which takes advantage of the structure of
-$\mathbf{A}$ to avoid costly matrix multiplication and $LDL^{\top}$
-decomposition steps.
+(Note two important facts about $\mathbf{A}$: first, $\mathbf{A}$ is full
+row-rank, but not full column rank; second, any sub-matrix of $\mathbf{A}$
+defined by taking a strict subset of its columns is full column-rank.) The final
+vector $\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e. $q_i \leq q_j$
+for $i \leq j$) and obeys the same box constraints as $\mathbf{y}$. This is a
+quadratic programming (QP) problem, for which several approaches and solvers
+exist. We introduce a modification of the dual active set method of Arnström et
+al. (2022, Algorithm 1) which takes advantage of the structure of $\mathbf{A}$
+to avoid costly matrix multiplication and $LDL^{\top}$ decomposition steps. This
+algorithm is implemented in *C++* as a sub-routine in functions handling
+responses in this metric space, and is made available in its own *R* wrapper
+function `monotoneQP`.
+
+## Algorithm
+
+The dual active set algorithm of Arnström et al. (2022), given by their
+Algorithm 1, is for the more generalized QP problem. We translate it into our
+context with the following notation. Denote $[m] := \{1, \dots, m\}$, and let
+$\mathbf{d} := \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$. For iteration
+$k \geq 0$, let $W_k \subseteq \{1, \dots, m + 1\}$ be an index set in increasing order, and let $\bar{W}_k = [m+1] \setminus W_k$ be its
+similarly-ordered relative complement in $[m+1]$. Denote with $\mathbf{A}_k$ the
+sub-matrix of $\mathbf{A}$ consisting of the columns indexed by $W_k$ (when
+defined), and denote with $\bar{\mathbf{A}}_k$ the sub-matrix consisting of the
+remaining columns (also when defined). Similarly, let $\mathbf{d}_k$ be a vector
+consisting of the elements of $\mathbf{d}$ indexed by $W_k$, and
+$\bar{\mathbf{d}}_k$ be a vector consisting of the remaining elements.
+
+### Iteratively updated algorithm variables
+
+* $\pmb{\eta}_k \rightarrow \pmb{\eta}^* \in \mathbb{R}^{m+1}$, the Lagrange
+multiplier associated with the primal monotone QP problem.
+* $\pmb{\mu}_k \rightarrow \pmb{\mu}^* \in \mathbb{R}^{m+1}$, the Lagrange
+multiplier associated with the dual problem to the monotone QP problem.
+* $W_k$ ($\bar{W}_k$), the working index set identifying which entries of $\pmb{\eta}_k$ may be positive (must be zero).
+
+### The algorithm
+
+0. Initialize $k=0$, $\mathbf{d} = \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$,
+$\pmb{\eta}_0 = \pmb{0}_{m+1}$, $W_0 = \emptyset$, $\pmb{\mu}_0 =\pmb{0}_{m+1}$,
+and $\mathbf{exit} = \verb+false+$.
+1. **while** !$\mathbf{exit}$ **do**
+    + **if** $W_k \neq [m + 1]$ **then**
+        * $[\tilde{\pmb{\eta}}_k]_{W_k} \leftarrow$ solution to $\mathbf{A}_k^{\top}\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} = - \mathbf{d}_k$.
+        * **if** $\tilde{\pmb{\eta}}_k \geq \pmb{0}$ **then**
+            - $[\pmb{\mu}_k]_{\bar{W}_k} \leftarrow \bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$.
+            - $\pmb{\eta}_{k+1} \leftarrow \tilde{\pmb{\eta}}_k$.
+            - **if** $\pmb{\mu}_k \geq \pmb{0}$ **then**
+                + $\mathbf{exit} \leftarrow \verb+true+$.
+            - **else**
+                + $j \leftarrow \mathrm{arg\:min}_{i \in \bar{W}_k} [\pmb{\mu}_k]_i$.
+                + $W_{k+1} \leftarrow \mathrm{sort}(W_k \cup \{j\})$.
+                + $\bar{W}_{k+1} \leftarrow \bar{W}_k \setminus \{j\}$.
+        * **else**
+            - $\mathbf{p}_k \leftarrow \tilde{\pmb{\eta}}_k - \pmb{\eta}_k$.
+            - $B \leftarrow \{i \in W_k : [\tilde{\pmb{\eta}}_k]_i < 0\}$.
+            - $j \leftarrow \mathrm{arg\:min}_{i \in B} -\frac{[\pmb{\eta}_k]_i}{[\mathbf{p}]_i}$.
+            - $W_{k+1} \leftarrow W_k \setminus \{j\}$.
+            - $\bar{W}_{k+1} \leftarrow \mathrm{sort}(\bar{W}_k \cup \{j\})$.
+            - $\pmb{\eta}_{k+1} \leftarrow \pmb{\eta}_k - \frac{[\pmb{\eta}_k]_j}{[\mathbf{p}_k]_j} \cdot \mathbf{p}_k$.
+    + **else**
+        * $\mathbf{p}_k \leftarrow$ solution to $\mathbf{A}\mathbf{A}^{\top}\mathbf{p}_k = \pmb{0}$, subject to $\mathbf{p}_k^{\top}\mathbf{d} < 0$.
+        * $B \leftarrow \{i : [\mathbf{p}_k]_i < 0\}$.
+        * $j \leftarrow \mathrm{arg\:min}_{i \in B} -\frac{[\pmb{\eta}_k]_i}{[\mathbf{p}_k]_i}$.
+        * $W_{k+1} \leftarrow W_k \setminus \{j\}$.
+        * $\bar{W}_{k+1} \leftarrow \mathrm{sort}(\bar{W}_k \cup \{j\})$.
+        * $\pmb{\eta}_{k+1} \leftarrow \pmb{\eta}_k - \frac{[\pmb{\eta}_k]_j}{[\mathbf{p}_k]_j} \cdot \mathbf{p}_k$.
+    + $k \leftarrow k + 1$.
+2. $W \leftarrow W_k$, $\pmb{\eta}^* \leftarrow \pmb{\eta}_k$, and $\widehat{\mathbf{q}} \leftarrow \mathbf{y} + \mathbf{A}_W\pmb{\eta}^*_W$.

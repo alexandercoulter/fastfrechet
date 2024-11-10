@@ -18,3 +18,33 @@ knitr::opts_chunk$set(
 library(fastfrechet)
 ```
 
+The Fréchet mean problem for univariate distribution responses equipped with the
+2-Wasserstein metric is an orthogonal projection problem. In the sample setting
+where distribution responses are represented by quantile functions
+$\mathbf{y} \in \mathbb{R}^m$ evaluated on a discrete uniform $m$-grid in
+$(0, 1)$ and obeying box constraints $y_j \in [b_L, b_U] \subseteq \mathbb{R}$,
+the Fréchet mean problem can be written
+$$
+\widehat{\mathbf{q}} := \mathrm{arg\:min}_{\mathbf{q} \in \mathbb{R}^m} \lVert{\mathbf{q} - \mathbf{y}} \rVert_F^2, \qquad \mathbf{b} - \mathbf{A}^{\top}\mathbf{q} \leq \pmb{0}_{m+1},
+$$
+where $\mathbf{b}^{\top} = \begin{pmatrix} b_L & \pmb{0}_{m-1}^{\top} & -b_U\end{pmatrix} \in \mathbb{R}^{m+1}$, and
+$\mathbf{A} \in \mathbb{R}^{m\times(m+1)}$ is a first-difference matrix of the
+form
+$$
+\mathbf{A} = \begin{pmatrix}
+  +1 & -1 &  0 &  0 & \cdots &  0 &  0 &  0 \\
+   0 & +1 & -1 &  0 & \cdots &  0 &  0 &  0 \\
+   0 &  0 & +1 & -1 & \cdots &  0 &  0 &  0 \\
+   0 &  0 &  0 & +1 & \cdots &  0 &  0 &  0 \\
+   \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
+   0 &  0 &  0 &  0 & \cdots & +1 & -1 &  0 \\
+   0 &  0 &  0 &  0 & \cdots &  0 & +1 & -1
+\end{pmatrix}.
+$$
+The final vector $\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e.
+$q_i \leq q_j$ for $i \leq j$) and obeys the same box constraints as
+$\mathbf{y}$. This is a quadratic programming (QP) problem, for which several
+approaches and solvers exist. We introduce a modification of the dual active
+set method of Arnström et al. (2022) which takes advantage of the structure of
+$\mathbf{A}$ to avoid costly matrix multiplication and $LDL^{\top}$
+decomposition steps.

@@ -1,8 +1,8 @@
 ---
-title: "Overview of Dual Active Set Method for monotoneQP"
+title: "Overview of Dual Active-Set Method for monotoneQP"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Overview of Dual Active Set Method for monotoneQP}
+  %\VignetteIndexEntry{Overview of Dual Active-Set Method for monotoneQP}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,15 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(fastfrechet)
-```
-
 ## Background
 
-The Fréchet mean problem for univariate distribution responses equipped with the
-2-Wasserstein metric is an orthogonal projection problem. In the sample setting
-where distribution responses are represented by quantile functions
+This vignette details the mathematical foundation of the custom dual active-set
+method we implement to solve the Fréchet mean problem for univariate
+distribution responses equipped with the 2-Wasserstein metric. In the
+"population setting", this is an orthogonal projection problem. In the "sample
+setting" where distribution responses are represented by quantile functions
 $\mathbf{y} \in \mathbb{R}^m$ evaluated on a discrete uniform $m$-grid in
 $(0, 1)$ and obeying box constraints $y_j \in [b_L, b_U] \subseteq \mathbb{R}$,
 the Fréchet mean problem can be written
@@ -43,26 +41,24 @@ $$
    0 &  0 &  0 &  0 & \cdots &  0 & +1 & -1
 \end{pmatrix}.
 $$
-(Note two important facts about $\mathbf{A}$: first, $\mathbf{A}$ is full
-row-rank, but not full column rank; second, any sub-matrix of $\mathbf{A}$
-defined by taking a strict subset of its columns is full column-rank.) The final
-vector $\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e. $q_i \leq q_j$
-for $i \leq j$) and obeys the same box constraints as $\mathbf{y}$. This is a
-quadratic programming (QP) problem, for which several approaches and solvers
-exist. We introduce a modification of the dual active set method of Arnström et
-al. (2022, Algorithm 1) which takes advantage of the structure of $\mathbf{A}$
-to avoid costly matrix multiplication and $LDL^{\top}$ decomposition steps. This
-algorithm is implemented in *C++* as a sub-routine in functions handling
-responses in this metric space, and is made available in its own *R* wrapper
-function `monotoneQP`.
+The final vector $\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e.
+$q_i \leq q_j$ for $i \leq j$) and obeys the same box constraints as
+$\mathbf{y}$. This is a quadratic programming (QP) problem, for which several
+approaches and solvers exist. We introduce a modification of the dual active-set
+method of Arnström et al. (2022, Algorithm 1) which utilizes the structure of
+$\mathbf{A}$ to avoid costly matrix multiplication and $LDL^{\top}$
+decomposition steps. This algorithm is implemented in *C++* as a sub-routine in
+functions handling responses in this metric space, and is made available in its
+own *R* wrapper function `monotoneQP`.
 
 ## Algorithm
 
-The dual active set algorithm of Arnström et al. (2022), given by their
+The dual active-set algorithm of Arnström et al. (2022), given by their
 Algorithm 1, is for the more generalized QP problem. We translate it into our
 context with the following notation. Denote $[m] := \{1, \dots, m\}$, and let
 $\mathbf{d} := \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$. For iteration
-$k \geq 0$, let $W_k \subseteq \{1, \dots, m + 1\}$ be an index set in increasing order, and let $\bar{W}_k = [m+1] \setminus W_k$ be its
+$k \geq 0$, let $W_k \subseteq \{1, \dots, m + 1\}$ be an index set in
+increasing order, and let $\bar{W}_k = [m+1] \setminus W_k$ be its
 similarly-ordered relative complement in $[m+1]$. Denote with $\mathbf{A}_k$ the
 sub-matrix of $\mathbf{A}$ consisting of the columns indexed by $W_k$ (when
 defined), and denote with $\bar{\mathbf{A}}_k$ the sub-matrix consisting of the
@@ -70,7 +66,9 @@ remaining columns (also when defined). Similarly, let $\mathbf{d}_k$ be a vector
 consisting of the elements of $\mathbf{d}$ indexed by $W_k$, and
 $\bar{\mathbf{d}}_k$ be a vector consisting of the remaining elements.
 
-### Iteratively updated algorithm variables
+### The algorithm
+
+The following algorithm variables are updated each iteration.
 
 * $\pmb{\eta}_k \rightarrow \pmb{\eta}^* \in \mathbb{R}^{m+1}$, the Lagrange
 multiplier associated with the primal monotone QP problem.
@@ -78,14 +76,18 @@ multiplier associated with the primal monotone QP problem.
 multiplier associated with the dual problem to the monotone QP problem.
 * $W_k$ ($\bar{W}_k$), the working index set identifying which entries of $\pmb{\eta}_k$ may be positive (must be zero).
 
-### The algorithm
+The full Algorithm 1 from Arnström et al. (2022) is given below, with applicable
+variable substitutions for our context. We also take advantage of two important
+facts about $\mathbf{A}$: first, $\mathbf{A}$ is full row-rank, but not full
+column rank; second, any sub-matrix of $\mathbf{A}$ defined by taking a strict
+subset of its columns is full column-rank.
 
-0. Initialize $k=0$, $\mathbf{d} = \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$,
+1. Initialize $k=0$, $\mathbf{d} = \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$,
 $\pmb{\eta}_0 = \pmb{0}_{m+1}$, $W_0 = \emptyset$, $\pmb{\mu}_0 =\pmb{0}_{m+1}$,
 and $\mathbf{exit} = \verb+false+$.
-1. **while** !$\mathbf{exit}$ **do**
-    + **if** $W_k \neq [m + 1]$ **then**
-        * $[\tilde{\pmb{\eta}}_k]_{W_k} \leftarrow$ solution to $\mathbf{A}_k^{\top}\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} = - \mathbf{d}_k$.
+2. **while** !$\mathbf{exit}$ **do**
+    a. **if** $W_k \neq [m + 1]$ **then**
+        * $[\tilde{\pmb{\eta}}_k]_{W_k} \leftarrow -(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$.
         * **if** $\tilde{\pmb{\eta}}_k \geq \pmb{0}$ **then**
             - $[\pmb{\mu}_k]_{\bar{W}_k} \leftarrow \bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$.
             - $\pmb{\eta}_{k+1} \leftarrow \tilde{\pmb{\eta}}_k$.
@@ -102,12 +104,101 @@ and $\mathbf{exit} = \verb+false+$.
             - $W_{k+1} \leftarrow W_k \setminus \{j\}$.
             - $\bar{W}_{k+1} \leftarrow \mathrm{sort}(\bar{W}_k \cup \{j\})$.
             - $\pmb{\eta}_{k+1} \leftarrow \pmb{\eta}_k - \frac{[\pmb{\eta}_k]_j}{[\mathbf{p}_k]_j} \cdot \mathbf{p}_k$.
-    + **else**
-        * $\mathbf{p}_k \leftarrow$ solution to $\mathbf{A}\mathbf{A}^{\top}\mathbf{p}_k = \pmb{0}$, subject to $\mathbf{p}_k^{\top}\mathbf{d} < 0$.
+    b. **else**
+        * $\mathbf{p}_k \leftarrow$ solution to $\mathbf{A}^{\top}\mathbf{A}\mathbf{p}_k = \pmb{0}$, subject to $\mathbf{p}_k^{\top}\mathbf{d} < 0$.
         * $B \leftarrow \{i : [\mathbf{p}_k]_i < 0\}$.
         * $j \leftarrow \mathrm{arg\:min}_{i \in B} -\frac{[\pmb{\eta}_k]_i}{[\mathbf{p}_k]_i}$.
         * $W_{k+1} \leftarrow W_k \setminus \{j\}$.
         * $\bar{W}_{k+1} \leftarrow \mathrm{sort}(\bar{W}_k \cup \{j\})$.
         * $\pmb{\eta}_{k+1} \leftarrow \pmb{\eta}_k - \frac{[\pmb{\eta}_k]_j}{[\mathbf{p}_k]_j} \cdot \mathbf{p}_k$.
-    + $k \leftarrow k + 1$.
-2. $W \leftarrow W_k$, $\pmb{\eta}^* \leftarrow \pmb{\eta}_k$, and $\widehat{\mathbf{q}} \leftarrow \mathbf{y} + \mathbf{A}_W\pmb{\eta}^*_W$.
+    c. $k \leftarrow k + 1$.
+3. $W \leftarrow W_k$, $\pmb{\eta}^* \leftarrow \pmb{\eta}_k$, and $\widehat{\mathbf{q}} \leftarrow \mathbf{y} + \mathbf{A}_W\pmb{\eta}^*_W$.
+
+### Matrix Simplifications
+
+The implementation of the dual active-set method from Arnström et al. (2022)
+involves iterative updates of the $LDL^{\top}$ decomposition of the
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ matrix. The form of $\mathbf{A}$ allows us to
+avoid these decompositions entirely, and represent the matrix operations
+$-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$ and
+$\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$
+with a simpler set of subtraction operations. Further, in steps subsequent to
+2(b) above, the result is invariant to any choice of $\mathbf{p}_k$ satisfying
+the two given equations. The upshot is the matrix $\mathbf{A}$ does not need to
+be stored, nor do expressions involving it or its sub-matrices need to be
+evaluated explicitly. We give a brief overview of each simplification, but omit
+the complete details.
+
+#### Evaluating $-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$
+
+The matrix $\mathbf{A}^{\top}\mathbf{A}$ is tridiagonal of the form
+$$
+\mathbf{A}^{\top}\mathbf{A} = \begin{pmatrix}
+  +1 & -1 &  0 &  0 & \cdots &  0 &  0 &  0 \\
+  -1 & +2 & -1 &  0 & \cdots &  0 &  0 &  0 \\
+   0 & -1 & +2 & -1 & \cdots &  0 &  0 &  0 \\
+   0 &  0 & -1 & +2 & \cdots &  0 &  0 &  0 \\
+   \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
+   0 &  0 &  0 &  0 & \cdots & +2 & -1 &  0 \\
+   0 &  0 &  0 &  0 & \cdots & -1 & +2 & -1 \\
+   0 &  0 &  0 &  0 & \cdots &  0 & -1 & +1
+\end{pmatrix}.
+$$
+For $W_k \subset [m + 1]$ (strict subset), the matrix
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ comprises the entries at the intersections of
+the columns/rows indexed by $W_k$, and so is also tridiagonal with possibly
+isolated diagonal entries. We implement a solver which incrementally searches
+along the indices in $W_k$ to identify isolated diagonal entries in
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by indices $w \in W_k$ where
+$w+1 \notin W_k$ and $w-1\notin W_k$) where inversion reduces to a simple scalar
+division operation, or fully block tridiagonal entries in
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by sequences of indices
+$(w, w+1, \dots, w + s) \subset W_k$) where we apply a simplified Thomas
+algorithm that takes advantage of the nearly-unique diagonal entries of
+$\mathbf{A}^{\top}\mathbf{A}$.
+
+
+#### Evaluating $\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$
+
+As a preliminary matter, if $W_k = \emptyset$, we evaluate this expression to simply $\mathbf{d}$. For $W_k \notin \{\emptyset, [m+1]\}$, the matrix multiplication in the expression can be reduced to two steps:
+
+1. solving $\mathbf{u} \leftarrow \mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k}$, and
+2. solving $\mathbf{v} \leftarrow \bar{\mathbf{A}}_k^{\top} \mathbf{u}$.
+
+In each case, as $\mathbf{A}$ is a difference matrix, left-multiplication by
+$\mathbf{A}_k$ or by $\bar{\mathbf{A}}_k^{\top}$ involves taking scalar
+differences of appropriate entries in $\tilde{\pmb{\eta}}_k$ (dictated by
+$W_k$), or in $\mathbf{u}$ (dictated by $\bar{W}_k$), respectively.
+
+#### Evaluating $\mathbf{A}^{\top}\mathbf{A}\mathbf{p}_k = \pmb{0}$ subject to $\mathbf{p}_k^{\top}\mathbf{d} < 0$
+
+Recalling $\mathbf{A}$ is full row rank, if $\mathbf{A}^{\top}\mathbf{A}\mathbf{p}_k = \pmb{0}$ then we can see
+$$
+\mathbf{A} \mathbf{p}_k = (\mathbf{A}\mathbf{A}^{\top})^{-1}\mathbf{A}\pmb{0} = \pmb{0},
+$$
+implying (by the form of $\mathbf{A}$) that
+$[\mathbf{p}_k]_i = [\mathbf{p}_k]_{i+1}$ for all $i < m + 1$. But then
+$\mathbf{p}_k = p \cdot \pmb{1}$ for some $p$, and the constraint is now written
+$$
+\mathbf{p}^{\top}\mathbf{d} < 0 \quad \iff \quad p \cdot \pmb{1}^{\top}\mathbf{d} < 0.
+$$
+Note that
+$$
+\begin{align}
+\pmb{1}^{\top}\mathbf{d} &= \pmb{1}^{\top} \mathbf{A}^{\top} \mathbf{y} - \mathbf{1}^{\top}\mathbf{b} \\
+&= \pmb{0}^{\top}\mathbf{y} - (b_L - b_U) \\
+&= b_U - b_L,
+\end{align}
+$$
+so as long as the box constraints are valid—i.e. $b_L < b_U$—we have
+$\pmb{1}^{\top}\mathbf{d} > 0$ and thus $p < 0$. Fixing $p < 0$ then, we see
+$$
+\begin{align}
+B &\leftarrow [m+1] \\
+j &\leftarrow \mathrm{arg\:min}_i -\frac{[\pmb{\eta}_k]_i}{p} = \mathrm{arg\:min}_i [\pmb{\eta}_k]_i \\
+W_{k+1} &\leftarrow [m+1] \setminus \{j\} \\
+\bar{W}_{k+1} &\leftarrow \{j\} \\
+\pmb{\eta}_{k+1} &\leftarrow \pmb{\eta}_k - [\pmb{\eta}_k]_j \cdot \pmb{1},
+\end{align}
+$$
+which do not depend on choice of $p$.

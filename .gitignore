@@ -54,3 +54,9 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 inst/doc
+/doc/
+/Meta/
+
+# paper.md and paper.html
+paper.md
+paper.html

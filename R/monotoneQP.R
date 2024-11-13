@@ -10,12 +10,9 @@
 #'  dual-active set method of \insertCite{arnstrom_dual_2022}{fastfrechet},
 #'  taking advantage of simplifications in this setting which avoid LDL' 
 #'  decompositions and other costly matrix product operations.
-#'
+#'  
+#' @inheritParams frechetreg_univar2wass
 #' @param Y A numeric vector or matrix.
-#' @param lower An optional numeric scalar (default `-Inf`) lower box constraint;
-#'  must be less than or equal to `upper`.
-#' @param upper An optional numeric scalar (default `Inf`) upper box constraint;
-#'  must be greater than or equal to `lower`.
 #' @param eps tolerance level (default `1e-10`).
 #' 
 #' @references 

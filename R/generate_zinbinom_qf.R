@@ -23,8 +23,10 @@
 #' \insertRef{coulter_fast_2024}{fastfrechet}
 #' 
 #' @return A list object with components:
-#' * `X` returns a `(n` \eqn{\times} `p)` covariate matrix.
-#' * `Y` returns an `(n` \eqn{\times} `m`) quantile function matrix.
+#' \tabular{ll}{
+#'   `X` \tab returns a `(n` \eqn{\times} `p)` covariate matrix. \cr
+#'   `Y` \tab returns an `(n` \eqn{\times} `m`) quantile function matrix. \cr
+#' }
 #' @import stats
 #' @export
 #'

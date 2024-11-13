@@ -31,6 +31,19 @@
 #' @export
 #'
 #' @examples
+#' # Set dimensions:
+#' n = 200
+#' p = 10
+#' m = 100
+#' 
+#' # Generate data:
+#' example_data = generate_zinbinom_qf(n = n, p = p, m = m)
+#' X = example_data$X
+#' Y = example_data$Y
+#' 
+#' # Plot empirical quantile functions:
+#' mseq = seq(0.5 / m, 1 - 0.5 / m, len = m)
+#' matplot(mseq, t(Y), type = 'l', lty = 1)
 generate_zinbinom_qf = function(n,
                                 p,
                                 m,

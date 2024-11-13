@@ -64,11 +64,17 @@ frechetreg_univar2wass <- function(X,
   if (nrow(X) != nrow(Y)) stop("Y and X should have the same number of rows.")
 
   # Check for length, data structure, and non-negativity of sparsity vector, if provided:
-  if (!is.null(lambda)) if (!(is.vector(lambda))) stop("lambda should be a vector.")
-  if (!is.null(lambda)) if (ncol(X) != length(lambda)) stop("lambda should have the same length as X has columns.")
-  if (!is.null(lambda)) if (any(lambda < 0)) stop("All lambda entries must be non-negative.")
+  if (!is.null(lambda)){
+    
+    if (!(is.vector(lambda))) stop("lambda should be a vector.")
+    if (ncol(X) != length(lambda)) stop("lambda should have the same length as X has columns.")
+    if (!is.numeric(lambda[1])) stop("lambda")
+    if (any(lambda < 0)) stop("All lambda entries must be non-negative.")
+    if (any(is.na(lambda))) stop("All lambda entries must be non-NA.")
+    if (any(is.infinite(lambda))) stop("All lambda entries must be finite.")
+    
+  }
   
-
   # Check for box constraint compatibility:
   if (lower >= upper) stop("Lower bound should be strictly less than upper bound.")
 

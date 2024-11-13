@@ -6,25 +6,25 @@
 #' for the space of univariate distribution responses equipped
 #' with the 2-Wasserstein metric. Observed distributions are assumed
 #' to be quantile functions evaluated on a common, equally spaced `m`-grid
-#' in (0, 1). Options include user-specified output covariate matrix,
+#' in \eqn{(0, 1)}. Options include user-specified output covariate matrix,
 #' generalized ridge sparsity vector \insertCite{tucker_variable_2023}{fastfrechet},
 #' and box constraints. The Fréchet regression problem in this context is reducible
 #' to a quadratic programming problem; the workhorse of this function is a custom
 #' active set method based on \insertCite{arnstrom_dual_2022}{fastfrechet}.
 #' 
 #'
-#' @param X A `(n x p)` "input" covariate matrix with no missing, all finite entries.
-#' @param Y A `(n x m)` matrix of observed quantile functions, row-wise monotone non-decreasing.
+#' @param X A `(n` \eqn{\times} `p)` "input" covariate matrix with no missing, all finite entries.
+#' @param Y A `(n` \eqn{\times} `m)` matrix of observed quantile functions, row-wise monotone non-decreasing.
 #'  Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
-#' @param Z An optional `(z x p)` "output" covariate matrix (default `NULL`) with no missing, all finite entries.
-#' @param lambda An optional `(p x 1)` vector with non-negative entries whose sum is strictly positive.
+#' @param Z An optional `(z` \eqn{\times} `p)` "output" covariate matrix (default `NULL`) with no missing, all finite entries.
+#' @param lambda An optional `(p` \eqn{\times} `1)` vector with non-negative entries whose sum is strictly positive.
 #'  If `NULL` a non-regularized regression is performed (the default).
 #' @param lower An optional numeric scalar (default `-Inf`) lower box constraint; must be strictly less than `upper`.
 #' @param upper An optional numeric scalar (default `Inf`) upper box constraint; must be strictly greater than `lower`.
 #' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
 #' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are skipped.
 #'
-#' @return A `(n x m)` matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
+#' @return A `(n` \eqn{\times} `m)` matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
 #'  The solution has rows that are monotone decreasing that are bounded between the `lower` and `upper` arguments.
 #' 
 #' @references 

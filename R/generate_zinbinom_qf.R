@@ -2,12 +2,12 @@
 #'
 #' @description
 #' This function generates random zero-inflated negative binomial (zinbinom)
-#' quantile functions, as functions of covariates X1, X2, X3, and X4.
-#' Quantile functions are generated from X parameters as in Experiment B in
+#' quantile functions, as functions of covariates \eqn{X_1}, \eqn{X_2}, \eqn{X_3}, and \eqn{X_4}.
+#' Quantile function matrix \eqn{Y} and covariate matrix \eqn{X} are generated as in Experiment B in
 #' \insertCite{coulter_fast_2024}{fastfrechet}, and are evaluated on a common,
-#' equally spaced `m`-grid in (0, 1). Options include number of samples
+#' equally spaced `m`-grid in \eqn{(0, 1)}. Options include number of samples
 #' (covariate vectors, and response quantile functions), number of total 
-#' covariates (at least 4; generated iid from N(0, 1)), grid density `m`,
+#' covariates (at least 4; generated iid from \eqn{N(0, 1)}), grid density `m`,
 #' and baseline zinbinom parameters.
 #' 
 #' @param n A numeric value strictly greater than 0. Determines the number of 
@@ -15,14 +15,16 @@
 #' @param p A numeric value strictly greater than 4. Determines the number of
 #' columns in the covariate matrix.
 #' @param m A numeric value strictly greater than 0.
-#' @param zero_inflation A numeric value in the range (0,1).
-#' @param prob A numeric value in the range (0,1).
+#' @param zero_inflation A numeric value in the range \eqn{(0,1)}.
+#' @param prob A numeric value in the range \eqn{(0,1)}.
 #' @param size A numeric value strictly greater than 0.
 #' 
 #' @references 
 #' \insertRef{coulter_fast_2024}{fastfrechet}
 #' 
-#' @return
+#' @return A list object with components:
+#' * `X` returns a `(n` \eqn{\times} `p)` covariate matrix.
+#' * `Y` returns an `(n` \eqn{\times} `m`) quantile function matrix.
 #' @import stats
 #' @export
 #'

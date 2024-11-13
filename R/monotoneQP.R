@@ -23,8 +23,8 @@
 #' 
 #' @return A list object with components:
 #' \tabular{ll}{
-#'   `Lagrange_Multiplier` \tab A `(n` \eqn{\times} `(m + 1))` matrix, row-wise contains the Lagrange multipliers associated with the QP problems. \cr
-#'   `Solution` \tab A `(n` \eqn{\times} `m)` matrix, row-wise contains the solutions to the QP problems. \cr
+#'   `Lagrange_Multiplier` \tab A (`n` \eqn{\times} (`m + 1`)) matrix, row-wise contains the Lagrange multipliers associated with the QP problems. \cr
+#'   `Solution` \tab A (`n` \eqn{\times} `m`) matrix, row-wise contains the solutions to the QP problems. \cr
 #' }
 #' 
 #' @export

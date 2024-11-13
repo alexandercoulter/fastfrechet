@@ -32,11 +32,42 @@ bibliography: "inst/REFERENCES.bib"
 
 # Summary
 
-This is the paper's summary.
+Fréchet regression (@petersen_frechet_2019) extends Euclidean regression to the
+general setting where response $Y$ resides in a metric space $\Omega$ equipped
+with a metric $d : \Omega \times \Omega \mapsto \mathbb{R}_+$. Subsequently, variable
+selection has been proposed for Fréchet regression (@tucker_variable_2023),
+again extending a generalized ridge penalty method developed in the Euclidean
+setting (@wu_cant_2021). Finding conditional Fréchet means (i.e. solving the
+Fréchet regression problem) is a context-specific task where general solvers are
+not available; on the other hand, @tucker_variable_2023 propose a general method
+for solving their variable selection problem, so long as some method for solving
+the associated Fréchet regression problem is available.
+
+Univariate distribution responses, equipped with the 2-Wasserstein metric, serve
+as an example use case in both @petersen_frechet_2019 and @tucker_variable_2023,
+and have emerging applications to biomedical data including continuous glucose
+monitoring data [MATABUENA REFERENCE] and actigraphy data [GHOSAL REFERENCE].
+@coulter_fast_2024 developed a new algorithm for solving the variable selection
+problem in this context, obtaining empirical speed increases up to 10,000x in
+simulation settings over the existing general purpose solver, with greater
+relative speed increases with increasing sample size and covariate count. This
+makes Fréchet regression methods accessible for data sets where such data is
+available for a large number of patient and covariates, such as the UK Biobank
+[DOHERTY REFERENCE].
+
+`fastfrechet` implements the fast variable selection algorithm of
+@coulter_fast_2024 for univariate distribution responses, as well as implements
+resampling procedures for variable selection like cross validation
+(@tucker_variable_2023) and complementary pairs stability selection
+(@coulter_fast_2024; @shah_variable_2013; @meinshausen_stability_2010). It also
+includes a new dedicated QP solver for the associated Fréchet regression
+problem, implementing the dual active-set method of @arnstrom_dual_2022 while
+taking advantage of the specific constraint structure to avoid matrix
+decomposition and multiplication operations.
 
 # Statement of need
 
-This is the paper's statement of need
+This is the paper's statement of need [edit from above?].
 
 # Mathematics
 

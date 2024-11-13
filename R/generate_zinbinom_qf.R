@@ -12,7 +12,7 @@
 #' 
 #' @param n A numeric value strictly greater than 0. Determines the number of 
 #' rows in the covariate matrix.
-#' @param p A numeric value strictly greater than 4. Determines the number of
+#' @param p A numeric value greater than or equal to 4. Determines the number of
 #' columns in the covariate matrix.
 #' @param m A numeric value strictly greater than 0.
 #' @param zero_inflation A numeric value in the range \eqn{(0,1)}.

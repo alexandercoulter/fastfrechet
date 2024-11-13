@@ -7,29 +7,51 @@
 generate_zinbinom_qf(n, p, m, zero_inflation = 0.2, prob = 0.5, size = 10)
 }
 \arguments{
-\item{n}{A numeric value strictly greater than 0. Determines the number of
+\item{n}{A positive integer. Determines the number of
 rows in the covariate matrix.}
 
-\item{p}{A numeric value strictly greater than 4. Determines the number of
+\item{p}{A positive integer greater than or equal to 4. Determines the number of
 columns in the covariate matrix.}
 
-\item{m}{A numeric value strictly greater than 0.}
+\item{m}{A positive integer.}
 
-\item{zero_inflation}{A numeric value in the range (0,1).}
+\item{zero_inflation}{A numeric value in the range \eqn{(0,1)}.}
 
-\item{prob}{A numeric value in the range (0,1).}
+\item{prob}{A numeric value in the range \eqn{(0,1)}.}
 
 \item{size}{A numeric value strictly greater than 0.}
 }
+\value{
+A list object with components:
+\tabular{ll}{
+\code{X} \tab returns a \verb{(n} \eqn{\times} \verb{p)} covariate matrix. \cr
+\code{Y} \tab returns an \verb{(n} \eqn{\times} \code{m}) quantile function matrix. \cr
+}
+}
 \description{
 This function generates random zero-inflated negative binomial (zinbinom)
-quantile functions, as functions of covariates X1, X2, X3, and X4.
-Quantile functions are generated from X parameters as in Experiment B in
+quantile functions, as functions of covariates \eqn{X_1}, \eqn{X_2}, \eqn{X_3}, and \eqn{X_4}.
+Quantile function matrix \eqn{Y} and covariate matrix \eqn{X} are generated as in Experiment B in
 \insertCite{coulter_fast_2024}{fastfrechet}, and are evaluated on a common,
-equally spaced \code{m}-grid in (0, 1). Options include number of samples
+equally spaced \code{m}-grid in \eqn{(0, 1)}. Options include number of samples
 (covariate vectors, and response quantile functions), number of total
-covariates (at least 4; generated iid from N(0, 1)), grid density \code{m},
+covariates (at least 4; generated iid from \eqn{N(0, 1)}), grid density \code{m},
 and baseline zinbinom parameters.
+}
+\examples{
+# Set dimensions:
+n = 200
+p = 10
+m = 100
+
+# Generate data:
+example_data = generate_zinbinom_qf(n = n, p = p, m = m)
+X = example_data$X
+Y = example_data$Y
+
+# Plot empirical quantile functions:
+mseq = seq(0.5 / m, 1 - 0.5 / m, len = m)
+matplot(mseq, t(Y), type = 'l', lty = 1)
 }
 \references{
 \insertRef{coulter_fast_2024}{fastfrechet}

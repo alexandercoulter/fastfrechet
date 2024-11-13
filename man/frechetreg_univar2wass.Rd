@@ -11,19 +11,18 @@ frechetreg_univar2wass(
   lambda = NULL,
   lower = -Inf,
   upper = Inf,
-  eps = 1e-10,
-  skip_checks = FALSE
+  eps = 1e-10
 )
 }
 \arguments{
-\item{X}{A \verb{(n x p)} "input" covariate matrix with no missing, all finite entries.}
+\item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{A \verb{(n x m)} matrix of observed quantile functions, row-wise monotone non-decreasing.
+\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions, row-wise monotone non-decreasing.
 Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
-\item{Z}{An optional \verb{(z x p)} "output" covariate matrix (default \code{NULL}) with no missing, all finite entries.}
+\item{Z}{An optional (\code{z} \eqn{\times} \code{p}) "output" covariate matrix (default \code{NULL}) with no missing, all finite entries.}
 
-\item{lambda}{An optional \verb{(p x 1)} vector with non-negative entries whose sum is strictly positive.
+\item{lambda}{An optional (\code{p} \eqn{\times} \code{1}) vector with non-negative entries whose sum is strictly positive.
 If \code{NULL} a non-regularized regression is performed (the default).}
 
 \item{lower}{An optional numeric scalar (default \code{-Inf}) lower box constraint; must be strictly less than \code{upper}.}
@@ -35,7 +34,7 @@ If \code{NULL} a non-regularized regression is performed (the default).}
 \item{skip_checks}{An optional logical argument (default \code{FALSE}). When \code{TRUE} compatibility and dimension checks are skipped.}
 }
 \value{
-A \verb{(n x m)} matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
+A (\code{n} \eqn{\times} \code{m}) matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
 The solution has rows that are monotone decreasing that are bounded between the \code{lower} and \code{upper} arguments.
 }
 \description{
@@ -44,7 +43,7 @@ objects \insertCite{petersen_frechet_2019}{fastfrechet},
 for the space of univariate distribution responses equipped
 with the 2-Wasserstein metric. Observed distributions are assumed
 to be quantile functions evaluated on a common, equally spaced \code{m}-grid
-in (0, 1). Options include user-specified output covariate matrix,
+in \eqn{(0, 1)}. Options include user-specified output covariate matrix,
 generalized ridge sparsity vector \insertCite{tucker_variable_2023}{fastfrechet},
 and box constraints. The Fréchet regression problem in this context is reducible
 to a quadratic programming problem; the workhorse of this function is a custom

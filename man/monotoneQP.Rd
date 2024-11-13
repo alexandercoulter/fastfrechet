@@ -9,18 +9,18 @@ monotoneQP(Y, lower = -Inf, upper = Inf, eps = 1e-10)
 \arguments{
 \item{Y}{A numeric vector or matrix.}
 
-\item{lower}{An optional numeric scalar (default \code{-Inf}) lower box constraint;
-must be less than or equal to \code{upper}.}
+\item{lower}{An optional numeric scalar (default \code{-Inf}) lower box constraint; must be strictly less than \code{upper}.}
 
-\item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint;
-must be greater than or equal to \code{lower}.}
+\item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint; must be strictly greater than \code{lower}.}
 
 \item{eps}{tolerance level (default \code{1e-10}).}
 }
 \value{
-A list with components:
-* Lagrange_Multiplier
-* Solution
+A list object with components:
+\tabular{ll}{
+\code{Lagrange_Multiplier} \tab returns a (\code{n} \eqn{\times} (\code{m + 1})) matrix, row-wise contains the Lagrange multipliers associated with the QP problems. \cr
+\code{Solution} \tab returns a (\code{n} \eqn{\times} \code{m}) matrix, row-wise contains the solutions to the QP problems. \cr
+}
 }
 \description{
 \code{monotoneQP()} wraps an \link{Rcpp} implementation of a custom active set method for

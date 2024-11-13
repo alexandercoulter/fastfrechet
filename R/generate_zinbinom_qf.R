@@ -10,11 +10,11 @@
 #' covariates (at least 4; generated iid from \eqn{N(0, 1)}), grid density `m`,
 #' and baseline zinbinom parameters.
 #' 
-#' @param n A numeric value strictly greater than 0. Determines the number of 
+#' @param n A positive integer. Determines the number of 
 #' rows in the covariate matrix.
-#' @param p A numeric value greater than or equal to 4. Determines the number of
+#' @param p A positive integer greater than or equal to 4. Determines the number of
 #' columns in the covariate matrix.
-#' @param m A numeric value strictly greater than 0.
+#' @param m A positive integer.
 #' @param zero_inflation A numeric value in the range \eqn{(0,1)}.
 #' @param prob A numeric value in the range \eqn{(0,1)}.
 #' @param size A numeric value strictly greater than 0.
@@ -39,9 +39,18 @@ generate_zinbinom_qf = function(n,
                                 size = 10){
   
   # Dimension and compatibility checks:
-  if(p < 4) stop('Must specify at least 4 covariate columns (\'p\').')
-  if(n < 1) stop('Must specify sample size \'n\' greater than 0.')
-  if(m < 1) stop('Must specify quantile function length \'m\' greater than 0.')
+  
+  # Positive integer checks for dimensions:
+  if(is.infinite(n) == 0) stop('\'n\' must be a positive integer.')
+  if(is.infinite(p) == 0) stop('\'p\' must be a positive integer.')
+  if(is.infinite(m) == 0) stop('\'m\' must be a positive integer.')
+  if((n != as.integer(n)) | (n < 1)) stop('\'n\' must be a positive integer.')
+  if((p != as.integer(p)) | (p < 4)) stop('\'p\' must be a positive integer greater than or equal to 4.')
+  if((m != as.integer(m)) | (m < 1)) stop('\'m\' must be a positive integer.')
+
+  # Numeric checks for zinbinom distribution:
+  if(!(is.numeric(zero_inflation) & is.numeric(prob) & is.numeric(size))) stop('\'zero_inflation\', \'prob\', and \'size\' must all be numeric.')
+  
   if((zero_inflation <= 0) | (zero_inflation >= 1)) stop('\'zero_inflation\' must be strictly in (0, 1).')
   if((prob <= 0) | (prob >= 1)) stop('\'prob\' must be strictly in (0, 1).')
   if(size <= 0) stop('\'size\' must be positive.')

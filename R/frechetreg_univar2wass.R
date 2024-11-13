@@ -49,13 +49,25 @@ frechetreg_univar2wass <- function(X,
   # Check for matrix inputs (X and Y; Z if provided):
   if (!(is.matrix(X) & is.matrix(Y))) stop("Y and X should be matrices.")
   if (!is.null(Z)) if (!is.matrix(Z)) stop("Z should be a matrix.")
+  
+  # Check for correct data type entries:
+  if (any(is.na(X)) | any(is.na(Y))) stop("Y and X must have non-NA entries.")
+  if (!is.null(Z)) if (any(is.na(Z))) stop("Z must have non-NA entries.")
+
+  if (!is.numeric(X[1]) | !is.numeric(Y[1])) stop("Y and X must have numeric entries.")
+  if (!is.null(Z)) if (!is.numeric(Z[1])) stop("Z must have numeric entries.")
+  
+  if (any(is.infinite(X)) | any(is.infinite(Y))) stop("Y and X must have finite entries.")
+  if (!is.null(Z)) if (any(is.infinite(Z))) stop("Z must have finite entries.")
 
   # Check for row matching between X and Y:
   if (nrow(X) != nrow(Y)) stop("Y and X should have the same number of rows.")
 
-  # Check for length and non-negativity of sparsity vector, if provided:
-  if (!is.null(lambda)) if (ncol(X) != length(lambda)) stop("lambda should have the same length as X has rows.")
+  # Check for length, data structure, and non-negativity of sparsity vector, if provided:
+  if (!is.null(lambda)) if (!(is.vector(lambda))) stop("lambda should be a vector.")
+  if (!is.null(lambda)) if (ncol(X) != length(lambda)) stop("lambda should have the same length as X has columns.")
   if (!is.null(lambda)) if (any(lambda < 0)) stop("All lambda entries must be non-negative.")
+  
 
   # Check for box constraint compatibility:
   if (lower >= upper) stop("Lower bound should be strictly less than upper bound.")

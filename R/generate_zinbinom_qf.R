@@ -25,7 +25,7 @@
 #' @return A list object with components:
 #' \tabular{ll}{
 #'   `X` \tab returns a `(n` \eqn{\times} `p)` covariate matrix. \cr
-#'   `Y` \tab returns an `(n` \eqn{\times} `m`) quantile function matrix. \cr
+#'   `Y` \tab returns an `(n` \eqn{\times} `m)` quantile function matrix. \cr
 #' }
 #' @import stats
 #' @export

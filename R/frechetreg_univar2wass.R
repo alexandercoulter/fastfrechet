@@ -76,9 +76,11 @@ frechetreg_univar2wass <- function(X,
   }
   
   # Check for box constraint compatibility:
+  if (!(is.numeric(lower) & is.numeric(upper))) stop("\'lower\' and \'upper\' must be numeric.")
   if (lower >= upper) stop("Lower bound should be strictly less than upper bound.")
 
   # Check error tolerance is strictly positive:
+  if (!is.numeric(eps)) stop("\'eps\' must be numeric.")
   if (eps <= 0) stop("Error tolerance should be strictly positive.")
 
   # Check for column matching between X and Z, if provided:

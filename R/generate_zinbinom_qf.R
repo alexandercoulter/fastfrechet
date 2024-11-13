@@ -37,7 +37,7 @@
 #' m = 100
 #' 
 #' # Generate data:
-#' example_data = generate_zinbinom_qf(n = n, p = p, m = m)
+#' example_data = generate_zinbinom_qf(n, p, m)
 #' X = example_data$X
 #' Y = example_data$Y
 #' 

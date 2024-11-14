@@ -47,18 +47,12 @@ frechetreg_univar2wass <- function(X,
   # Compatibility and dimension checks:
 
   # Check for matrix inputs (X and Y; Z if provided):
-  if (!(is.matrix(X) & is.matrix(Y))) stop("Y and X should be matrices.")
-  if (!is.null(Z)) if (!is.matrix(Z)) stop("Z should be a matrix.")
+  if (!(is.matrix(X) & is.matrix(Y)) | !(mode(X) == "numeric" & mode(Y) == "numeric")) stop("Y and X must be numeric matrices.")
+  if (!is.null(Z)) if (!is.matrix(Z) | mode(Z) != "numeric") stop("Z must be a numeric matrix, if provided.")
   
   # Check for correct data type entries:
-  if (any(is.na(X)) | any(is.na(Y))) stop("Y and X must have non-NA entries.")
-  if (!is.null(Z)) if (any(is.na(Z))) stop("Z must have non-NA entries.")
-
-  if (!is.numeric(X[1]) | !is.numeric(Y[1])) stop("Y and X must have numeric entries.")
-  if (!is.null(Z)) if (!is.numeric(Z[1])) stop("Z must have numeric entries.")
-  
-  if (any(is.infinite(X)) | any(is.infinite(Y))) stop("Y and X must have finite entries.")
-  if (!is.null(Z)) if (any(is.infinite(Z))) stop("Z must have finite entries.")
+  if (!all(is.finite(X)) | !all(is.finite(Y))) stop("Y and X must have finite numeric entries.")
+  if (!is.null(Z)) if (!all(is.finite(Z))) stop("Z must have finite numeric entries, if provided.")
 
   # Check for row matching between X and Y:
   if (nrow(X) != nrow(Y)) stop("Y and X should have the same number of rows.")
@@ -66,12 +60,10 @@ frechetreg_univar2wass <- function(X,
   # Check for length, data structure, and non-negativity of sparsity vector, if provided:
   if (!is.null(lambda)){
     
-    if (!(is.vector(lambda))) stop("lambda should be a vector.")
+    if (!(is.vector(lambda)) | mode(lambda) != "numeric") stop("lambda must be a numeric vector.")
     if (ncol(X) != length(lambda)) stop("lambda should have the same length as X has columns.")
-    if (!is.numeric(lambda[1])) stop("lambda")
+    if (!all(is.finite(lambda))) stop("lambda must have finite, non-negative numeric entries.")
     if (any(lambda < 0)) stop("All lambda entries must be non-negative.")
-    if (any(is.na(lambda))) stop("All lambda entries must be non-NA.")
-    if (any(is.infinite(lambda))) stop("All lambda entries must be finite.")
     
   }
   

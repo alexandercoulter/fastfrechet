@@ -34,7 +34,7 @@ check_wholenumber = function(x){
   if(bool_check) stop(stop_message)
   
   # Check for > 0:
-  bool_check = tryCatch(x > 0, error = function(e) TRUE, warning = function(w) TRUE)
+  bool_check = tryCatch(x < 1, error = function(e) TRUE, warning = function(w) TRUE)
   if(bool_check) stop(stop_message)
   
 }

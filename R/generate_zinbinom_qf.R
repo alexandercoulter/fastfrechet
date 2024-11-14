@@ -15,8 +15,8 @@
 #' @param p A positive integer greater than or equal to 4. Determines the number of
 #' columns in the covariate matrix.
 #' @param m A positive integer.
-#' @param zero_inflation A numeric value in the range \eqn{(0,1)}.
-#' @param prob A numeric value in the range \eqn{(0,1)}.
+#' @param zero_inflation A numeric value in the range \eqn{[0,1]}.
+#' @param prob A numeric value in the range \eqn{(0,1]}.
 #' @param size A numeric value strictly greater than 0.
 #' 
 #' @references 
@@ -57,8 +57,8 @@ generate_zinbinom_qf = function(n,
   check_numeric(size, "scalar", finite = TRUE)
   # if(!is.vector(zero_inflation) | !is.vector(prob) | !is.vector(size)) stop("'zero_inflation', 'prob', and 'size' must all be numeric scalars.")
   # if(length(zero_inflation) != 1 | length(prob) != 1 | length(size) != 1) stop("'zero_inflation', 'prob', and 'size' must all be numeric scalars.")
-  if((zero_inflation <= 0) | (zero_inflation >= 1)) stop("'zero_inflation' must be strictly in (0, 1).")
-  if((prob <= 0) | (prob >= 1)) stop("'prob' must be strictly in (0, 1).")
+  if((zero_inflation <= 0) | (zero_inflation >= 1)) stop("'zero_inflation' must be strictly in [0, 1].")
+  if((prob <= 0) | (prob > 1)) stop("'prob' must be strictly in (0, 1].")
   if(size <= 0) stop("'size' must be strictly positive.")
   
   # Generate covariate matrix:

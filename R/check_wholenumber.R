@@ -1,4 +1,4 @@
-#' Title
+#' Check if input is a whole number (positive integer)
 #'
 #' @param x 
 #'

@@ -1,4 +1,4 @@
-#' Title
+#' Check if input is a numeric scalar, vector, or matrix, with no missing values
 #'
 #' @param x 
 #' @param finite 

@@ -61,6 +61,8 @@ FRiSO_univar2wass = function(X,
   m = ncol(Y)
   p = ncol(X)
   
+  # Dimension and compatibility checks:
+  
   # Check for matrix inputs (X and Y; Z if provided):
   if (!(is.matrix(X) & is.matrix(Y)) | !(mode(X) == "numeric" & mode(Y) == "numeric")) stop("Y and X must be numeric matrices.")
   

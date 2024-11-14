@@ -20,17 +20,17 @@ check_numeric = function(x, object_type = c("scalar", "vector", "matrix"), finit
   
   
   # Check for numeric data type:
-  bool_check = tryCatch(mode(x) != "numeric", error = function(e) TRUE)
+  bool_check = tryCatch(mode(x) != "numeric", error = function(e) TRUE, warning = function(w) TRUE)
   if(bool_check) stop(stop_message)
   
   # Check for vector or matrix structure:
   if(object_type != "matrix"){
     
-    bool_check = tryCatch(!is.vector(x), error = function(e) TRUE)
+    bool_check = tryCatch(!is.vector(x), error = function(e) TRUE, warning = function(w) TRUE)
     
   } else {
     
-    bool_check = tryCatch(!is.matrix(x), error = function(e) TRUE)
+    bool_check = tryCatch(!is.matrix(x), error = function(e) TRUE, warning = function(w) TRUE)
     
   }
   if(bool_check) stop(stop_message)
@@ -38,7 +38,7 @@ check_numeric = function(x, object_type = c("scalar", "vector", "matrix"), finit
   # If scalar, check for length = 1:
   if(scalar){
     
-    bool_check = tryCatch(length(x) != 1, error = function(e) TRUE)
+    bool_check = tryCatch(length(x) != 1, error = function(e) TRUE, warning = function(w) TRUE)
     if(bool_check) stop(stop_message)
     
   }
@@ -46,12 +46,12 @@ check_numeric = function(x, object_type = c("scalar", "vector", "matrix"), finit
   # If finite, check for finite (else just check for non-NA/NaN):
   if(finite){
     
-    bool_check = tryCatch(!any(is.finite(x)), error = function(e) TRUE)
+    bool_check = tryCatch(!any(is.finite(x)), error = function(e) TRUE, warning = function(w) TRUE)
     if(bool_check) stop(stop_message)
     
   } else {
     
-    bool_check = tryCatch(is.na(x), error = function(e) TRUE)
+    bool_check = tryCatch(is.na(x), error = function(e) TRUE, warning = function(w) TRUE)
     if(bool_check) stop(stop_message)
     
   }

@@ -61,13 +61,58 @@ FRiSO_univar2wass = function(X,
   m = ncol(Y)
   p = ncol(X)
   
-  # Compatibility checks:
-  if(n != nrow(Y)) stop("\'X\' and \'Y\' should have the same number of rows.")
-  if(lower > upper) stop('Lower bound should be strictly less than upper bound.')
+  # Check for matrix inputs (X and Y; Z if provided):
+  if (!(is.matrix(X) & is.matrix(Y)) | !(mode(X) == "numeric" & mode(Y) == "numeric")) stop("Y and X must be numeric matrices.")
   
-  if(is.null(lambda_init)) lambda_init = rep(tauseq[1] / p, p)
-  if(length(lambda_init) != p) stop("\'lambda_init\' length and ncol(X) should match.")
-  if(eps < 0) stop("\'eps\' should be non-negative.")
+  # Check for correct data type entries:
+  if (!all(is.finite(X)) | !all(is.finite(Y))) stop("Y and X must have finite numeric entries.")
+  
+  # Check for row matching between X and Y:
+  if (n != nrow(Y)) stop("Y and X should have the same number of rows.")
+  
+  # Check for length, data structure, and non-negativity of sparsity vector, if provided:
+  if (!is.null(lambda_init)){
+    
+    if (!(is.vector(lambda)) | mode(lambda_init) != "numeric") stop("lambda must be a numeric vector.")
+    if (length(lambda_init) != p) stop("lambda should have the same length as X has columns.")
+    if (!all(is.finite(lambda_init))) stop("lambda must have finite, non-negative numeric entries.")
+    if (any(lambda_init < 0)) stop("All lambda entries must be non-negative.")
+    
+  }
+  
+  # Check for box constraint compatibility:
+  if (!(is.numeric(lower) & is.numeric(upper)) | !(length(lower) == 1 & length(upper) == 1)) stop("\'lower\' and \'upper\' must be numeric scalars.")
+  if (lower >= upper) stop("Lower bound should be strictly less than upper bound.")
+  
+  # Check error tolerance is numeric and strictly positive:
+  if (!is.numeric(eps) | length(eps) != 1) stop("\'eps\' must be a numeric scalar.")
+  if (eps <= 0) stop("Error tolerance should be strictly positive.")
+  
+  # Check nudge is numeric and non-negative:
+  if (!is.numeric(nudge) | length(nudge) != 1) stop("\'nudge\' must be a numeric scalar.")
+  if (nudge < 0) stop("\'nudge\' should be non-negative.")
+  
+  # Check alpha is numeric and positive:
+  if (!is.numeric(alpha) | length(alpha) != 1) stop("\'alpha\' must be a numeric scalar.")
+  if (alpha <= 0) stop("\'alpha\' should be strictly positive.")
+  
+  # Check max_iter is an integer (or numeric equivalent) and positive:
+  if ((max_iter != as.integer(max_iter)) | (max_iter < 1)) stop("\'max_iter\' must be a positive integer.")
+  
+  # Check max_theta is numeric and positive:
+  if (!is.numeric(max_theta) | length(max_theta) != 1) stop("\'max_theta\' must be a numeric scalar.")
+  if (max_theta <= 0) stop("\'max_theta\' should be strictly positive.")
+  
+  # Check impulse is numeric and strictly within (0, 1]:
+  if (!is.numeric(impulse) | length(impulse) != 1) stop("\'impulse\' must be a numeric scalar within (0, 1].")
+  if ((impulse <= 0) | (impulse > 1)) stop("\'impulse\' must be within (0, 1].")
+  
+  # Check for monotonicity of Y values:
+  if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("Y should be row-wise monotone.")
+  
+  # Check for box constraints on Y values:
+  if ((max(Y) > upper) | (min(Y) < lower)) stop("Y should obey box constraints.")
+  
   
   # Center and scale inputs:
   Xc = scaleX_cpp(X)

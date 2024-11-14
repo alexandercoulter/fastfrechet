@@ -79,7 +79,7 @@ frechetreg_univar2wass <- function(X,
   if (!is.null(Z)) if (ncol(X) != ncol(Z)) stop("X and Z must have the same number of columns.")
 
   # Check for monotonicity of Y values:
-  if (ncol(Y) > 1) if (min(Y[, -1] - Y[, -ncol(Y)]) < 0) stop("Y should be row-wise monotone.")
+  if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("Y should be row-wise monotone.")
 
   # Check for box constraints on Y values:
   if ((max(Y) > upper) | (min(Y) < lower)) stop("Y should obey box constraints.")
@@ -120,7 +120,7 @@ frechetreg_univar2wass <- function(X,
             error = function(e) {
               S <- svd(Xc)
               g <- S$d > 1e-10
-              return(list(S$v[, g, drop = FALSE], crossprod(S$v[, g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g]^2)))
+              return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g]^2)))
             }
           )
 
@@ -138,7 +138,7 @@ frechetreg_univar2wass <- function(X,
             error = function(e) {
               S <- svd(crossprod(Xc))
               g <- S$d > 1e-10
-              return(list(S$v[, g, drop = FALSE], crossprod(S$v[, g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g])))
+              return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g])))
             }
           )
 
@@ -225,7 +225,7 @@ frechetreg_univar2wass <- function(X,
           g <- S$d > 1e-10
 
           # Evaluate UU'Y, ordering the multiplication based on n > m:
-          M <- if (n > m) S$u[, g, drop = FALSE] %*% crossprod(S$u[, g, drop = FALSE], Y) else tcrossprod(S$u[, g, drop = FALSE]) %*% Y
+          M <- if (n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
 
           # Calculate Yhat:
           Yhat <- rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
@@ -238,7 +238,7 @@ frechetreg_univar2wass <- function(X,
               g <- S$d > 1e-10
 
               # Evaluate UU'Y, ordering the multiplication based on n > m:
-              if (n > m) S$u[, g, drop = FALSE] %*% crossprod(S$u[, g, drop = FALSE], Y) else tcrossprod(S$u[, g, drop = FALSE]) %*% Y
+              if (n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
             }
           )
 
@@ -295,7 +295,7 @@ frechetreg_univar2wass <- function(X,
     )
 
     # Calculate Qhat from stability optimality condition:
-    Qhat <- Yhat + (Eta[, -ncol(Eta)] - Eta[, -1])
+    Qhat <- Yhat + (Eta[ , -ncol(Eta)] - Eta[ , -1])
   }
 
   # Return Qhat value:

@@ -16,7 +16,7 @@ check_numeric = function(x, object_type = c("scalar", "vector", "matrix"), finit
   finite_label = if(finite) " with finite entries" else ""
   
   # Determine "stop" message:
-  stop_message = sprintf("%s must be a numeric %s%s.", name_x, finite_label, object_type)
+  stop_message = sprintf("%s must be a numeric %s%s.", name_x, object_type, finite_label)
   
   
   # Check for numeric data type:

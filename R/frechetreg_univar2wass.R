@@ -47,42 +47,55 @@ frechetreg_univar2wass <- function(X,
   # Compatibility and dimension checks:
 
   # Check for matrix inputs (X and Y; Z if provided):
-  if (!(is.matrix(X) & is.matrix(Y)) | !(mode(X) == "numeric" & mode(Y) == "numeric")) stop("Y and X must be numeric matrices.")
-  if (!is.null(Z)) if (!is.matrix(Z) | mode(Z) != "numeric") stop("Z must be a numeric matrix, if provided.")
+  check_numeric(X, "matrix", finite = TRUE)
+  check_numeric(Y, "matrix", finite = TRUE)
+  if (!is.null(Z)) check_numeric(Z, "matrix", finite = TRUE)
+  
+  # if (!(is.matrix(X) & is.matrix(Y)) | !(mode(X) == "numeric" & mode(Y) == "numeric")) stop("Y and X must be numeric matrices.")
+  # if (!is.null(Z)) if (!is.matrix(Z) | mode(Z) != "numeric") stop("Z must be a numeric matrix, if provided.")
   
   # Check for correct data type entries:
-  if (!all(is.finite(X)) | !all(is.finite(Y))) stop("Y and X must have finite numeric entries.")
-  if (!is.null(Z)) if (!all(is.finite(Z))) stop("Z must have finite numeric entries, if provided.")
+  # if (!all(is.finite(X)) | !all(is.finite(Y))) stop("Y and X must have finite numeric entries.")
+  # if (!is.null(Z)) if (!all(is.finite(Z))) stop("Z must have finite numeric entries, if provided.")
 
   # Check for row matching between X and Y:
-  if (nrow(X) != nrow(Y)) stop("Y and X should have the same number of rows.")
+  if (nrow(X) != nrow(Y)) stop("'X' and 'Y' must have the same number of rows.")
 
   # Check for length, data structure, and non-negativity of sparsity vector, if provided:
   if (!is.null(lambda)){
     
-    if (!(is.vector(lambda)) | mode(lambda) != "numeric") stop("lambda must be a numeric vector.")
-    if (ncol(X) != length(lambda)) stop("lambda should have the same length as X has columns.")
-    if (!all(is.finite(lambda))) stop("lambda must have finite, non-negative numeric entries.")
-    if (any(lambda < 0)) stop("All lambda entries must be non-negative.")
+    check_numeric(lambda, "vector", finite = TRUE)
+    # if (mode(lambda) != "numeric") stop("lambda must be a numeric vector.")
+    # if (!is.vector(lambda)) stop("lambda must be a numeric vector.")
+    # if (!all(is.finite(lambda))) stop("lambda must have finite, non-negative numeric entries.")
+    if (ncol(X) != length(lambda)) stop("'lambda' must have the same length as 'X' has columns.")
+    if (any(lambda < 0)) stop("'lambda' must have non-negative entries.")
     
   }
   
   # Check for box constraint compatibility:
-  if (!(is.numeric(lower) & is.numeric(upper)) | !(length(lower) == 1 & length(upper) == 1)) stop("\'lower\' and \'upper\' must be numeric scalars.")
-  if (lower >= upper) stop("Lower bound should be strictly less than upper bound.")
+  check_numeric(lower, "scalar", finite = FALSE)
+  check_numeric(upper, "scalar", finite = FALSE)
+  # if (!is.numeric(lower) | !is.numeric(upper)) stop("\'lower\' and \'upper\' must be numeric scalars.")
+  # if (!is.vector(lower) | !is.vector(upper)) stop("\'lower\' and \'upper\' must be numeric scalars.")
+  # if (length(lower) != 1 | length(upper) != 1) stop("\'lower\' and \'upper\' must be numeric scalars.")
+  if (lower >= upper) stop("'lower' must be strictly less than 'upper'.")
 
   # Check error tolerance is strictly positive:
-  if (!is.numeric(eps) | length(eps) != 1) stop("\'eps\' must be a numeric scalar.")
-  if (eps <= 0) stop("Error tolerance should be strictly positive.")
+  check_numeric(eps, "scalar", finite = TRUE)
+  # if (!is.numeric(eps)) stop("\'eps\' must be a numeric scalar.")
+  # if (!is.vector(eps)) stop("\'eps\' must be a numeric scalar.")
+  # if (length(eps) != 1) stop("\'eps\' must be a numeric scalar.")
+  if (eps <= 0) stop("'eps' must be strictly positive.")
 
   # Check for column matching between X and Z, if provided:
-  if (!is.null(Z)) if (ncol(X) != ncol(Z)) stop("X and Z must have the same number of columns.")
+  if (!is.null(Z)) if (ncol(X) != ncol(Z)) stop("'X' and 'Z' must have the same number of columns.")
 
   # Check for monotonicity of Y values:
-  if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("Y should be row-wise monotone.")
+  if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("'Y' must be row-wise monotone.")
 
   # Check for box constraints on Y values:
-  if ((max(Y) > upper) | (min(Y) < lower)) stop("Y should obey box constraints.")
+  if ((max(Y) > upper) | (min(Y) < lower)) stop("'Y' must obey box constraints given by 'lower' and 'upper'.")
 
   # Solve for Yhat (i.e. unconstrained weighted mean):
   {

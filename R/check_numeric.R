@@ -36,7 +36,7 @@ check_numeric = function(x, object_type = c("scalar", "vector", "matrix"), finit
   if(bool_check) stop(stop_message)
   
   # If scalar, check for length = 1:
-  if(scalar){
+  if(object_type == "scalar"){
     
     bool_check = tryCatch(length(x) != 1, error = function(e) TRUE, warning = function(w) TRUE)
     if(bool_check) stop(stop_message)

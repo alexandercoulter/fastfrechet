@@ -44,6 +44,7 @@ frechetreg_univar2wass <- function(X,
                                    lower = -Inf,
                                    upper = Inf,
                                    eps = 1e-10) {
+  
   # Compatibility and dimension checks:
 
   # Numeric matrix checks for X and Y, Z if provided:

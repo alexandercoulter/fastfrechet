@@ -37,36 +37,27 @@ monotoneQP = function(Y,
   # If Y is a vector, turn into a row matrix:
   if(is.vector(Y)) Y = rbind(Y)
   
-  # Check that Y is a matrix with finite numeric values:
+  # Numeric matrix check for Y:
   check_numeric(Y, "matrix", finite = TRUE)
-  # if(!is.matrix(Y) | mode(Y) != "numeric") stop("'Y' must be a numeric vector or matrix.")
-  # if(!all(is.finite(Y))) stop("'Y' must have finite numeric entries.")
-  
   # Check Y has at least one row and one column:
   if(prod(dim(Y)) == 0) stop("'Y' must have at least one row and column.")
   
-  # Check for box constraint compatibility:
+  # Numeric scalar check and compatibility checks for lower/upper:
   check_numeric(lower, "scalar", finite = FALSE)
   check_numeric(upper, "scalar", finite = FALSE)
-  # if (!is.numeric(lower) | !is.numeric(upper)) stop("'lower' and 'upper' must be numeric scalars.")
-  # if (!is.vector(lower) | !is.vector(upper)) stop("'lower' and 'upper' must be numeric scalars.")
-  # if (length(lower) != 1 | length(upper) != 1) stop("'lower' and 'upper' must be numeric scalars.")
   if (lower >= upper) stop("'lower' must be strictly less than 'upper'.")
   
-  # Check error tolerance is strictly positive:
+  # Numeric scalar and constraint checks for eps:
   check_numeric(eps, "scalar", finite = FALSE)
-  # if (!is.numeric(eps)) stop("'eps' must be a numeric scalar.")
-  # if (!is.vector(eps)) stop("'eps' must be a numeric scalar.")
-  # if (length(eps) != 1) stop("'eps' must be a numeric scalar.")
   if (eps <= 0) stop("'eps' must be strictly positive.")
   
-  # Run custom active set method to obtain Lagrange multiplier:
+  # Run custom active set method to obtain Lagrange multiplier 'Eta':
   Eta = Custom_Active_Set(Y = Y,
                           L = cbind(rep(lower, nrow(Y))),
                           U = cbind(rep(upper, nrow(Y))),
                           eps = eps)
   
-  # Obtain row-monotone solution:
+  # Obtain row-monotone solution Q:
   Q = Y + (Eta[ , -ncol(Eta)] - Eta[ , -1])
   
   # Enforce strict box constraints against any numerical violations:

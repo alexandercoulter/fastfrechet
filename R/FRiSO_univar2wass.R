@@ -58,84 +58,56 @@ FRiSO_univar2wass = function(X,
   
   # Dimension and compatibility checks:
   
-  # Check for matrix inputs (X and Y; Z if provided):
+  # Numeric matrix checks for X and Y, Z if provided:
   check_numeric(X, "matrix", finite = TRUE)
   check_numeric(Y, "matrix", finite = TRUE)
-  # if (!(is.matrix(X) & is.matrix(Y)) | !(mode(X) == "numeric" & mode(Y) == "numeric")) stop("Y and X must be numeric matrices.")
-  
-  # Check for correct data type entries:
-  # if (!all(is.finite(X)) | !all(is.finite(Y))) stop("Y and X must have finite numeric entries.")
-  
   # Check for row matching between X and Y:
   if (nrow(X) != nrow(Y)) stop("'X' and 'Y' must have the same number of rows.")
   
-  # Check for data structure and positivity of tauseq:
+  # Numeric vector and constraint checks for tauseq:
   check_numeric(tauseq, "vector", finite = TRUE)
-  # if (!is.numeric(tauseq)) stop("'tauseq' must be a numeric vector.")
-  # if (!is.vector(tauseq)) stop("'tauseq' must be a numeric vector.")
-  # if (!all(is.finite(tauseq))) stop("'tauseq' must have positive real entries.")
   if(min(tauseq) <= 0) stop("'tauseq' must have positive real entries.")
   
-  # Check for length, data structure, and non-negativity of sparsity vector, if provided:
+  # Numeric vector and dimension/constraint checks for lambda, if provided:
   if (!is.null(lambda_init)){
     
     check_numeric(lambda_init, "vector", finite = TRUE)
-    # if (!is.numeric(lambda_init)) stop("lambda must be a numeric vector.")
-    # if (!is.vector(lambda_init)) stop("lambda must be a numeric vector.")
-    # if (!all(is.finite(lambda_init))) stop("lambda must have finite, non-negative numeric entries.")
     if (length(lambda_init) != ncol(X)) stop("'lambda' must have the same length as 'X' has columns.")
     if (any(lambda_init < 0)) stop("'lambda' must have non-negative entries.")
     
+  } else {
+    
+    # Initialize lambda_init if not provided:
+    lambda_init = rep(1, ncol(X))
+    
   }
   
-  # Check for box constraint compatibility:
+  # Numeric scalar check and compatibility checks for lower/upper:
   check_numeric(lower, "scalar", finite = FALSE)
   check_numeric(upper, "scalar", finite = FALSE)
-  # if (!is.numeric(lower) | !is.numeric(upper)) stop("'lower' and 'upper' must be numeric scalars.")
-  # if (!is.vector(lower) | !is.vector(upper)) stop("'lower' and 'upper' must be numeric scalars.")
-  # if (length(lower) != 1 | length(upper) != 1) stop("'lower' and 'upper' must be numeric scalars.")
   if (lower >= upper) stop("'lower' must be strictly less than 'upper'.")
   
-  # Check error tolerance is numeric and strictly positive:
+  # Numeric scalar and constraint checks for eps:
   check_numeric(eps, "scalar", finite = TRUE)
-  # f (!is.numeric(eps)) stop("'eps' must be a numeric scalar.")
-  # if (!is.vector(eps)) stop("'eps' must be a numeric scalar.")
-  # if (length(eps) != 1) stop("'eps' must be a numeric scalar.")
   if (eps <= 0) stop("'eps' must be strictly positive.")
   
-  # Check nudge is numeric and non-negative:
+  # Numeric scalar and constraint checks for nudge:
   check_numeric(nudge, "scalar", finite = TRUE)
-  # if (!is.numeric(nudge)) stop("'nudge' must be a numeric scalar.")
-  # if (!is.vector(nudge)) stop("'nudge' must be a numeric scalar.")
-  # if (length(nudge) != 1) stop("'nudge' must be a numeric scalar.")
   if (nudge < 0) stop("'nudge' must be non-negative.")
   
-  # Check alpha is numeric and positive:
+  # Numeric scalar and constraint checks for alpha:
   check_numeric(alpha, "scalar", finite = TRUE)
-  # if (!is.numeric(alpha)) stop("'alpha' must be a numeric scalar.")
-  # if (!is.vector(alpha)) stop("'alpha' must be a numeric scalar.")
-  # if (length(alpha) != 1) stop("'alpha' must be a numeric scalar.")
   if (alpha <= 0) stop("'alpha' must be strictly positive.")
   
-  # Check max_iter is an integer (or numeric equivalent) and positive.
+  # Positive integer check for max_iter:
   check_wholenumber(max_iter)
-  # if(!is.vector(max_iter)) stop("'max_iter' must be a positive integer.")
-  # if(length(max_iter) != 1) stop("'max_iter' must be a positive integer.")
-  # if(max_iter != as.integer(max_iter)) stop("'max_iter' must be a positive integer.")
-  # if(max_iter < 1) stop("'max_iter' must be a positive integer.")
   
-  # Check max_theta is numeric and positive:
+  # Numeric scalar and constraint checks for max_theta:
   check_numeric(max_theta, "scalar", finite = FALSE)
-  # if (!is.numeric(max_theta)) stop("'max_theta' must be a numeric scalar.")
-  # if (!is.vector(max_theta)) stop("'max_theta' must be a numeric scalar.")
-  # if (length(max_theta) != 1) stop("'max_theta' must be a numeric scalar.")
   if (max_theta <= 0) stop("'max_theta' must be strictly positive.")
 
-  # Check impulse is numeric and strictly within (0, 1]:
+  # Numeric scalar and constraint checks for impulse:
   check_numeric(impulse, "scalar", finite = TRUE)
-  # if (!is.numeric(impulse)) stop("'impulse' must be a numeric scalar.")
-  # if (!is.vector(impulse)) stop("'impulse' must be a numeric scalar.")
-  # if (length(impulse) != 1) stop("'impulse' must be a numeric scalar.")
   if ((impulse <= 0) | (impulse > 1)) stop("'impulse' must be within (0, 1].")
 
   # Check for monotonicity of Y values:

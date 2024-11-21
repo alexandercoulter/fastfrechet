@@ -120,6 +120,9 @@ FRiSO_univar2wass = function(X,
   # Center and scale inputs:
   Xc = scaleX_cpp(X)
   
+  # If all entries are zero, then cannot do FRiSO (all covariates are equivalent):
+  if(all(Xc == 0)) stop("'X' must have at least one non-trivial column.")
+  
   # Run FRiSO:
   friso = FRiSO_GSD(X = Xc,
                     Y = Y,

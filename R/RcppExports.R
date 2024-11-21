@@ -12,23 +12,8 @@ scaleXZ_cpp <- function(X, Z, tol = 1e-10) {
 }
 
 #' @export
-modulo <- function(x, m) {
-    .Call(`_fastfrechet_modulo`, x, m)
-}
-
-#' @export
-Thomas_algorithm <- function(v, method = 2L) {
-    .Call(`_fastfrechet_Thomas_algorithm`, v, method)
-}
-
-#' @export
-hW_solver_Thomas <- function(W, c) {
-    .Call(`_fastfrechet_hW_solver_Thomas`, W, c)
-}
-
-#' @export
-Custom_Active_Set <- function(Yhat, L, U, eps = 1e-8) {
-    .Call(`_fastfrechet_Custom_Active_Set`, Yhat, L, U, eps)
+monotoneQP_warmstart <- function(Y, W_init, lower, upper, eps = 1e-10) {
+    .Call(`_fastfrechet_monotoneQP_warmstart`, Y, W_init, lower, upper, eps)
 }
 
 #' @export

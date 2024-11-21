@@ -36,53 +36,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// modulo
-arma::uvec modulo(const arma::uvec& x, const int& m);
-RcppExport SEXP _fastfrechet_modulo(SEXP xSEXP, SEXP mSEXP) {
+// monotoneQP_warmstart
+arma::mat monotoneQP_warmstart(const arma::mat& Y, const arma::mat& W_init, const double& lower, const double& upper, const double& eps);
+RcppExport SEXP _fastfrechet_monotoneQP_warmstart(SEXP YSEXP, SEXP W_initSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP epsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::uvec& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const int& >::type m(mSEXP);
-    rcpp_result_gen = Rcpp::wrap(modulo(x, m));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Thomas_algorithm
-arma::colvec Thomas_algorithm(const arma::colvec& v, const int& method);
-RcppExport SEXP _fastfrechet_Thomas_algorithm(SEXP vSEXP, SEXP methodSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::colvec& >::type v(vSEXP);
-    Rcpp::traits::input_parameter< const int& >::type method(methodSEXP);
-    rcpp_result_gen = Rcpp::wrap(Thomas_algorithm(v, method));
-    return rcpp_result_gen;
-END_RCPP
-}
-// hW_solver_Thomas
-arma::colvec hW_solver_Thomas(const arma::uvec& W, const arma::colvec& c);
-RcppExport SEXP _fastfrechet_hW_solver_Thomas(SEXP WSEXP, SEXP cSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::uvec& >::type W(WSEXP);
-    Rcpp::traits::input_parameter< const arma::colvec& >::type c(cSEXP);
-    rcpp_result_gen = Rcpp::wrap(hW_solver_Thomas(W, c));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Custom_Active_Set
-arma::mat Custom_Active_Set(const arma::mat& Yhat, const arma::mat& L, const arma::mat& U, const double& eps);
-RcppExport SEXP _fastfrechet_Custom_Active_Set(SEXP YhatSEXP, SEXP LSEXP, SEXP USEXP, SEXP epsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type Yhat(YhatSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type L(LSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type U(USEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type W_init(W_initSEXP);
+    Rcpp::traits::input_parameter< const double& >::type lower(lowerSEXP);
+    Rcpp::traits::input_parameter< const double& >::type upper(upperSEXP);
     Rcpp::traits::input_parameter< const double& >::type eps(epsSEXP);
-    rcpp_result_gen = Rcpp::wrap(Custom_Active_Set(Yhat, L, U, eps));
+    rcpp_result_gen = Rcpp::wrap(monotoneQP_warmstart(Y, W_init, lower, upper, eps));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -136,10 +101,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_fastfrechet_scaleX_cpp", (DL_FUNC) &_fastfrechet_scaleX_cpp, 2},
     {"_fastfrechet_scaleXZ_cpp", (DL_FUNC) &_fastfrechet_scaleXZ_cpp, 3},
-    {"_fastfrechet_modulo", (DL_FUNC) &_fastfrechet_modulo, 2},
-    {"_fastfrechet_Thomas_algorithm", (DL_FUNC) &_fastfrechet_Thomas_algorithm, 2},
-    {"_fastfrechet_hW_solver_Thomas", (DL_FUNC) &_fastfrechet_hW_solver_Thomas, 2},
-    {"_fastfrechet_Custom_Active_Set", (DL_FUNC) &_fastfrechet_Custom_Active_Set, 4},
+    {"_fastfrechet_monotoneQP_warmstart", (DL_FUNC) &_fastfrechet_monotoneQP_warmstart, 5},
     {"_fastfrechet_XDXt", (DL_FUNC) &_fastfrechet_XDXt, 2},
     {"_fastfrechet_projA0", (DL_FUNC) &_fastfrechet_projA0, 2},
     {"_fastfrechet_FRiSO_GSD", (DL_FUNC) &_fastfrechet_FRiSO_GSD, 12},

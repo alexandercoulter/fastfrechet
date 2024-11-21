@@ -412,6 +412,345 @@ arma::mat Custom_Active_Set(const arma::mat& Yhat,
 
 //' @export
 // [[Rcpp::export]]
+arma::mat monotoneQP_warmstart(const arma::mat& Y,
+                               const arma::mat& W_init,
+                               const double& lower,
+                               const double& upper,
+                               const double& eps = 1e-10){
+  
+  int n = Y.n_rows;
+  int m = Y.n_cols;
+  int m1 = m + 1;
+  arma::vec y(m);
+  arma::vec d(m1);
+  
+  // Initialize some variables
+  double neps = -1 * eps;
+  arma::vec eta(m1);
+  arma::vec eta_old(m1);
+  arma::mat Eta(n, m1);
+  arma::uvec w;
+  arma::uvec wc;
+  arma::vec x;
+  arma::vec mu(m1);
+  arma::vec mu_wc;
+  arma::vec p(m1);
+  arma::vec etap_ratio;
+  arma::uvec inds;
+  arma::vec a = arma::regspace(1, m) / arma::regspace(2, m1);
+  arma::uvec j;
+  arma::uvec wj_sub;
+  arma::uvec insertj;
+  arma::uvec diffw;
+  
+  int L;
+  int R;
+  int LR; 
+  int Lw;
+  
+  bool keep_looping;
+  
+  for(int k = 0; k < n; k++){
+    
+    y = Y.row(k).t();
+    w = find(W_init.row(k) == 1);
+    wc = find(W_init.row(k) == 0);
+    
+    // Calculate d
+    arma::vec d(m + 1);
+    std::copy(y.begin(), y.end(), d.begin());
+    d(m) = upper;
+    d(0) -= lower;
+    d.tail(m) -= y;
+    
+    // Initialize some variables
+    eta.zeros();
+    eta_old.zeros();
+    mu.zeros();
+    p.zeros();
+    
+    int L;
+    int R;
+    int LR; 
+    int Lw;
+    
+    // Set exit variable
+    bool keep_looping = true;
+    
+    // Enter loop
+    while(keep_looping){
+      
+      Lw = w.n_elem;
+      eta_old = eta;
+      
+      if(Lw <= m){
+        
+        if(Lw == 0){
+          
+          eta.zeros();
+          
+        } else {
+          
+          if(Lw == 1){
+            
+            if((w(0) == 0) | (w(0) == m)){
+              
+              eta(w) = -d(w);
+              
+            } else {
+              
+              eta(w) = -d(w) * 0.5;
+              
+            }
+            
+          } else {
+            
+            diffw = arma::diff(w);
+            L = 0;
+            R = 0;
+            
+            while(L < Lw){
+              
+              if(R == (Lw - 1)){
+                
+                if(L == R){
+                  
+                  if(w(L) == m){
+                    
+                    eta(w(L)) = -d(w(L));
+                    
+                  }else{
+                    
+                    eta(w(L)) = -d(w(L)) * 0.5;
+                    
+                  }
+                  
+                }else{
+                  
+                  LR = R - L;
+                  if(w(L) == 0){
+                    
+                    x = arma::cumsum(-d(arma::regspace<arma::uvec>(L, R)));
+                    
+                    eta(w(R)) = x(LR);
+                    for(int i = LR - 1; i >= 0; i--){
+                      
+                      eta(w(L) + i) = eta(w(L) + i + 1) + x(i);
+                      
+                    }
+                    
+                  }else if(w(R) == m){
+                    
+                    x.set_size(LR + 1);
+                    x.zeros();
+                    x(0) = -d(w(R));
+                    for(int i = 1; i <= LR; i++){
+                      
+                      x(i) = x(i - 1) - d(w(R) - i);
+                      
+                    }
+                    eta(w(L)) = x(LR);
+                    for(int i = 1; i <= LR; i++){
+                      
+                      eta(w(L) + i) = eta(w(L) + i - 1) + x(LR - i);
+                      
+                    }
+                    
+                  }else{
+                    
+                    x.set_size(LR + 1);
+                    x.zeros();
+                    x(0) = -d(w(L)) * 0.5;
+                    
+                    for(int i = 1; i <= LR; i++){
+                      
+                      x(i) = (x(i - 1) - d(w(L) + i)) * a(i);
+                      
+                    }
+                    eta(w(R)) = x(LR);
+                    for(int i = LR - 1; i >= 0; i--){
+                      
+                      eta(w(L) + i) = x(i) + eta(w(L) + i + 1) * a(i);
+                      
+                    }
+                    
+                  }
+                  
+                }
+                
+                R++;
+                L = R;
+                
+              }else{
+                
+                if(diffw(R) == 1){
+                  
+                  R++;
+                  
+                }else{
+                  
+                  if(L == R){
+                    
+                    if(w(L) == 0){
+                      
+                      eta(w(L)) = -d(w(L));
+                      
+                    }else{
+                      
+                      eta(w(L)) = -d(w(L)) * 0.5;
+                      
+                    }
+                    
+                  }else{
+                    
+                    LR = R - L;
+                    
+                    if(w(L) == 0){
+                      
+                      x = arma::cumsum(-d(arma::regspace<arma::uvec>(L, R)));
+                      
+                      eta(w(R)) = x(LR);
+                      for(int i = LR - 1; i >= 0; i--){
+                        
+                        eta(w(L) + i) = eta(w(L) + i + 1) + x(i);
+                        
+                      }
+                      
+                    } else {
+                      
+                      x.set_size(LR + 1);
+                      x.zeros();
+                      x(0) = -d(w(L)) * 0.5;
+                      
+                      for(int i = 1; i <= LR; i++){
+                        
+                        x(i) = (x(i - 1) - d(w(L) + i)) * a(i);
+                        
+                      }
+                      eta(w(R)) = x(LR);
+                      for(int i = LR - 1; i >= 0; i--){
+                        
+                        eta(w(L) + i) = x(i) + eta(w(L) + i + 1) * a(i);
+                        
+                      }
+                      
+                    }
+                    
+                  }
+                  
+                  R++;
+                  L = R;
+                  
+                }
+                
+              }
+              
+            }
+            
+          }
+          
+        }
+        
+        if(eta.min() > neps){
+          
+          if(Lw > 0){
+            
+            x.set_size(m);
+            x.zeros();
+            inds = w(find(w < m));
+            x(inds) = eta(inds);
+            inds = w(find(w > 0));
+            x(inds - 1) -= eta(inds);
+            
+            mu(wc).zeros();
+            inds = wc(find(wc < m));
+            mu(inds) = x(inds);
+            inds = wc(find(wc > 0));
+            mu(inds) -= x(inds - 1);
+            mu(wc) += d(wc);
+            
+          } else {
+            
+            mu = d;
+            
+          }
+          
+          if(mu(wc).min() > neps){
+            
+            keep_looping = false;
+            
+          } else {
+            
+            mu_wc = mu(wc);
+            j = mu_wc.index_min();
+            wj_sub = wc(j);
+            
+            if(Lw == 0){
+              
+              w = wj_sub;
+              wc.shed_rows(j);
+              
+            } else {
+              
+              insertj = find(w > wj_sub(0));
+              
+              if(insertj.n_elem == 0){
+                
+                w.insert_rows(w.n_elem, wj_sub);
+                
+              } else {
+                
+                w.insert_rows(insertj(0), wj_sub);
+                
+              }
+              
+              wc.shed_rows(j);
+              
+            }
+            
+          }
+          
+        } else {
+          
+          p = eta - eta_old;
+          inds = w(find(eta(w) < eps));
+          etap_ratio = -eta(inds) / p(inds);
+          j = inds(etap_ratio.index_min());
+          insertj = find(wc > j(0));
+          
+          if(insertj.n_elem == 0){
+            
+            insertj = wc.n_elem;
+            
+          }
+          
+          wc.insert_rows(insertj(0), j);
+          w.shed_rows(arma::find(w == j(0)));
+          eta = eta_old - (eta_old(j(0)) / p(j(0))) * p;
+          
+        }
+        
+      } else {
+        
+        j = eta.index_min();
+        w.shed_rows(arma::find(w == j(0)));
+        wc = j;
+        eta -= eta(j(0));
+        
+      }
+      
+    }
+    
+    Eta.row(k) = eta.t();
+    
+  }
+  
+  return(Eta);
+  
+}
+
+//' @export
+// [[Rcpp::export]]
 arma::mat XDXt(const arma::mat& X,
                const arma::colvec& d){
   

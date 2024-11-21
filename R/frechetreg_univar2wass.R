@@ -284,7 +284,7 @@ frechetreg_univar2wass <- function(X,
   # Solve for Qhat (i.e. constrained weighted mean):
   {
     # Lagrange multiplier from custom active set method:
-    Eta <- monotoneQP_warmstart(
+    Eta <- monotoneQP_cpp(
       Y = Y,
       lower = lower,
       upper = upper,

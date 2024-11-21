@@ -40,6 +40,7 @@
 frechetreg_univar2wass <- function(X,
                                    Y,
                                    Z = NULL,
+                                   C_init = NULL,
                                    lambda = NULL,
                                    lower = -Inf,
                                    upper = Inf,
@@ -85,7 +86,7 @@ frechetreg_univar2wass <- function(X,
     if(is.null(Z)) if(nrow(C_init) != nrow(X)) stop("'X' and 'C_init' must have same number of rows, if 'Z' is not provided.")
     if(!is.null(Z)) if(nrow(C_init) != nrow(Z)) stop("'Z' and 'C_init', if both provided, must have same number of rows.")
     
-    # Check ncol(Z) = ncol(Y) + 1
+    # Check ncol(C_init) = ncol(Y) + 1
     if(ncol(C_init) != (ncol(Y) + 1)) stop("'C_init' must have one more column than 'Y'.")
     
     # Convert with sign operator

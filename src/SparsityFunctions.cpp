@@ -54,7 +54,7 @@ Rcpp::List scaleXZ_cpp(const arma::mat& X,
 
 //' @export
 // [[Rcpp::export]]
-arma::mat monotoneQP_warmstart(const arma::mat& Y,
+arma::mat monotoneQP_cpp(const arma::mat& Y,
                                const arma::mat& W_init,
                                const double& lower,
                                const double& upper,
@@ -616,7 +616,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
         XtGY = Xnt * GY;
         
         // Lagrange multiplier and constrained solution:
-        H = monotoneQP_warmstart(Yhat, C, lower, upper, 1e-10);
+        H = monotoneQP_cpp(Yhat, C, lower, upper, 1e-10);
         C = sign(H);
         Q = Yhat + (H.head_cols(m) - H.tail_cols(m));
         sum_C = sum(C, 1);
@@ -831,7 +831,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
         Yhat = Ybar + Xn * DFtXtY;
         
         // Lagrange multiplier and constrained solution:
-        H = monotoneQP_warmstart(Yhat, C, lower, upper, 1e-10);
+        H = monotoneQP_cpp(Yhat, C, lower, upper, 1e-10);
         C = sign(H);
         Q = Yhat + (H.head_cols(m) - H.tail_cols(m));
         sum_C = sum(C, 1);

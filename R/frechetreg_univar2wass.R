@@ -15,15 +15,14 @@
 #'
 #' @param X A (`n` \eqn{\times} `p`) "input" covariate matrix with no missing, all finite entries.
 #' @param Y A (`n` \eqn{\times} `m`) matrix of observed quantile functions, row-wise monotone non-decreasing.
-#' @param C_init An optional (`m + 1`)-long numeric vector (or (`n` \eqn{\times} `m + 1`) matrix) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.
 #'  Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
 #' @param Z An optional (`z` \eqn{\times} `p`) "output" covariate matrix (default `NULL`) with no missing, all finite entries.
+#' @param C_init An optional (`n` \eqn{\times} `m + 1`) matrix (or `z` \eqn{\times} `m + 1` if `Z` is provided) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.
 #' @param lambda An optional (`p` \eqn{\times} `1`) vector with non-negative entries whose sum is strictly positive.
 #'  If `NULL` a non-regularized regression is performed (the default).
 #' @param lower An optional numeric scalar (default `-Inf`) lower box constraint; must be strictly less than `upper`.
 #' @param upper An optional numeric scalar (default `Inf`) upper box constraint; must be strictly greater than `lower`.
 #' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
-#' @param skip_checks An optional logical argument (default `FALSE`). When `TRUE` compatibility and dimension checks are skipped.
 #'
 #' @return A (`n` \eqn{\times} `m`) matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
 #'  The solution has rows that are monotone decreasing that are bounded between the `lower` and `upper` arguments.
@@ -75,6 +74,32 @@ frechetreg_univar2wass <- function(X,
 
   # Check for column matching between X and Z, if provided:
   if (!is.null(Z)) if (ncol(X) != ncol(Z)) stop("'X' and 'Z' must have the same number of columns.")
+  
+  # Numeric check and conversion for optional C_init:
+  if(!is.null(C_init)){
+    
+    # Check it is a numeric matrix; infinite entries (specifically +Inf) are OK
+    check_numeric(C_init, "matrix", FALSE)
+    
+    # Check for row-matching with X or Z, depending on whether Z is specified
+    if(is.null(Z)) if(nrow(C_init) != nrow(X)) stop("'X' and 'C_init' must have same number of rows, if 'Z' is not provided.")
+    if(!is.null(Z)) if(nrow(C_init) != nrow(Z)) stop("'Z' and 'C_init', if both provided, must have same number of rows.")
+    
+    # Check ncol(Z) = ncol(Y) + 1
+    if(ncol(C_init) != (ncol(Y) + 1)) stop("'C_init' must have one more column than 'Y'.")
+    
+    # Convert with sign operator
+    C_init = sign(C_init)
+    
+    # If there are negative entries, exit with error
+    if(min(C_init) < 0) stop("'C_init' must contain non-negative entries.")
+    
+  } else {
+    
+    # If not provided, initialize with zero-matrix, with appropriate nrow
+    C_init = if(is.null(Z)) matrix(0, nrow(X), ncol(Y) + 1) else matrix(0, nrow(Z), ncol(Y) + 1)
+    
+  }
 
   # Check for monotonicity of Y values:
   if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("'Y' must be row-wise monotone non-decreasing.")
@@ -318,5 +343,5 @@ frechetreg_univar2wass <- function(X,
   }
 
   # Return Qhat value:
-  return(Qhat)
+  return(list("Qhat" = Qhat, "Lagrange_Multiplier" = Eta))
 }

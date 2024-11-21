@@ -52,10 +52,11 @@ monotoneQP = function(Y,
   if (eps <= 0) stop("'eps' must be strictly positive.")
   
   # Run custom active set method to obtain Lagrange multiplier 'Eta':
-  Eta = Custom_Active_Set(Y = Y,
-                          L = cbind(rep(lower, nrow(Y))),
-                          U = cbind(rep(upper, nrow(Y))),
-                          eps = eps)
+  Eta = monotoneQP_warmstart(Y = Y,
+                             W_init = matrix(0, nrow(Y), ncol(Y) + 1),
+                             lower = lower,
+                             upper = upper,
+                             eps = eps)
   
   # Obtain row-monotone solution Q:
   Q = Y + (Eta[ , -ncol(Eta)] - Eta[ , -1])

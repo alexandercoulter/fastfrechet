@@ -49,15 +49,25 @@ monotoneQP = function(Y,
   # Numeric check and conversion for optional C_init:
   if(!is.null(C_init)){
     
+    # Can take vector input; convert to row-matrix
     if(is.vector(C_init)) C_init = rbind(C_init)
+    
+    # Check it is a numeric matrix; infinite entries (specifically +Inf) are OK
     check_numeric(C_init, "matrix", FALSE)
-    if(min(C_init) < 0) stop("'C_init' must contain non-negative entries.")
+    
+    # Check row and column compatibility with Y
     if(nrow(C_init) != nrow(Y)) stop("'Y' and 'C_init' must have same number of rows.")
     if(ncol(C_init) != (ncol(Y) + 1)) stop("'C_init' must have one more column than 'Y'.")
+    
+    # Convert with sign operator
     C_init = sign(C_init)
+    
+    # If there are negative entries, exit with error
+    if(min(C_init) < 0) stop("'C_init' must contain non-negative entries.")
     
   } else {
     
+    # If not provided, initialize with zero-matrix
     C_init = matrix(0, nrow(Y), ncol(Y) + 1)
     
   }

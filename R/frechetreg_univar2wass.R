@@ -332,7 +332,7 @@ frechetreg_univar2wass <- function(X,
   {
     # Lagrange multiplier from custom active set method:
     Eta <- monotoneQP_cpp(
-      Y = Y,
+      Y = Yhat,
       C_init = C_init,
       lower = lower,
       upper = upper,

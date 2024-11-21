@@ -284,10 +284,10 @@ frechetreg_univar2wass <- function(X,
   # Solve for Qhat (i.e. constrained weighted mean):
   {
     # Lagrange multiplier from custom active set method:
-    Eta <- Custom_Active_Set(
-      Y = Yhat,
-      L = cbind(rep(lower, nrow(Yhat))),
-      U = cbind(rep(upper, nrow(Yhat))),
+    Eta <- monotoneQP_warmstart(
+      Y = Y,
+      lower = lower,
+      upper = upper,
       eps = eps
     )
 

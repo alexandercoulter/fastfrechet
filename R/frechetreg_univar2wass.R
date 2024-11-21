@@ -15,6 +15,7 @@
 #'
 #' @param X A (`n` \eqn{\times} `p`) "input" covariate matrix with no missing, all finite entries.
 #' @param Y A (`n` \eqn{\times} `m`) matrix of observed quantile functions, row-wise monotone non-decreasing.
+#' @param C_init An optional (`m + 1`)-long numeric vector (or (`n` \eqn{\times} `m + 1`) matrix) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.
 #'  Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
 #' @param Z An optional (`z` \eqn{\times} `p`) "output" covariate matrix (default `NULL`) with no missing, all finite entries.
 #' @param lambda An optional (`p` \eqn{\times} `1`) vector with non-negative entries whose sum is strictly positive.
@@ -76,7 +77,7 @@ frechetreg_univar2wass <- function(X,
   if (!is.null(Z)) if (ncol(X) != ncol(Z)) stop("'X' and 'Z' must have the same number of columns.")
 
   # Check for monotonicity of Y values:
-  if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("'Y' must be row-wise monotone.")
+  if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("'Y' must be row-wise monotone non-decreasing.")
 
   # Check for box constraints on Y values:
   if ((max(Y) > upper) | (min(Y) < lower)) stop("'Y' must obey box constraints given by 'lower' and 'upper'.")
@@ -89,7 +90,7 @@ frechetreg_univar2wass <- function(X,
       output <- scaleXZ_cpp(X, Z, tol = 1e-10)
       Xc <- output$Xc
       Zc <- output$Zc
-
+      
       # Grab dimensions:
       n <- nrow(Xc)
       p <- ncol(Xc)
@@ -116,7 +117,11 @@ frechetreg_univar2wass <- function(X,
           M <- tryCatch(solve(crossprod(Xc), crossprod(Xc, Y)),
             error = function(e) {
               S <- svd(Xc)
-              g <- S$d > 1e-10
+              g <- which(S$d > 1e-10)
+              
+              # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
+              if(length(g) == 0) return(list(matrix(0, p, 1), matrix(0, 1, m)))
+              
               return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g]^2)))
             }
           )
@@ -134,7 +139,11 @@ frechetreg_univar2wass <- function(X,
           M <- tryCatch(solve(crossprod(Xc), crossprod(Xc, Y)),
             error = function(e) {
               S <- svd(crossprod(Xc))
-              g <- S$d > 1e-10
+              g <- which(S$d > 1e-10)
+              
+              # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
+              if(length(g) == 0) return(matrix(0, p, m))
+              
               return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g])))
             }
           )
@@ -193,7 +202,7 @@ frechetreg_univar2wass <- function(X,
     } else {
       # Center and scale X matrix:
       Xc <- scaleX_cpp(X)
-
+      
       # Grab dimensions:
       n <- nrow(Xc)
       p <- ncol(Xc)
@@ -219,10 +228,19 @@ frechetreg_univar2wass <- function(X,
         if (p >= n) {
           # Immediately calculate SVD of Xc = USV':
           S <- svd(Xc)
-          g <- S$d > 1e-10
-
-          # Evaluate UU'Y, ordering the multiplication based on n > m:
-          M <- if (n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
+          g <- which(S$d > 1e-10)
+          
+          # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
+          if (length(g) == 0){
+            
+            M <- 0
+            
+          } else {
+            
+            # Evaluate UU'Y, ordering the multiplication based on n > m:
+            M <- if (n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
+            
+          }
 
           # Calculate Yhat:
           Yhat <- rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
@@ -232,8 +250,11 @@ frechetreg_univar2wass <- function(X,
             error = function(e) {
               # If inversion fails, calculate SVD of Xc = USV':
               S <- svd(Xc)
-              g <- S$d > 1e-10
-
+              g <- which(S$d > 1e-10)
+              
+              # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
+              if (length(g) == 0) return(0)
+              
               # Evaluate UU'Y, ordering the multiplication based on n > m:
               if (n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
             }
@@ -286,6 +307,7 @@ frechetreg_univar2wass <- function(X,
     # Lagrange multiplier from custom active set method:
     Eta <- monotoneQP_cpp(
       Y = Y,
+      C_init = C_init,
       lower = lower,
       upper = upper,
       eps = eps

@@ -901,11 +901,11 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
   arma::mat Yt = Y.t();       // transposed Y (calculate once)
   arma::mat Xnt = Xn.t();     // transposed scaled X matrix (calculate once)
   arma::mat H(n, m + 1);      // Lagrange multiplier (capital Eta)
+  arma::mat C(n, m + 1);      // Active constraint matrix
   arma::mat Yhat(n, m);       // unconstrained quantile (embedded) solution
   arma::mat Q(n, m);          // constrained quantile (embedded) solution
   arma::mat E(n, m);          // residuals matrix
   arma::mat tilE(m, n);       // adjusted residuals matrix
-  arma::mat C(n, m - 1);      // active constraint matrix
   arma::mat V(m, n);          // matrix for second derivative
   arma::colvec Vi(m + 2);     // vector for holding (0, V[ , i]', 0)'
   arma::colvec AAAVi;         // vector for holding (A[ , w]' A[ , w])^{-1}A[ , w]' V[ , i]
@@ -980,9 +980,11 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
         XtGY = Xnt * GY;
         
         // Lagrange multiplier and constrained solution:
-        H = Custom_Active_Set(Yhat, L, U);
+        // H = Custom_Active_Set(Yhat, L, U);
+        H = monotoneQP_warmstart(Yhat, C, lower, upper, 1e-10);
+        C = sign(H);
         Q = Yhat + (H.head_cols(m) - H.tail_cols(m));
-        sum_C = sum(H, 1);
+        sum_C = sum(C, 1);
         
         // Residuals matrix:
         E = Q - Y;
@@ -1194,9 +1196,11 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
         Yhat = Ybar + Xn * DFtXtY;
         
         // Lagrange multiplier and constrained solution:
-        H = Custom_Active_Set(Yhat, L, U);
+        // H = Custom_Active_Set(Yhat, L, U);
+        H = monotoneQP_warmstart(Yhat, C, lower, upper, 1e-10);
+        C = sign(H);
         Q = Yhat + (H.head_cols(m) - H.tail_cols(m));
-        sum_C = sum(H, 1);
+        sum_C = sum(C, 1);
         
         // Residuals matrix:
         E = Q - Y;

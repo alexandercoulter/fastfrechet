@@ -55,7 +55,7 @@ Rcpp::List scaleXZ_cpp(const arma::mat& X,
 //' @export
 // [[Rcpp::export]]
 arma::mat monotoneQP_cpp(const arma::mat& Y,
-                               const arma::mat& W_init,
+                               const arma::mat& C_init,
                                const double& lower,
                                const double& upper,
                                const double& eps = 1e-10){
@@ -95,8 +95,8 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
   for(int k = 0; k < n; k++){
     
     y = Y.row(k).t();
-    w = find(W_init.row(k) == 1);
-    wc = find(W_init.row(k) == 0);
+    w = find(C_init.row(k) == 1);
+    wc = find(C_init.row(k) == 0);
     
     // Calculate d
     arma::vec d(m + 1);

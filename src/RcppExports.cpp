@@ -36,18 +36,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// monotoneQP_warmstart
-arma::mat monotoneQP_warmstart(const arma::mat& Y, const arma::mat& W_init, const double& lower, const double& upper, const double& eps);
-RcppExport SEXP _fastfrechet_monotoneQP_warmstart(SEXP YSEXP, SEXP W_initSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP epsSEXP) {
+// monotoneQP_cpp
+arma::mat monotoneQP_cpp(const arma::mat& Y, const arma::mat& C_init, const double& lower, const double& upper, const double& eps);
+RcppExport SEXP _fastfrechet_monotoneQP_cpp(SEXP YSEXP, SEXP C_initSEXP, SEXP lowerSEXP, SEXP upperSEXP, SEXP epsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type W_init(W_initSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type C_init(C_initSEXP);
     Rcpp::traits::input_parameter< const double& >::type lower(lowerSEXP);
     Rcpp::traits::input_parameter< const double& >::type upper(upperSEXP);
     Rcpp::traits::input_parameter< const double& >::type eps(epsSEXP);
-    rcpp_result_gen = Rcpp::wrap(monotoneQP_warmstart(Y, W_init, lower, upper, eps));
+    rcpp_result_gen = Rcpp::wrap(monotoneQP_cpp(Y, C_init, lower, upper, eps));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -101,7 +101,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_fastfrechet_scaleX_cpp", (DL_FUNC) &_fastfrechet_scaleX_cpp, 2},
     {"_fastfrechet_scaleXZ_cpp", (DL_FUNC) &_fastfrechet_scaleXZ_cpp, 3},
-    {"_fastfrechet_monotoneQP_warmstart", (DL_FUNC) &_fastfrechet_monotoneQP_warmstart, 5},
+    {"_fastfrechet_monotoneQP_cpp", (DL_FUNC) &_fastfrechet_monotoneQP_cpp, 5},
     {"_fastfrechet_XDXt", (DL_FUNC) &_fastfrechet_XDXt, 2},
     {"_fastfrechet_projA0", (DL_FUNC) &_fastfrechet_projA0, 2},
     {"_fastfrechet_FRiSO_GSD", (DL_FUNC) &_fastfrechet_FRiSO_GSD, 12},

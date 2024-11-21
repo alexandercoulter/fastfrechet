@@ -12,8 +12,8 @@ scaleXZ_cpp <- function(X, Z, tol = 1e-10) {
 }
 
 #' @export
-monotoneQP_warmstart <- function(Y, W_init, lower, upper, eps = 1e-10) {
-    .Call(`_fastfrechet_monotoneQP_warmstart`, Y, W_init, lower, upper, eps)
+monotoneQP_cpp <- function(Y, C_init, lower, upper, eps = 1e-10) {
+    .Call(`_fastfrechet_monotoneQP_cpp`, Y, C_init, lower, upper, eps)
 }
 
 #' @export

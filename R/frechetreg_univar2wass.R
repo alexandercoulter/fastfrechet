@@ -25,7 +25,7 @@
 #' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
 #'
 #' @return A (`n` \eqn{\times} `m`) matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
-#'  The solution has rows that are monotone decreasing that are bounded between the `lower` and `upper` arguments.
+#'  The solution has rows that are monotone non-decreasing and bounded between the `lower` and `upper` arguments.
 #'
 #' @references
 #' \insertRef{arnstrom_dual_2022}{fastfrechet}

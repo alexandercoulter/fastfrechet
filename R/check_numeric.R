@@ -50,7 +50,7 @@ check_numeric = function(x, object_type = c("scalar", "vector", "matrix"), finit
     
   } else {
     
-    bool_check = tryCatch(is.na(x), error = function(e) TRUE, warning = function(w) TRUE)
+    bool_check = tryCatch(any(is.na(x)), error = function(e) TRUE, warning = function(w) TRUE)
     if(bool_check) stop(stop_message)
     
   }

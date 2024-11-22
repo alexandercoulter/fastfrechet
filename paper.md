@@ -1,33 +1,34 @@
 ---
-title: 'fastfrechet: An R package for fast implementation of Fréchet regression functions for distribution responses'
+title: 'fastfrechet: An R package for fast implementation of Fréchet regression functions
+  for distribution responses'
 tags:
-  - R
-  - Fréchet regression
-  - Variable selection
-  - Distributions
-  - Wasserstein
-  - Metric space
-authors:
-  - name: Alexander Coulter
-    orcid: 0009-0001-9116-6588
-    equal-contrib: true
-    affiliation: 1
-  - name: Rebecca Lee
-    orcid: 0000-0001-8162-6555
-    equal-contrib: true
-    affiliation: 1
-  - name: Dr. Irina Gaynanova
-    orcid: 0000-0002-4116-0268
-    equal-contrib: true
-    affiliation: 2
-    corresponding: true
+- R
+- Fréchet regression
+- Variable selection
+- Distributions
+- Wasserstein
+- Metric space
+date: "12 November 2024"
 affiliations:
- - name: Department of Statistics, Texas A&M University, United States
-   index: 1
- - name: Department of Biostatistics, University of Michigan, United States
-   index: 2
-date: 12 November 2024
-bibliography: "inst/REFERENCES.bib"
+- name: Department of Statistics, Texas A&M University, United States
+  index: 1
+- name: Department of Biostatistics, University of Michigan, United States
+  index: 2
+authors:
+- name: Alexander Coulter
+  orcid: "0009-0001-9116-6588"
+  equal-contrib: yes
+  affiliation: 1
+- name: Rebecca Lee
+  orcid: "0000-0001-8162-6555"
+  equal-contrib: yes
+  affiliation: 1
+- name: Dr. Irina Gaynanova
+  orcid: "0000-0002-4116-0268"
+  equal-contrib: yes
+  affiliation: 2
+  corresponding: yes
+bibliography: inst/REFERENCES.bib
 ---
 
 # Summary

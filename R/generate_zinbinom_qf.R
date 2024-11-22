@@ -34,6 +34,7 @@
 #' n = 100  # number of samples - nrow(X) and nrow(Y).
 #' p = 10   # number of covariates - ncol(X).
 #' m = 100  # EQF grid density - ncol(Y).
+#' mseq = seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
 #' 
 #' set.seed(31)
 #' mydata = fastfrechet::generate_zinbinom_qf(n = n,
@@ -44,7 +45,7 @@
 #' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
 #' 
 #' # Plot the EQFs:
-#' plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Q)),
+#' plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Y)),
 #'      main = 'Zero-Inflated Negative Binomial QFs',
 #'      xlab = 'p', ylab = 'quantile')
 #' for(i in 1:n) lines(mseq, Y[i, ], lwd = 2)

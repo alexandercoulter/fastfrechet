@@ -59,7 +59,7 @@
 #' # Dense grid of 'allowance' totals:
 #' tauseq = seq(0.2, 20, 0.2)
 #' 
-#' # Generate estimated 'allowance' vectors \lambda for each \tau, stored
+#' # Generate estimated 'allowance vector's \lambda for each \tau, stored
 #' # column-wise in matrix 'L':
 #' L = fastfrechet::FRiSO_univar2wass(X = X,
 #'                                    Y = Y,

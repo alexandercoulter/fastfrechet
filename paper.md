@@ -2,12 +2,13 @@
 title: 'fastfrechet: An R package for fast implementation of Fréchet regression functions
   for distribution responses'
 tags:
-- R
 - Fréchet regression
 - Variable selection
 - Distributions
 - Wasserstein
 - Metric space
+- R
+- C++
 date: "12 November 2024"
 affiliations:
 - name: Department of Statistics, Texas A&M University, United States

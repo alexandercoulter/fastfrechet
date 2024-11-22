@@ -23,9 +23,11 @@ FRiSO_CPSS = function(X, Y, B = 50, thresh = 0.0001, ...){
   m = ncol(Y)
   
   # Dimension checks:
-  if(n != nrow(Y)) stop("X and Y must have same number of rows.")
-  
+  check_wholenumber(B);
+  check_numeric(thresh);
   if(thresh <= 0) stop("'thresh' must be positive.")
+  
+  if(n != nrow(Y)) stop("X and Y must have same number of rows.")
   
   # Create empty selected variables (sv) and selected samples (ss) arrays:
   sv = array(NA, c(B, 2, length(full_tauseq), p))

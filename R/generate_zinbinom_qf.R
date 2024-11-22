@@ -43,6 +43,11 @@
 #' X = mydata$X  # (n x p) matrix of covariates
 #' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
 #' 
+#' # Plot the EQFs:
+#' plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Q)),
+#'      main = 'Zero-Inflated Negative Binomial QFs',
+#'      xlab = 'p', ylab = 'quantile')
+#' for(i in 1:n) lines(mseq, Y[i, ], lwd = 2)
 generate_zinbinom_qf = function(n,
                                 p,
                                 m,

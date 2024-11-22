@@ -3,7 +3,6 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 using namespace Rcpp;
 
-//' @export
 // [[Rcpp::export]]
 arma::mat scaleX_cpp(const arma::mat& X,
                      const double& tol = 1e-10){
@@ -24,7 +23,6 @@ arma::mat scaleX_cpp(const arma::mat& X,
   
 }
 
-//' @export
 // [[Rcpp::export]]
 Rcpp::List scaleXZ_cpp(const arma::mat& X,
                        const arma::mat& Z,
@@ -52,7 +50,6 @@ Rcpp::List scaleXZ_cpp(const arma::mat& X,
   
 }
 
-//' @export
 // [[Rcpp::export]]
 arma::mat monotoneQP_cpp(const arma::mat& Y,
                                const arma::mat& C_init,
@@ -391,7 +388,6 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
   
 }
 
-//' @export
 // [[Rcpp::export]]
 arma::mat XDXt(const arma::mat& X,
                const arma::colvec& d){
@@ -402,7 +398,6 @@ arma::mat XDXt(const arma::mat& X,
   
 }
 
-//' @export
 // [[Rcpp::export]]
 arma::colvec projA0(const arma::colvec& v,
                     const arma::colvec& h){
@@ -489,7 +484,6 @@ arma::colvec projA0(const arma::colvec& v,
   
 }
 
-//' @export
 // [[Rcpp::export]]
 Rcpp::List FRiSO_GSD(const arma::mat& X,
                      const arma::mat& Y,

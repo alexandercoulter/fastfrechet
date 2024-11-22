@@ -30,6 +30,36 @@
 #' @export
 #'
 #' @examples
+#' # Set box constraints:
+#' lower = 0.5
+#' upper = 1.5
+#' 
+#' # Generate example vector:
+#' m = 100
+#' set.seed(31)
+#' y = rnorm(m, 2 * seq(0, 1, len = m), 0.1)
+#' 
+#' # Calculate monotone, box-constrained projection:
+#' output = fastfrechet::monotoneQP(y, lower = 0.5, upper = 1.5)
+#' 
+#' # Note: to numerical precision, these QFs are non-decreasing...
+#' min(diff(output$Solution[1, ]))
+#' 
+#' # ...bounded from below by the lower bound...
+#' min(output$Solution) - lower
+#' 
+#' # ...and bounded from above by the upper bound...
+#' max(output$Solution) - upper
+#' 
+#' # Plot values of the generated vector:
+#' plot(y, xlab = "x", ylab = "y", main = "Monotone and Box Constrained")
+#' abline(h = c(lower, upper), lty = 2, col = "gray80")
+#' 
+#' # Add values of monotone projection:
+#' points(mY$Solution[1, ], pch = 20)
+#' 
+#' legend("topleft", pch = c(1, 20), bty = "n",
+#'        legend = c("Unconstrained", "Monotone Constrained"))
 monotoneQP = function(Y,
                       C_init = NULL,
                       lower = -Inf,

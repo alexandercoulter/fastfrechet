@@ -37,6 +37,19 @@
 #' @export
 #'
 #' @examples
+#' Generate data using the output of `generate_zinbinom_qf`
+#' n = 100  # number of samples - nrow(X) and nrow(Y).
+#' p = 10   # number of covariates - ncol(X).
+#' m = 100  # EQF grid density - ncol(Y).
+#' 
+#' set.seed(31)
+#' mydata = fastfrechet::generate_zinbinom_qf(n = n,
+#'                                            p = p,
+#'                                            m = m)
+#' 
+#' X = mydata$X  # (n x p) matrix of covariates
+#' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+#' 
 #' # i.e. Estimate conditional QFs:
 #' Q = fastfrechet::frechetreg_univar2wass(X = X,
 #'                                         Y = Y,

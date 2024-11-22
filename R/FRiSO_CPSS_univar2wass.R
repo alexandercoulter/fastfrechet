@@ -10,7 +10,11 @@
 #' @export
 #'
 #' @examples
-FRiSO_CPSS = function(X, Y, B = 50, thresh = 0.0001, ...){
+FRiSO_CPSS_univar2wass = function(X,
+                                  Y,
+                                  B = 50,
+                                  thresh = 0.0001,
+                                  ...){
   
   # Grab parameters:
   Call = list(...)

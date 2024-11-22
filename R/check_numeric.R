@@ -4,9 +4,8 @@
 #' @param finite 
 #' @param object_type 
 #'
-#' @return
+#' @return No returned value
 #'
-#' @examples
 check_numeric = function(x, object_type = c("scalar", "vector", "matrix"), finite = TRUE){
   
   # Get variable name:

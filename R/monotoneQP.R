@@ -56,7 +56,7 @@
 #' abline(h = c(lower, upper), lty = 2, col = "gray80")
 #' 
 #' # Add values of monotone projection:
-#' points(mY$Solution[1, ], pch = 20)
+#' points(output$Solution[1, ], pch = 20)
 #' 
 #' legend("topleft", pch = c(1, 20), bty = "n",
 #'        legend = c("Unconstrained", "Monotone Constrained"))

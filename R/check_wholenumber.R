@@ -2,9 +2,8 @@
 #'
 #' @param x 
 #'
-#' @return
-#'
-#' @examples
+#' @return No return output.
+#' 
 check_wholenumber = function(x){
   
   # Get variable name:

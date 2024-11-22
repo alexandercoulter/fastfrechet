@@ -52,8 +52,13 @@
 #' mydata = fastfrechet::generate_zinbinom_qf(n = n,
 #'                                            p = p,
 #'                                            m = m)
+#'
+#' X = mydata$X  # (n x p) matrix of covariates
+#' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+#' 
 #' # Dense grid of 'allowance' totals
-#' tauseq = seq(20, 0.2, -0.2)
+#' tauseq = seq(0.2, 20, 0.2)
+#' 
 #' # Generate estimated 'allowance' vectors \lambda for each \tau, stored
 #' # column-wise in matrix 'L'.
 #' L = fastfrechet::FRiSO_univar2wass(X = X,
@@ -64,7 +69,7 @@
 #'                                    eps = 0.001,
 #'                                    nudge = 0.001)
 #'                                  
-#' # Plot FRiSO results in new plot:
+#' # Plot FRiSO solution paths
 #' plot(x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0, max(L)),
 #'      main = 'FRiSO Selection Paths', xlab = expression(tau),
 #'      ylab = expression(lambda))
@@ -72,9 +77,8 @@
 #' legend('topleft', lwd = 2, col = 1:2, bty = 'n',
 #' legend = c('Unrelated variable', 'Model variable'))
 #' 
-#' # Note that with this sample size, we have sufficient information to correctly
-#' # identify the first 4 variables as significantly affecting our QFs.
-#' print(difftime(Sys.time(), t1))
+#' # Note that with this sample size, there is sufficient information to
+#' # correctly identify the first 4 variables significantly affect the QFs.
 FRiSO_univar2wass = function(X,
                              Y,
                              lower = -Inf,

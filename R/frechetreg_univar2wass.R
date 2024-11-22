@@ -54,17 +54,21 @@
 #' Q = fastfrechet::frechetreg_univar2wass(X = X,
 #'                                         Y = Y,
 #'                                         Z = NULL,
+#'                                         C_init = NULL,
 #'                                         lambda = NULL,
 #'                                         lower = 0,
 #'                                         upper = Inf)
-#'# Note: to numerical precision, these QFs are non-decreasing:
-#'min(apply(Q, 1, diff))
-#'# ...and bounded from below by zero, our lower rbound:
-#'min(Q)
-#'# Plot these conditional QFs beside the EQFs:
-#'plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, 60),
-#'     main = 'Fréchet Regression QFs', xlab = 'p', ylab = 'quantile')
-#'for(i in 1:n) lines(mseq, Q[i, ], col = 'red', lwd = 2)
+#' 
+#' # Note: to numerical precision, these QFs are non-decreasing...
+#' min(apply(Q, 1, diff))
+#' 
+#' # ...and bounded from below by the lower bound, zero:
+#' min(Q)
+#' 
+#' # Plot the conditional QFs:
+#' plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Q)),
+#'      main = 'Fréchet Regression QFs', xlab = 'p', ylab = 'quantile')
+#' for(i in 1:n) lines(mseq, Q[i, ], lwd = 2)
 frechetreg_univar2wass <- function(X,
                                    Y,
                                    Z = NULL,

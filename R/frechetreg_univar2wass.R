@@ -51,7 +51,7 @@
 #' X = mydata$X  # (n x p) matrix of covariates
 #' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
 #' 
-#' # i.e. Estimate conditional QFs:
+#' # Estimate conditional QFs:
 #' output = fastfrechet::frechetreg_univar2wass(X = X,
 #'                                              Y = Y,
 #'                                              Z = NULL,
@@ -68,7 +68,7 @@
 #' 
 #' # Plot the conditional QFs:
 #' plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(output$Qhat)),
-#'      main = 'Fréchet Regression QFs', xlab = 'p', ylab = 'quantile')
+#'      main = "Fréchet Regression QFs", xlab = "p", ylab = "quantile")
 #' for(i in 1:n) lines(mseq, output$Qhat[i, ], lwd = 2)
 frechetreg_univar2wass <- function(X,
                                    Y,

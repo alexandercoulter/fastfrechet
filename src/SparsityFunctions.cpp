@@ -102,20 +102,23 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
     d(0) -= lower;
     d.tail(m) -= y;
     
-    // Initialize some variables
+    // Reset some variables to zero.
     eta.zeros();
     eta_old.zeros();
     mu.zeros();
     p.zeros();
     
-    int L;
-    int R;
-    int LR; 
-    int Lw;
-    
-    // Set exit variable
-    bool keep_looping = true;
-    
+    // Check if d immediately satisfies restraint, otherwise start loop
+    if(d.min() > neps){
+      
+      keep_looping = false;
+      
+    } else {
+      
+      keep_looping = true;
+      
+    }
+
     // Enter loop
     while(keep_looping){
       

@@ -51,24 +51,24 @@
 #' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
 #' 
 #' # i.e. Estimate conditional QFs:
-#' Q = fastfrechet::frechetreg_univar2wass(X = X,
-#'                                         Y = Y,
-#'                                         Z = NULL,
-#'                                         C_init = NULL,
-#'                                         lambda = NULL,
-#'                                         lower = 0,
-#'                                         upper = Inf)
+#' output = fastfrechet::frechetreg_univar2wass(X = X,
+#'                                              Y = Y,
+#'                                              Z = NULL,
+#'                                              C_init = NULL,
+#'                                              lambda = NULL,
+#'                                              lower = 0,
+#'                                              upper = Inf)
 #' 
 #' # Note: to numerical precision, these QFs are non-decreasing...
-#' min(apply(Q, 1, diff))
+#' min(apply(output$Qhat, 1, diff))
 #' 
 #' # ...and bounded from below by the lower bound, zero:
-#' min(Q)
+#' min(output$Qhat)
 #' 
 #' # Plot the conditional QFs:
 #' plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Q)),
 #'      main = 'Fréchet Regression QFs', xlab = 'p', ylab = 'quantile')
-#' for(i in 1:n) lines(mseq, Q[i, ], lwd = 2)
+#' for(i in 1:n) lines(mseq, output$Qhat[i, ], lwd = 2)
 frechetreg_univar2wass <- function(X,
                                    Y,
                                    Z = NULL,

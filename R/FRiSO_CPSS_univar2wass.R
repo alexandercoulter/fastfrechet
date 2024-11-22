@@ -23,7 +23,9 @@ FRiSO_CPSS = function(X, Y, B = 50, thresh = 0.0001, ...){
   m = ncol(Y)
   
   # Dimension checks:
-  if(n != nrow(Y)) stop('X and Y must have same number of rows.')
+  if(n != nrow(Y)) stop("X and Y must have same number of rows.")
+  
+  if(thresh <= 0) stop("'thresh' must be positive.")
   
   # Create empty selected variables (sv) and selected samples (ss) arrays:
   sv = array(NA, c(B, 2, length(full_tauseq), p))
@@ -56,7 +58,7 @@ FRiSO_CPSS = function(X, Y, B = 50, thresh = 0.0001, ...){
       L1 = do.call(FRiSO_univar2wass, args = Call)
       
       ss[b, 1, t, ] = as.numeric((1:n) %in% s1)
-      sv[b, 1, t, ] = as.numeric(L1[ , 1] > 0.0001)
+      sv[b, 1, t, ] = as.numeric(L1[ , 1] > thresh)
       
       # Second sample:
       Call$'X' = X[s2, , drop = FALSE]
@@ -65,7 +67,7 @@ FRiSO_CPSS = function(X, Y, B = 50, thresh = 0.0001, ...){
       L2 = do.call(FRiSO_univar2wass, args = Call)
       
       ss[b, 2, t, ] = as.numeric((1:n) %in% s2)
-      sv[b, 2, t, ] = as.numeric(L2[ , 1] > 0.0001)
+      sv[b, 2, t, ] = as.numeric(L2[ , 1] > thres)
       
     }
     

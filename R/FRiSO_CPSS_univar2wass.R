@@ -31,7 +31,8 @@ FRiSO_CPSS_univar2wass = function(X,
   check_numeric(thresh, "scalar", finite = TRUE)
   if(thresh <= 0) stop("'thresh' must be positive.")
   
-  if(n != nrow(Y)) stop("X and Y must have same number of rows.")
+  if(n != nrow(Y)) stop("'X' and 'Y' must have same number of rows.")
+  if(n <= 1) stop("'X' and 'Y' must have at least two rows (ideally at least log2(B) rows).")
   
   # Create empty selected variables (sv) and selected samples (ss) arrays:
   sv = array(NA, c(B, 2, length(full_tauseq), p))

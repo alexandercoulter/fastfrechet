@@ -43,6 +43,15 @@
 #' @export
 #'
 #' @examples
+#' Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
+#' n = 100  # number of samples - nrow(X) and nrow(Y).
+#' p = 10   # number of covariates - ncol(X).
+#' m = 100  # EQF grid density - ncol(Y).
+#' 
+#' set.seed(31)
+#' mydata = fastfrechet::generate_zinbinom_qf(n = n,
+#'                                            p = p,
+#'                                            m = m)
 #' # Dense grid of 'allowance' totals
 #' tauseq = seq(20, 0.2, -0.2)
 #' # Generate estimated 'allowance' vectors \lambda for each \tau, stored

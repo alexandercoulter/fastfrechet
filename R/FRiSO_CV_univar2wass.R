@@ -124,6 +124,6 @@ FRiSO_CV_univar2wass = function(X, Y, K = NULL, thresh = 0.0001, ...){
               'error_sum' = error_sum,
               'opt_tau' = opt_tau,
               'opt_lambda' = opt_lambda,
-              'opt_selected' = opt_selected)
+              'opt_selected' = opt_selected))
   
 }

@@ -13,6 +13,7 @@ FRiSO_CV_univar2wass = function(X, Y, K = NULL, thresh = 0.0001, ...){
   
   # Grab parameters:
   Call = list(...)
+  full_tauseq = Call$tauseq
   lower = Call$'lower'
   upper = Call$'upper'
   

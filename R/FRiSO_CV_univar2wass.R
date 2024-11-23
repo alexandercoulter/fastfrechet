@@ -3,13 +3,18 @@
 #' @param X 
 #' @param Y 
 #' @param K 
+#' @param thresh 
 #' @param ... other inputs to FRiSO
 #'
 #' @return
 #' @export
 #'
 #' @examples
-FRiSO_CV_univar2wass = function(X, Y, K = NULL, thresh = 0.0001, ...){
+FRiSO_CV_univar2wass = function(X,
+                                Y,
+                                K = NULL,
+                                thresh = 0.0001,
+                                ...){
   
   # Grab parameters:
   Call = list(...)

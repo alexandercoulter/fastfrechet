@@ -65,7 +65,7 @@ FRiSO_CV_univar2wass = function(X, Y, K = NULL, thresh = 0.0001, ...){
     L = do.call(FRiSO_univar2wass, args = Call)
     
     # Calculate errors from test subset:
-    C_init = matrix(0, nrow(Xtest), p + 1)
+    C_init = matrix(0, nrow(Xtest), m + 1)
     for(t in 1:length(full_tauseq)){
       
       # Find chosen model support:

@@ -4,6 +4,7 @@
 #' @param Y An [n by m] matrix row-wise consisting of empirical quantile functions, each evaluated on a uniformly space m-grid on (0, 1).
 #' @param B Positive integer number of complementary pair sub-samples to take of original data set (default 50).
 #' @param thresh A finite positive scalar selection threshold, where \eqn{\hat{lambda}_k(\tau) > }`thresh` means the \eqn{k^{th}} variable is selected, and not selected otherwise.
+#' @param new_splits_per_tau 
 #' @param ... Any required or optional parameters to `FRiSO_univar2wass` function.
 #'
 #' @return List containing: 'tau', a vector containing the values of tau which were fed into the function call; 'selected_variables' element, a [B by 2 by length(tauseq) by p] array containing 0's and 1's identifying which variables were selected by CPSS per sub-sample; 'selected_samples' element, a [B x 2 x length(tauseq) x n] array containing 0's and 1's identifying which samples were selected in course of CPSS; a 'stability_paths' element, a [length(tauseq) x p] matrix containing stability measures for each variable (column-wise) against given tauseq.
@@ -14,6 +15,7 @@ FRiSO_CPSS_univar2wass = function(X,
                                   Y,
                                   B = 50,
                                   thresh = 0.0001,
+                                  new_splits_per_tau = TRUE,
                                   ...){
   
   # Grab parameters:

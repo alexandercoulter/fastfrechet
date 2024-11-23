@@ -105,9 +105,25 @@ FRiSO_CV_univar2wass = function(X, Y, K = NULL, thresh = 0.0001, ...){
     
   }
   
-  # Return outputs: CV errors, aggregate CV error, and optimal tau:
+  # Calculate aggregate CV error for each \tau:
+  error_sum = rowSums(errors)
+  
+  # Calculate \tau which minimizes aggregate CV error:
+  opt_tau = full_tauseq[which.min(error_sum)[1]]
+  
+  # Calculate high-precision 'allowance vector' \lambda using opt_tau:
+  Call$'tauseq' = opt_tau
+  Call$'eps' = 1e-6
+  opt_lambda = do.call(FRiSO_univar2wass, args = Call)[ , 1]
+  
+  # Identify selected variables at opt_tau, using given threshold
+  opt_selected = which(opt_lambda > thresh)
+  
+  # Return outputs:
   return(list('errors' = errors,
-              'error_sum' = rowSums(errors),
-              'opt_tau' = Call$tauseq[which.min(rowSums(errors))]))
+              'error_sum' = error_sum,
+              'opt_tau' = opt_tau,
+              'opt_lambda' = opt_lambda,
+              'opt_selected' = opt_selected)
   
 }

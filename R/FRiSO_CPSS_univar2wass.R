@@ -64,8 +64,8 @@ FRiSO_CPSS_univar2wass = function(X,
       
       L1 = do.call(FRiSO_univar2wass, args = Call)
       
-      ss[b, 1, t, ] = as.numeric((1:n) %in% s1)
-      sv[b, 1, t, ] = as.numeric(L1[ , 1] > thresh)
+      ss[b, 1, t, ] = ((1:n) %in% s1) + 0
+      sv[b, 1, t, ] = (L1[ , 1] > thresh) + 0
       
       # Second sample:
       Call$'X' = X[s2, , drop = FALSE]
@@ -73,8 +73,8 @@ FRiSO_CPSS_univar2wass = function(X,
       
       L2 = do.call(FRiSO_univar2wass, args = Call)
       
-      ss[b, 2, t, ] = as.numeric((1:n) %in% s2)
-      sv[b, 2, t, ] = as.numeric(L2[ , 1] > thresh)
+      ss[b, 2, t, ] = ((1:n) %in% s2) + 0
+      sv[b, 2, t, ] = (L2[ , 1] > thresh) + 0
       
     }
     

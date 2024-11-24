@@ -20,7 +20,7 @@ FRiSO_CPSS_univar2wass = function(X,
   
   # Grab parameters:
   Call = list(...)
-  full_tauseq = Call$tauseq
+  full_tauseq = Call$'tauseq'
   
   # Extract dimensions:
   n = nrow(X)

@@ -16,11 +16,17 @@ FRiSO_CV_univar2wass = function(X,
                                 thresh = 0.0001,
                                 ...){
   
-  # Grab parameters:
-  Call = list(...)
-  full_tauseq = Call$tauseq
-  lower = Call$'lower'
-  upper = Call$'upper'
+  # Extract call parameters:
+  Call = c(as.list(environment()), list(...))
+  
+  # Create call list for `FRiSO_univar2wass`, matching from Call if provided:
+  Send_Call = formals(FRiSO_univar2wass)
+  Send_Call[names(Call)[names(Call) %in% names(Send_Call)]] = Call[names(Call) %in% names(Send_Call)]
+  
+  # Extract necessary parameters for `frechetreg_univar2wass`:
+  full_tauseq = Send_Call$'tauseq'
+  lower = Send_Call$'lower'
+  upper = Send_Call$'upper'
   
   # Check numeric, and grab dimensions:
   check_numeric(X, "matrix", finite = TRUE)
@@ -52,7 +58,7 @@ FRiSO_CV_univar2wass = function(X,
   K_sub = sample(rep(1:K, ceiling(n / K))[1:n])
   
   # Create empty CV errors array:
-  errors = matrix(NA, nrow = length(Call$tauseq), ncol = K)
+  errors = matrix(NA, nrow = length(full_tauseq), ncol = K)
   
   # Loop through folds:
   for(k in 1:K){
@@ -65,9 +71,9 @@ FRiSO_CV_univar2wass = function(X,
     Ytest  = Y[K_sub == k, , drop = FALSE]
     
     # Train, i.e. run FRiSO:
-    Call$'X' = Xtrain
-    Call$'Y' = Ytrain
-    L = do.call(FRiSO_univar2wass, args = Call)
+    Send_Call$'X' = Xtrain
+    Send_Call$'Y' = Ytrain
+    L = do.call(FRiSO_univar2wass, args = Send_Call)
     
     # Calculate errors from test subset:
     C_init = matrix(0, nrow(Xtest), m + 1)
@@ -117,9 +123,9 @@ FRiSO_CV_univar2wass = function(X,
   opt_tau = full_tauseq[which.min(error_sum)[1]]
   
   # Calculate high-precision 'allowance vector' \lambda using opt_tau:
-  Call$'tauseq' = opt_tau
-  Call$'eps' = 1e-6
-  opt_lambda = do.call(FRiSO_univar2wass, args = Call)[ , 1]
+  Send_Call$'tauseq' = opt_tau
+  Send_Call$'eps' = 1e-6
+  opt_lambda = do.call(FRiSO_univar2wass, args = Send_Call)[ , 1]
   
   # Identify selected variables at opt_tau, using given threshold
   opt_selected = which(opt_lambda > thresh)

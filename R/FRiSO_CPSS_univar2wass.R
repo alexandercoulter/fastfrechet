@@ -5,7 +5,7 @@
 #' @param B Positive integer number of complementary pair sub-samples to take of original data set (default 50).
 #' @param thresh A finite positive scalar selection threshold, where \eqn{\hat{lambda}_k(\tau) > }`thresh` means the \eqn{k^{th}} variable is selected, and not selected otherwise.
 #' @param new_splits_per_tau 
-#' @param ... Any required or optional parameters to `FRiSO_univar2wass` function.
+#' @param ... Any other required or optional parameters to `FRiSO_univar2wass` function, matched only by exact name.
 #'
 #' @return List containing: 'tau', a vector containing the values of tau which were fed into the function call; 'selected_variables' element, a [B by 2 by length(tauseq) by p] array containing 0's and 1's identifying which variables were selected by CPSS per sub-sample; 'selected_samples' element, a [B x 2 x length(tauseq) x n] array containing 0's and 1's identifying which samples were selected in course of CPSS; a 'stability_paths' element, a [length(tauseq) x p] matrix containing stability measures for each variable (column-wise) against given tauseq.
 #' @export
@@ -18,8 +18,14 @@ FRiSO_CPSS_univar2wass = function(X,
                                   new_splits_per_tau = TRUE,
                                   ...){
   
-  # Grab parameters:
-  Call = list(...)
+  # Extract call parameters:
+  Call = as.list(match.call())[-1]
+  
+  # Create call list for FRiSO_univar2wass, matching from Call if provided:
+  Send_Call = formals(FRiSO_univar2wass)
+  Send_Call[names(Call)[names(Call) %in% names(Send_Call)]] = Call[names(Call) %in% names(Send_Call)]
+  
+  # Extract full tauseq:
   full_tauseq = Call$'tauseq'
   
   # Extract dimensions:
@@ -44,7 +50,7 @@ FRiSO_CPSS_univar2wass = function(X,
   for(t in 1:length(full_tauseq)){
     
     # Extract current tau:
-    Call$'tauseq' = full_tauseq[t]
+    Send_Call$'tauseq' = full_tauseq[t]
     
     # Loop over splits:
     for(b in 1:B){
@@ -61,19 +67,19 @@ FRiSO_CPSS_univar2wass = function(X,
       # 4. Save selected covariates by choosing all where L > 0.0001
       
       # First sample:
-      Call$'X' = X[s1, , drop = FALSE]
-      Call$'Y' = Y[s1, , drop = FALSE]
+      Send_Call$'X' = X[s1, , drop = FALSE]
+      Send_Call$'Y' = Y[s1, , drop = FALSE]
       
-      L1 = do.call(FRiSO_univar2wass, args = Call)
+      L1 = do.call(FRiSO_univar2wass, args = Send_Call)
       
       ss[b, 1, t, ] = ((1:n) %in% s1) + 0
       sv[b, 1, t, ] = (L1[ , 1] > thresh) + 0
       
       # Second sample:
-      Call$'X' = X[s2, , drop = FALSE]
-      Call$'Y' = Y[s2, , drop = FALSE]
+      Send_Call$'X' = X[s2, , drop = FALSE]
+      Send_Call$'Y' = Y[s2, , drop = FALSE]
       
-      L2 = do.call(FRiSO_univar2wass, args = Call)
+      L2 = do.call(FRiSO_univar2wass, args = Send_Call)
       
       ss[b, 2, t, ] = ((1:n) %in% s2) + 0
       sv[b, 2, t, ] = (L2[ , 1] > thresh) + 0

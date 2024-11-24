@@ -19,9 +19,9 @@ FRiSO_CPSS_univar2wass = function(X,
                                   ...){
   
   # Extract call parameters:
-  Call = as.list(match.call())[-1]
+  Call = c(as.list(environment()), list(...))
   
-  # Create call list for FRiSO_univar2wass, matching from Call if provided:
+  # Create call list for `FRiSO_univar2wass`, matching from Call if provided:
   Send_Call = formals(FRiSO_univar2wass)
   Send_Call[names(Call)[names(Call) %in% names(Send_Call)]] = Call[names(Call) %in% names(Send_Call)]
   

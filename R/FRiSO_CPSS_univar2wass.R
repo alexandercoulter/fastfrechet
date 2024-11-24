@@ -11,6 +11,39 @@
 #' @export
 #'
 #' @examples
+#' Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
+#' n = 101  # number of samples - nrow(X) and nrow(Y).
+#' p = 10   # number of covariates - ncol(X).
+#' m = 100  # EQF grid density - ncol(Y).
+#' lower = 0
+#' upper = Inf
+#' 
+#' set.seed(31)
+#' mydata = fastfrechet::generate_zinbinom_qf(n = n,
+#'                                            p = p,
+#'                                            m = m)
+#' X = mydata$X  # (n x p) matrix of covariates
+#' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+#' 
+#' # Set complementary pairs stability selection parameters
+#' B = 50
+#' thresh = 0.0001
+#' tauseq = 1:10
+#' eps = 0.001
+#' 
+#' # Run complementary pairs stability selection
+#' cpss = FRiSO_CPSS_univar2wass(X = X,
+#'                               Y = Y,
+#'                               B = B,
+#'                               thresh = thresh,
+#'                               lower = lower,
+#'                               upper = upper,
+#'                               tauseq = tauseq,
+#'                               eps = eps)
+#' 
+#' # Plot stability paths
+#' matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
+#'         col = c(rep('red', 4), rep('black', p - 4)))
 FRiSO_CPSS_univar2wass = function(X,
                                   Y,
                                   B = 50,

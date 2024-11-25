@@ -131,7 +131,8 @@ FRiSO_CV_univar2wass = function(X,
   opt_selected = which(opt_lambda > thresh)
   
   # Return outputs:
-  return(list('errors' = errors,
+  return(list('tauseq' = full_tauseq,
+              'errors' = errors,
               'error_sum' = error_sum,
               'opt_tau' = opt_tau,
               'opt_lambda' = opt_lambda,

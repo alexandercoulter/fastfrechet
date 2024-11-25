@@ -12,7 +12,7 @@
 #'
 #' @examples
 #' # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
-#' n = 101  # number of samples - nrow(X) and nrow(Y).
+#' n = 100  # number of samples - nrow(X) and nrow(Y).
 #' p = 10   # number of covariates - ncol(X).
 #' m = 100  # EQF grid density - ncol(Y).
 #' lower = 0

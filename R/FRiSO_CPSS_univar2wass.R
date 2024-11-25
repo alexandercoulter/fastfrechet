@@ -61,7 +61,9 @@ FRiSO_CPSS_univar2wass = function(X,
   # Extract full tauseq:
   full_tauseq = Call$'tauseq'
   
-  # Extract dimensions:
+  # Check numeric, and grab dimensions:
+  check_numeric(X, "matrix", finite = TRUE)
+  check_numeric(Y, "matrix", finite = TRUE)
   n = nrow(X)
   halfn = floor(n/2)
   p = ncol(X)
@@ -125,9 +127,10 @@ FRiSO_CPSS_univar2wass = function(X,
   stability_paths = apply(sv, c(3, 4), mean)
   
   # Return outputs: tau sequence, selected variables, selected samples, and stability paths
-  return(list('tau' = full_tauseq,
+  return(list('tauseq' = full_tauseq,
               'selected_variables' = sv,
               'selected_samples' = ss,
-              'stability_paths' = stability_paths))
+              'stability_paths' = stability_paths,
+              'model_size_est' = rowMeans(stability_paths)))
   
 }

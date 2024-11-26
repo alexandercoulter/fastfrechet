@@ -73,15 +73,21 @@ observations per empirical response; and the user cannot specify box constraints
 for finite distribution support, so fitted responses can violate known bounds
 even when observed responses do not. By contrast, the R package `frechet`
 largely does not have these limitations, however its solver still does not
-reliably obey box constraints and is relatively slow.
+reliably obey box constraints and is relatively slow. The R package
+`fastfrechet` does not have the practical limitations of `WRI`, while it obtains
+more accurate solutions in a fraction the time compared to `frechet`.
 
-For variable selection, while the coordinate descent algorithm is available as
-part of the supplementary material to @tucker_variable_2023, this implementation
-is not readily accessible through a repository nor in package structure. Since
-the variable selection procedure involves solving a re-weighted Fréchet
-regression problem, which neither `WRI` nor `frechet` is amenable to, those
-packages are of no utility to the variable selection procedure.
-
+For variable selection, the coordinate descent algorithm is available as
+part of the supplementary material to @tucker_variable_2023. However, this
+implementation is not readily accessible through a repository nor in package
+structure. Part of the variable selection problem is solving a weighted version
+of the associated Fréchet regression problem, but neither `WRI` nor `frechet` is
+amenable to specifying these weights. As such, to our knowledge there is no
+existing package which implements the variable selection procedure of
+@tucker_variable_2023, either fully or partially. The R package `fastfrechet`
+provides ready implementation of the variable selection method through a fast,
+robust gradient descent algorithm, and allows the user to optionally specify the
+weighting structure for Fréchet regression in the variable selection framework.
 
 # Old writing
 

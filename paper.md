@@ -34,6 +34,57 @@ bibliography: inst/REFERENCES.bib
 
 # Summary
 
+We present `fastfrechet`, an R package providing fast implementation of Fréchet
+regression and variable selection methods for univariate distribution responses. 
+Distribution-as-response is gaining wider attention, especially within
+biomedical settings where observation-rich patient level data sets are
+available, such as continuous glucose monitoring [MATABUENA REFERNECE],
+actigraphy [GHOSAL REFERENCE], and feature densities in CT scans [PETERSEN, LIU,
+DIVANI REFERENCE]. Naïve application of standard Euclidean regression is not
+appropriate since the response space is not a vector space. To overcome such
+issues, @petersen_frechet_2019 proposed an extension of regression with
+Euclidean covariates, for responses within a general metric space, so-called
+*Fréchet regression*. Using this general framework, @tucker_variable_2023
+proposed a variable selection method through a similar extension of a Euclidean
+method (@wu_cant_2021). As the solution to the Fréchet regression problem is
+specific to the metric space, the initially published implementation of the
+variable selection procedure employs a coordinate descent algorithm which makes
+minimal use of the problem geometry, favoring generality at the expense of
+prohibitively slow computation time. @coulter_fast_2024 developed a second order
+gradient descent algorithm for the specific setting of univariate distributions
+equipped with the 2-Wasserstein metric (*2-Wasserstein space*), decreasing
+solution time on the order of 10,000\eqn{\times}. `fastfrechet` implements this
+new variable selection solver, along with a customized active set method
+(@arnstrom_dual_2022) for solving the Fréchet regression problem efficiently. It
+also includes implementations of the cross-validation and stability selection
+procedures respectively described in @tucker_variable_2023 and
+@coulter_fast_2024, allowing Fréchet regression with resampling-supplemented
+variable selection to be a viable and readily available procedure for
+distribution response settings.
+
+# Statement of Need
+
+For Fréchet regression, two publicly available software package exists which
+implement Fréchet regression in 2-Wasserstein space. The R package `WRI` has
+several practical limitations: it requires strictly monotone empirical quantile
+functions (or, strictly positive empirical densities), which is unnecessary in
+this setting; it sets a seemingly arbitrarily minimum threshold of 25
+observations per empirical response; and the user cannot specify box constraints
+for finite distribution support, so fitted responses can violate known bounds
+even when observed responses do not. By contrast, the R package `frechet`
+largely does not have these limitations, however its solver still does not
+reliably obey box constraints and is relatively slow.
+
+For variable selection, while the coordinate descent algorithm is available as
+part of the supplementary material to @tucker_variable_2023, this implementation
+is not readily accessible through a repository nor in package structure. Since
+the variable selection procedure involves solving a re-weighted Fréchet
+regression problem, which neither `WRI` nor `frechet` is amenable to, those
+packages are of no utility to the variable selection procedure.
+
+
+# Old writing
+
 Fréchet regression (@petersen_frechet_2019) extends Euclidean regression to the
 general setting where response $Y$ resides in a metric space $\Omega$ equipped
 with a metric $d : \Omega \times \Omega \mapsto \mathbb{R}_+$. Subsequently, variable
@@ -66,28 +117,6 @@ includes a new dedicated QP solver for the associated Fréchet regression
 problem, implementing the dual active-set method of @arnstrom_dual_2022 while
 taking advantage of the specific constraint structure to avoid matrix
 decomposition and multiplication operations.
-
-# Statement of need
-
-This is the paper's statement of need [edit from above?].
-
-# Mathematics
-
-This is an equation example $x = 1$.
-
-This is another equation example
-$$
-\begin{align}
-x &= 1 \\
-x + 2 &= 3
-\end{align}
-$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
-\end{equation}
-and refer to \autoref{eq:fourier} from text.
 
 # Citations
 

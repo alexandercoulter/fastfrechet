@@ -47,10 +47,10 @@ Euclidean covariates, for responses within a general metric space, so-called
 *Fréchet regression*. Using this general framework, @tucker_variable_2023
 proposed a variable selection method, extending @wu_cant_2021.
 
-As the solution to the Fréchet regression problem is specific to the metric
-space, the initial variable selection implementation employs a coordinate
-descent algorithm which favors generality at the expense of prohibitively slow
-computation time. @coulter_fast_2024 developed fast algorithm to solve the
+The solution to the Fréchet regression problem is specific to the metric space.
+As such, the original variable selection implementation employs a coordinate
+descent algorithm which favors generality with the cost of prohibitively slow
+computation time. @coulter_fast_2024 developed a fast algorithm to solve the
 variable selection problem for the specific setting of univariate distributions
 equipped with the 2-Wasserstein metric (*2-Wasserstein space*). `fastfrechet`
 implements this new variable selection solver, along with a customized dual

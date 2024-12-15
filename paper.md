@@ -54,30 +54,26 @@ to large data sets, such as the UK Biobank [@doherty_large_2017].
 
 # Statement of Need
 
-For Fréchet regression, two publicly available software packages exist which
-implement Fréchet regression in 2-Wasserstein space. The R package `WRI` has
-several practical limitations: it requires strictly monotone empirical quantile
-functions (or, strictly positive empirical densities), which is unnecessary in
-this setting; it sets a seemingly arbitrary minimum threshold of 25 observations
-per empirical response; and the user cannot specify box constraints for bounded
-distribution support, so fitted responses can violate known bounds even when
-observed responses do not. By contrast, the R package `frechet` largely does not
-have these limitations, however its solver still does not reliably obey box
-constraints and is relatively slow. The R package `fastfrechet` does not have
-the practical limitations of `WRI`, while it obtains more accurate solutions in
-a fraction the time compared to `frechet`.
+No software package currently supports variable selection for 2-Wasserstein
+Fréchet regression, and until @coulter_fast_2024, existing algorithms are too
+slow for practical use. Additionally, while to our knowledge there are two
+packages which implement Fréchet regression in 2-Wasserstein space—the R package
+`WRI`, and the R package `frechet`—these packages are computationally
+inefficient and limited in scope. For instance, `WRI` does not support
+user-specified box constraints for the support of underlying distributions, and
+requires strictly monotone quantile function inputs (or, equivalently, strictly
+positive density inputs). `frechet` allows more flexible user specifications,
+but its Fréchet regression solver is slow and does not satisfy constraints to
+satisfactory accuracy.
 
-For variable selection, the coordinate descent algorithm is available as
-part of the supplementary material to @tucker_variable_2023. However, this
-implementation is not readily accessible through a repository, nor in package
-structure. Part of the variable selection problem is solving a weighted version
-of the associated Fréchet regression problem, but neither `WRI` nor `frechet` is
-amenable to specifying these weights. To our knowledge, there is no existing
-package which implements the variable selection procedure of
-@tucker_variable_2023, either fully or partially. The R package `fastfrechet`
-provides ready implementation of the variable selection method through a fast,
-robust gradient descent algorithm, and allows the user to optionally specify the
-weighting structure for Fréchet regression in the variable selection framework.
+`fastfrechet` bridges these gaps by providing a fast and scalable package-ready
+implementation of variable selection for 2-Wasserstein Fréchet regression. It
+implements a customized dual active-set solver based on @arnstrom_dual_2022 to
+solve the Fréchet regression problem, which overcomes the computational and user
+specification limitations of existing packages. `fastfrechet` also includes new
+resampling tools—cross-validation as discussed in @tucker_variable_2023, and
+stability selection as discussed in @coulter_fast_2024—to supplement automatic
+variable selection.
 
 # Performance Comparisons
 

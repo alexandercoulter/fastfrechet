@@ -120,7 +120,7 @@ a customization of the dual active-set method of @arnstrom_dual_2022 (see the
 accompanying `VIGNETTE_NAME` vignette). The resulting algorithm provides a fast
 and numerically exact solution to the Fréchet regression problem, illustrated in
 Figure \autoref{fig:frechetreg_comparison}. Note the `WRI` package requires
-strictly monotone inputs, so add a small monotone adjustment to the response
+strictly monotone inputs, so we add a small monotone adjustment to the response
 matrix when using that package.
 ```
 library(microbenchmark)

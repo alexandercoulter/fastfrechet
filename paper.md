@@ -56,15 +56,15 @@ to large data sets, such as the UK Biobank [@doherty_large_2017].
 
 No software package currently supports variable selection for 2-Wasserstein
 Fréchet regression, and until @coulter_fast_2024, existing algorithms are too
-slow for practical use. Additionally, while to our knowledge there are two
-packages which implement Fréchet regression in 2-Wasserstein space—the R package
-`WRI`, and the R package `frechet`—these packages are computationally
-inefficient and limited in scope. For instance, `WRI` does not support
-user-specified box constraints for the support of underlying distributions, and
-requires strictly monotone quantile function inputs (or, equivalently, strictly
-positive density inputs). `frechet` allows more flexible user specifications,
-but its Fréchet regression solver is slow and does not satisfy constraints to
-satisfactory accuracy.
+slow for practical use. To our knowledge, there are two packages which implement
+Fréchet regression in 2-Wasserstein space: the R package `WRI`, and the R
+package `frechet`. However, these packages are computationally inefficient and
+limited in scope. For instance, `WRI` does not support user-specified box
+constraints for the support of underlying distributions, and requires strictly
+monotone quantile function inputs (or, equivalently, strictly positive density
+inputs). `frechet` allows more flexible user specifications, but its Fréchet
+regression solver is slow and does not satisfy constraints to satisfactory
+accuracy.
 
 `fastfrechet` bridges these gaps by providing a fast and scalable package-ready
 implementation of variable selection for 2-Wasserstein Fréchet regression. It
@@ -75,7 +75,7 @@ resampling tools—cross-validation as discussed in @tucker_variable_2023, and
 stability selection as discussed in @coulter_fast_2024—to supplement automatic
 variable selection.
 
-# Performance Comparisons
+# Performance Comparisons to Existing Implementations
 
 We illustrate the performance of R package `fastfrechet` against existing
 implementations with simulated covariate-dependent, zero-inflated negative

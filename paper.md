@@ -38,14 +38,15 @@ We present `fastfrechet`, an R package providing fast implementation of Fréchet
 regression and variable selection methods for univariate distribution responses. 
 Distribution-as-response is gaining wider attention, especially within
 biomedical settings where observation-rich patient level data sets are
-available, such as continuous glucose monitoring [MATABUENA REFERNECE],
-actigraphy [GHOSAL REFERENCE], and feature densities in CT scans [PETERSEN, LIU,
-DIVANI REFERENCE]. Naïve application of standard Euclidean regression is not
-appropriate since the response space is not a vector space. To overcome such
-issues, @petersen_frechet_2019 proposed an extension of regression with
-Euclidean covariates, for responses within a general metric space, so-called
-*Fréchet regression*. Using this general framework, @tucker_variable_2023
-proposed a variable selection method, extending @wu_cant_2021.
+available, such as continuous glucose monitoring
+[@matabuena_glucodensities_2021], actigraphy [@ghosal_distributional_2023], and
+feature densities in CT scans [@petersen_wasserstein_2021]. Naïve application of
+standard Euclidean regression is not appropriate since the response space is not
+a vector space. To overcome such issues, @petersen_frechet_2019 proposed an
+extension of regression with Euclidean covariates, for responses within a
+general metric space, so-called *Fréchet regression*. Using this general
+framework, @tucker_variable_2023 proposed a variable selection method, extending
+@wu_cant_2021.
 
 The solution to the Fréchet regression problem is specific to the metric space.
 As such, the original variable selection implementation employs a coordinate
@@ -60,7 +61,7 @@ and stability selection procedures respectively described in
 @tucker_variable_2023 and @coulter_fast_2024. These improvements allow Fréchet
 regression with resampling-supplemented variable selection to be viable and
 readily available procedures for distribution responses, especially for
-application to large data sets like the UK Biobank [DOHERTY REFERENCE].
+application to large data sets like the UK Biobank [@doherty_large_2017].
 
 # Statement of Need
 

@@ -1,5 +1,8 @@
 #' Check if input is a whole number (positive integer)
-#'
+#' 
+#' @description
+#' 
+#' 
 #' @param x 
 #'
 #' @return No return output.

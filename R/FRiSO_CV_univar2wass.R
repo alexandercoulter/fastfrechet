@@ -11,7 +11,15 @@
 #' @param thresh Positive scalar that determines the selection cutoff for the `lambda` vector in the variable selection problem. 
 #' @param ... other inputs to FRiSO see [fastfrechet::FRiSO_univar2wass()].
 #'
-#' @return
+#' @return A list object with components:
+#' \tabular{ll}{
+#'   `tauseq` \tab returns a  \cr
+#'   `errors` \tab returns an  \cr
+#'   `error_sum` \tab returns an  \cr
+#'   `opt_tau` \tab returns an  \cr
+#'   `opt_lambda` \tab returns an  \cr
+#'   `opt_selected` \tab returns an  \cr
+#' }
 #' @export
 #'
 #' @examples

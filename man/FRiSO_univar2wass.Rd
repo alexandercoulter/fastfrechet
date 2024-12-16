@@ -29,10 +29,10 @@ Entries must obey user-specified box constraints given by \code{lower} and \code
 
 \item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint; must be strictly greater than \code{lower}.}
 
-\item{tauseq}{A (\code{p} \eqn{\times} \code{1}) vector containing 'tau' values at
+\item{tauseq}{A numeric vector containing 'tau' values at
 which to solve FRiSO problem.}
 
-\item{lambda_init}{An optional (\code{p} \eqn{\times} \code{1}) vector giving the
+\item{lambda_init}{An optional \code{p}-long numeric vector giving the
 initial allowance vector' lambda for FRiSO algorithm (default \code{NULL});
 will be scaled to sit on tau-simplex for first entry of \code{tauseq}.}
 

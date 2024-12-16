@@ -52,7 +52,8 @@
 #' max(output$Solution) - upper
 #' 
 #' # Plot values of the generated vector:
-#' plot(y, xlab = "x", ylab = "y", main = "Monotone and Box Constrained")
+#' plot(y, main = "Monotone and Box Constrained", las = 1,
+#'      xlab = "Vector Entry", ylab = expression("y, "*hat("q")))
 #' abline(h = c(lower, upper), lty = 2, col = "gray80")
 #' 
 #' # Add values of monotone projection:

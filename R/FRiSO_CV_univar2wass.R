@@ -1,12 +1,26 @@
 #' FRiSO_CV_univar2wass
+#' 
+#' @description
+#' 
+#' 
 #'
+#' @inheritParams frechetreg_univar2wass
 #' @param X 
 #' @param Y 
-#' @param K 
-#' @param thresh 
-#' @param ... other inputs to FRiSO
+#' @param K Numeric whole number no bigger than `nrow(X)`.
+#' @param thresh Positive scalar that determines the selection cutoff for the `lambda` vector in the variable selection problem. 
+#' @param ... other inputs to FRiSO see [fastfrechet::FRiSO_univar2wass()].
 #'
-#' @return
+#' @return A list object with components:
+#' \tabular{ll}{
+#'   `tauseq` \tab returns a (`n` \eqn{\times} `m`) matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
+#'    The solution has rows that are monotone non-decreasing and bounded between the `lower` and `upper` arguments. \cr
+#'   `errors` \tab returns a (`n` \eqn{\times} `m`) matrix that contains the refitted test errors.  \cr
+#'   `error_sum` \tab returns a `n` length vector that contains the aggregate CV error for each \eqn{\tau}. \cr
+#'   `opt_tau` \tab returns an (ADD objecttype and dimensions) the \tau that contains \eqn{\tau} that minimizes aggregate CV error. \cr
+#'   `opt_lambda` \tab returns an (ADD objecttype and dimensions) high-precision 'allowance vector'. \cr
+#'   `opt_selected` \tab returns an (ADD objecttype and dimensions) Identify selected variables at opt_tau, using given threshold.\cr
+#' }
 #' @export
 #'
 #' @examples

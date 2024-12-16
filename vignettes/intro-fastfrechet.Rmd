@@ -17,3 +17,67 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(fastfrechet)
 ```
+
+# Introduction
+
+`fastfrechet` is an R package providing fast and robust solutions to several
+computational problems associated with Fréchet regression (Petersen et al. 2019)
+and an associated variable selection method (Tucker et al. 2023), focusing on a
+specific metric space setting. Fréchet regression generalizes regression with
+Euclidean covariates and Euclidean responses, to settings where responses exist
+in a general metric space (i.e. non-vector space). The space of univariate
+distribution response objects is one such example, recently gaining popularity
+in biomedical applications where technological advances have made rich
+patient-level data sets commonplace in a variety of settings. These larger data
+sets and complex response constraints require newer, faster algorithms for
+feasibility and scalability (Coulter et al. 2024), which `fastfrechet` provides.
+
+This vignette walks through an example use case of all of the available
+functions in `fastfrechet`. This includes simulating example covariate-dependent
+distribution responses, implementing Fréchet regression, performing variable
+selection, and utilizing resampling tools to supplement automatic variable
+selection. Where appropriate, the mathematical problems being solved by each
+function are briefly described. A second vignette, `monotoneQP-fastfrechet`,
+provides a more detailed algorithmic exposition of the function `monotoneQP`
+specifically.
+
+
+# Running Through an Example
+
+## Generating quantile functions
+
+### Using `fastfrechet::generate_zinbinom_qf`
+
+### Plotting
+
+
+## Fréchet regression
+
+### Using `fastfrechet::frechetreg_univar2wass`
+
+### Plotting $\widehat{\mathbf{Y}}$ and $\widehat{\mathbf{Q}}$
+
+
+## Variable selection with Fréchet ridge selection operator
+
+### Using `fastfrechet::FRiSO_univar2wass`
+
+### Plotting $\widehat{\pmb{\lambda}}(\tau)$ solution paths
+
+
+
+# Resampling for Variable Selection
+
+## Cross-validation
+
+### Using `fastfrechet::FRiSO_CV_univar2wass`
+
+### Plotting, interpreting CV errors and optimal solution
+
+## Complementary pairs stability selection
+
+### Using `fastfrechet::FRiSO_CPSS_univar2wass`
+
+### Plotting, interpreting stability paths
+
+### Shah and Samworth error control

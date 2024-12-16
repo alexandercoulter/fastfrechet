@@ -16,18 +16,18 @@ knitr::opts_chunk$set(
 
 ## Background
 
-This vignette details the mathematical foundation of the custom dual active-set
-method we implement to solve the Fréchet mean problem for univariate
-distribution responses equipped with the 2-Wasserstein metric. In the
-"population setting", this is an orthogonal projection problem. In the "sample
-setting" where distribution responses are represented by quantile functions
+This vignette details the mathematical foundation of the algorithm we implement
+to solve the non-convex Fréchet mean problem for univariate distribution
+responses equipped with the 2-Wasserstein metric. In the "population setting",
+this is an orthogonal projection problem. In the "sample setting" where
+distribution responses are represented by quantile functions
 $\mathbf{y} \in \mathbb{R}^m$ evaluated on a discrete uniform $m$-grid in
 $(0, 1)$ and obeying box constraints $y_j \in [b_L, b_U] \subseteq \mathbb{R}$,
 the Fréchet mean problem can be written
 $$
-\widehat{\mathbf{q}} := \mathrm{arg\:min}_{\mathbf{q} \in \mathbb{R}^m} \lVert{\mathbf{q} - \mathbf{y}} \rVert_2^2, \qquad \mathbf{b} - \mathbf{A}^{\top}\mathbf{q} \leq \pmb{0}_{m+1},
+\widehat{\mathbf{q}} := \mathrm{arg\:min}_{\mathbf{q} \in \mathbb{R}^m} \lVert{\mathbf{q} - \widehat{\mathbf{y}}} \rVert_2^2, \qquad \mathbf{b} - \mathbf{A}^{\top}\mathbf{q} \leq \pmb{0}_{m+1},
 $$
-where $\mathbf{b}^{\top} = \begin{pmatrix} b_L & \pmb{0}_{m-1}^{\top} & -b_U\end{pmatrix} \in \mathbb{R}^{m+1}$, and
+where $\mathbf{b}^{\top} = \begin{pmatrix} b_L & \pmb{0}_{m-1}^{\top} & -b_U\end{pmatrix} \in \mathbb{R}^{m+1}$,
 $\mathbf{A} \in \mathbb{R}^{m\times(m+1)}$ is a first-difference matrix of the
 form
 $$
@@ -39,23 +39,79 @@ $$
    \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
    0 &  0 &  0 &  0 & \cdots & +1 & -1 &  0 \\
    0 &  0 &  0 &  0 & \cdots &  0 & +1 & -1
-\end{pmatrix}.
+\end{pmatrix},
 $$
-The final vector $\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e.
-$q_i \leq q_j$ for $i \leq j$) and obeys the same box constraints as
-$\mathbf{y}$. This is a quadratic programming (QP) problem, for which several
-approaches and solvers exist. We introduce a modification of the dual active-set
-method of Arnström et al. (2022, Algorithm 1) which utilizes the structure of
-$\mathbf{A}$ to avoid costly matrix multiplication and $LDL^{\top}$
-decomposition steps. This algorithm is implemented in *C++* as a sub-routine in
-functions handling responses in this metric space, and is made available in its
-own *R* wrapper function `monotoneQP`.
+and finally $\widehat{\mathbf{y}}$ is a non-convex sum of the $\mathbf{y}$'s
+which does not necessarily sit in the target space. The final projected vector
+$\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e. $q_i \leq q_j$ for
+$i \leq j$) and obeys the same box constraints as the $\mathbf{y}$'s. The
+`fastfrechet` package implements a solver for this problem via the `monotoneQP`
+function.
+
+## Example Utilization
+
+To first visualize what `monotoneQP` does, we specify a set of box constraints
+$b_L = 0.5$ and $b_U = 1.5$, and generate an example vector which does not obey
+those constraints and does not exhibit monotonicity.
+```{r}
+# Set box constraints:
+lower = 0.5
+upper = 1.5
+
+# Generate example vector:
+m = 100
+
+set.seed(31)
+y = rnorm(m, seq(0, 2, len = m), 0.1)
+```
+
+We next calculate the fitted vector...
+```{r}
+# Calculate monotone, box-constrained projection:
+output = fastfrechet::monotoneQP(y, lower = 0.5, upper = 1.5)
+```
+which fits inside the box constraints...
+```{r}
+# ...bounded from below by the lower bound...
+min(output$Solution) - lower
+
+# ...and bounded from above by the upper bound...
+max(output$Solution) - upper
+```
+and has monotone non-decreasing entries.
+```{r}
+min(diff(output$Solution[1, ]))
+```
+The original vector and the fitted vector are plotted together.
+```{r, fig.width = 6.25, fig.height = 5}
+# Plot values of the generated vector:
+plot(y, main = "Monotone and Box Constrained", las = 1,
+     xlab = "Vector Entry", ylab = expression("y, "*hat("q")))
+abline(h = c(lower, upper), lty = 2, col = "gray80")
+
+# Add values of monotone projection:
+points(output$Solution[1, ], pch = 20)
+
+legend("topleft", pch = c(1, 20), bty = "n",
+       legend = c("Unconstrained", "Monotone Constrained"))
+```
 
 ## Algorithm
 
-The dual active-set algorithm of Arnström et al. (2022), given by their
-Algorithm 1, is for the more generalized QP problem. We translate it into our
-context with the following notation. Denote $[m] := \{1, \dots, m\}$, and let
+Solving for $\widehat{\mathbf{q}}$ is a quadratic programming (QP) problem, for
+which several approaches and solvers exist. We introduce a modification of the
+dual active-set method of Arnström et al. (2022, Algorithm 1) which utilizes the
+sparse structure of $\mathbf{A}$ to avoid costly matrix multiplication and
+$LDL^{\top}$ decomposition steps. This algorithm is implemented in *C++* as a
+sub-routine in `fastfrechet` functions solving Fréchet mean problems for
+2-Wasserstein space, and is also made available as a standalone QP solver in the
+`monotoneQP` function.
+
+### Notation
+
+The dual active-set algorithm of Arnström et al. (2022) is for QP problems with
+general constraints. We translate it into our context with the following
+notation. Denote $[m] := \{1, \dots, m\}$, and let
 $\mathbf{d} := \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$. For iteration
 $k \geq 0$, let $W_k \subseteq \{1, \dots, m + 1\}$ be an index set in
 increasing order, and let $\bar{W}_k = [m+1] \setminus W_k$ be its
@@ -154,7 +210,7 @@ $w+1 \notin W_k$ and $w-1\notin W_k$) where inversion reduces to a simple scalar
 division operation, or fully block tridiagonal entries in
 $\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by sequences of indices
 $(w, w+1, \dots, w + s) \subset W_k$) where we apply a simplified Thomas
-algorithm that takes advantage of the nearly-unique diagonal entries of
+algorithm that takes advantage of the repeated diagonal entries of
 $\mathbf{A}^{\top}\mathbf{A}$.
 
 

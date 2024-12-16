@@ -20,13 +20,12 @@ FRiSO_CV_univar2wass(X, Y, K = NULL, thresh = 1e-04, ...)
 \value{
 A list object with components:
 \tabular{ll}{
-\code{tauseq} \tab returns a (\code{n} \eqn{\times} \code{m}) matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
-The solution has rows that are monotone non-decreasing and bounded between the \code{lower} and \code{upper} arguments. \cr
-\code{errors} \tab returns a (\code{n} \eqn{\times} \code{m}) matrix that contains the refitted test errors.  \cr
-\code{error_sum} \tab returns a \code{n} length vector that contains the aggregate CV error for each \eqn{\tau}. \cr
-\code{opt_tau} \tab returns an (ADD objecttype and dimensions) the \tau that contains \eqn{\tau} that minimizes aggregate CV error. \cr
-\code{opt_lambda} \tab returns an (ADD objecttype and dimensions) high-precision 'allowance vector'. \cr
-\code{opt_selected} \tab returns an (ADD objecttype and dimensions) Identify selected variables at opt_tau, using given threshold.\cr
+\code{tauseq} \tab returns the numeric vector containing \eqn{\tau} values at which FRiSO problem was solved. \cr
+\code{errors} \tab returns a (\code{p} \eqn{\times} \code{length(tauseq)}) matrix that contains the refitted test errors.  \cr
+\code{error_sum} \tab returns a \code{length(tauseq)}-long vector that contains the aggregate CV error for each \eqn{\tau}. \cr
+\code{opt_tau} \tab returns a numeric scalar that is the \eqn{\tau} that minimizes the aggregate CV error. \cr
+\code{opt_lambda} \tab returns a \code{p}-long numeric vector that is the high-precision 'allowance vector'. \cr
+\code{opt_selected} \tab returns a numeric vector (up to \code{p}-long) that contains the indices of the variables selected in the optimal model. \cr
 }
 }
 \description{

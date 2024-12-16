@@ -15,9 +15,9 @@
 #' 
 #'
 #' @inheritParams frechetreg_univar2wass
-#' @param tauseq A (`p` \eqn{\times} `1`) vector containing 'tau' values at
+#' @param tauseq A numeric vector containing 'tau' values at
 #'  which to solve FRiSO problem.
-#' @param lambda_init An optional (`p` \eqn{\times} `1`) vector giving the 
+#' @param lambda_init An optional `p`-long numeric vector giving the 
 #'  initial allowance vector' lambda for FRiSO algorithm (default `NULL`);
 #'  will be scaled to sit on tau-simplex for first entry of `tauseq`.
 #' @param eps A non-negative error tolerance parameter (default `1e-5`).

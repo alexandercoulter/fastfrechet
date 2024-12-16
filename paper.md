@@ -35,7 +35,7 @@ bibliography: inst/REFERENCES.bib
 # Summary
 
 Distribution-as-response regression problems are gaining wider attention,
-especially within biomedical settings where observation-rich patient level data
+especially within biomedical settings where observation-rich patient specific data
 sets are available, such as continuous glucose monitoring
 [@matabuena_glucodensities_2021], actigraphy [@ghosal_distributional_2023], and
 feature densities in CT scans [@petersen_wasserstein_2021].

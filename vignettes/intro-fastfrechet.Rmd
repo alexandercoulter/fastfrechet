@@ -1,6 +1,7 @@
 ---
 title: "Introduction to R package fastfrechet"
 output: rmarkdown::html_vignette
+bibliography: '`r system.file("REFERENCES.bib", package="fastfrechet")`'
 vignette: >
   %\VignetteIndexEntry{Introduction to R package fastfrechet}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,6 +13,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+knitr::opts_chunk$set(fig.align = "center", 
+               out.width = "70%",
+               fig.width = 6, fig.height = 5.5)
 ```
 
 ```{r setup}
@@ -20,26 +24,10 @@ library(fastfrechet)
 
 # Introduction
 
-`fastfrechet` is an R package providing fast and robust solutions to several
-computational problems associated with Fréchet regression (Petersen et al. 2019)
-and an associated variable selection method (Tucker et al. 2023), focusing on a
-specific metric space setting. Fréchet regression generalizes regression with
-Euclidean covariates and Euclidean responses, to settings where responses exist
-in a general metric space (i.e. non-vector space). The space of univariate
-distribution response objects is one such example, recently gaining popularity
-in biomedical applications where technological advances have made rich
-patient-level data sets commonplace in a variety of settings. These larger data
-sets and complex response constraints require newer, faster algorithms for
-feasibility and scalability (Coulter et al. 2024), which `fastfrechet` provides.
+`fastfrechet` is an R package providing fast and robust solutions to several computational problems associated with Fréchet regression (Petersen et al. 2019) and an associated variable selection method (Tucker et al. 2023), focusing on a specific metric space setting. Fréchet regression generalizes regression with Euclidean covariates and Euclidean responses, to settings where responses exist in a general metric space (i.e. non-vector space). The space of univariate distribution response objects is one such example, recently gaining popularity in biomedical applications where technological advances have made rich patient-level data sets commonplace in a variety of settings. These larger data sets and complex response constraints require newer, faster algorithms for feasibility and scalability (Coulter et al. 2024), which `fastfrechet` provides.\
 
 This vignette walks through an example use case of all of the available
-functions in `fastfrechet`. This includes simulating example covariate-dependent
-distribution responses, implementing Fréchet regression, performing variable
-selection, and utilizing resampling tools to supplement automatic variable
-selection. Where appropriate, the mathematical problems being solved by each
-function are briefly described. A second vignette, `monotoneQP-fastfrechet`,
-provides a more detailed algorithmic exposition of the function `monotoneQP`
-specifically.
+functions in `fastfrechet`. This includes simulating example covariate-dependent distribution responses, implementing Fréchet regression, performing variable selection, and utilizing resampling tools to supplement automatic variable selection. Where appropriate, the mathematical problems being solved by each function are briefly described. A second vignette, `monotoneQP-fastfrechet`, provides a more detailed algorithmic exposition of the function `monotoneQP` specifically.
 
 
 # Running Through an Example
@@ -48,23 +36,102 @@ specifically.
 
 ### Using `fastfrechet::generate_zinbinom_qf`
 
+```{r}
+n = 100  # number of samples - nrow(X) and nrow(Y).
+p = 10   # number of covariates - ncol(X).
+m = 100  # EQF grid density - ncol(Y).
+mseq = seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
+
+set.seed(31)
+mydata = fastfrechet::generate_zinbinom_qf(n = n,
+                                           p = p,
+                                           m = m)
+ 
+X = mydata$X  # (n x p) matrix of covariates
+Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+```
+
+
 ### Plotting
+
+```{r}
+# Plot the EQFs:
+plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Y)),
+     main = "Zero-Inflated Negative Binomial QFs",
+     xlab = "p", ylab = "quantile")
+for(i in 1:n) lines(mseq, Y[i, ], lwd = 2)
+
+```
 
 
 ## Fréchet regression
 
 ### Using `fastfrechet::frechetreg_univar2wass`
 
+```{r}
+# Estimate conditional QFs:
+output = fastfrechet::frechetreg_univar2wass(X = X,
+                                             Y = Y,
+                                             Z = NULL,
+                                             #C_init = NULL,
+                                             lambda = NULL,
+                                             lower = 0,
+                                             upper = Inf)
+ 
+# Note: to numerical precision, these QFs are non-decreasing...
+min(apply(output$Qhat, 1, diff))
+ 
+# ...and bounded from below by the lower bound, zero:
+min(output$Qhat)
+```
+
+
 ### Plotting $\widehat{\mathbf{Y}}$ and $\widehat{\mathbf{Q}}$
+
+```{r}
+# Plot the conditional QFs:
+plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(output$Qhat)),
+      main = "Fréchet Regression QFs", xlab = "p", ylab = "quantile")
+for(i in 1:n) lines(mseq, output$Qhat[i, ], lwd = 2)
+
+```
 
 
 ## Variable selection with Fréchet ridge selection operator
 
 ### Using `fastfrechet::FRiSO_univar2wass`
 
+```{r}
+# Dense grid of "allowance" totals:
+tauseq = seq(0.2, 20, 0.2)
+
+# Generate estimated "allowance vector"s \lambda for each \tau, stored
+# column-wise in matrix `L`:
+L = FRiSO_univar2wass(X = X,
+                      Y = Y,
+                      lower = 0,
+                      upper = Inf,
+                      tauseq = tauseq,
+                      eps = 0.001,
+                      nudge = 0.001)
+```
+
+
+
 ### Plotting $\widehat{\pmb{\lambda}}(\tau)$ solution paths
 
+```{r}                             
+# Plot FRiSO "allowance vector" solution paths:
+plot(x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0, max(L)),
+     main = "FRiSO Selection Paths", xlab = expression(tau),
+     ylab = expression(lambda))
+for(k in 1:p) lines(tauseq, L[k, ], col = (k %in% 1:4) + 1, lwd = 2)
+legend("topleft", lwd = 2, col = 1:2, bty = "n",
+       legend = c("Unrelated variable", "Model variable"))
 
+# Note that with this sample size, there is sufficient information to
+# correctly identify the first 4 variables significantly affect the QFs.
+```
 
 # Resampling for Variable Selection
 
@@ -72,12 +139,59 @@ specifically.
 
 ### Using `fastfrechet::FRiSO_CV_univar2wass`
 
+```{r}
+
+
+
+
+```
+
 ### Plotting, interpreting CV errors and optimal solution
+
+```{r}
+
+
+
+
+```
 
 ## Complementary pairs stability selection
 
 ### Using `fastfrechet::FRiSO_CPSS_univar2wass`
 
+```{r}
+
+# Set complementary pairs stability selection parameters
+B = 50
+thresh = 0.0001
+tauseq = 1:10
+eps = 0.001
+lower = 0
+upper = Inf
+ 
+# Run complementary pairs stability selection
+cpss = FRiSO_CPSS_univar2wass(X = X,
+                              Y = Y,
+                              B = B,
+                              thresh = thresh,
+                              lower = lower,
+                              upper = upper,
+                              tauseq = tauseq,
+                              eps = eps)
+
+```
+
 ### Plotting, interpreting stability paths
 
+```{r}
+# Plot stability paths
+matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
+        col = c(rep('red', 4), rep('black', p - 4)),
+        ylab = "Stability Paths",
+        xlab = bquote(tau))
+```
+
 ### Shah and Samworth error control
+
+
+

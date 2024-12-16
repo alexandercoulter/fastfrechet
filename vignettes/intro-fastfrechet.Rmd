@@ -17,3 +17,47 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(fastfrechet)
 ```
+
+# Introduction
+
+
+
+# Running Through an Example
+
+## Generating quantile functions
+
+### Using `fastfrechet::generate_zinbinom_qf`
+
+### Plotting
+
+
+## Fréchet regression
+
+### Using `fastfrechet::frechetreg_univar2wass`
+
+### Plotting $\widehat{\mathbf{Y}}$ and $\widehat{\mathbf{Q}}$
+
+
+## Variable selection with Fréchet ridge selection operator
+
+### Using `fastfrechet::FRiSO_univar2wass`
+
+### Plotting $\widehat{\pmb{\lambda}}(\tau)$ solution paths
+
+
+
+# Resampling for Variable Selection
+
+## Cross-validation
+
+### Using `fastfrechet::FRiSO_CV_univar2wass`
+
+### Plotting, interpreting CV errors and optimal solution
+
+## Complementary pairs stability selection
+
+### Using `fastfrechet::FRiSO_CPSS_univar2wass`
+
+### Plotting, interpreting stability paths
+
+### Shah and Samworth error control

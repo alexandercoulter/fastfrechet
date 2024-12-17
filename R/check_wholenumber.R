@@ -1,9 +1,11 @@
 #' Check if input is a whole number (positive integer)
 #' 
 #' @description
+#' This function checks to see if `x` is a positive integer (a whole number).
+#' If `x` is not a whole number, the function stops the current R process and
+#' returns an error.
 #' 
-#' 
-#' @param x 
+#' @param x Any R object.
 #'
 #' @return No return output.
 #' 

@@ -33,7 +33,7 @@ algorithm developed in
 
 To use `fastfrechet`, you need to install
 [`R`](https://cran.r-project.org/). To enhance your user experience, you
-may use some IDE for it (e.g. [`RStudio`](https://www.rstudio.com/)).
+may use some IDE for it (e.g. [`RStudio`](https://www.rstudio.com/)).
 
 The development version of
 [`fastfrechet`](https://github.com/alexandercoulter/fastfrechet) is

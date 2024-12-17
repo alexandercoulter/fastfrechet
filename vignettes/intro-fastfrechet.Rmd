@@ -140,18 +140,43 @@ legend("topleft", lwd = 2, col = 1:2, bty = "n",
 ### Using `fastfrechet::FRiSO_CV_univar2wass`
 
 ```{r}
+# Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
 
+lower = 0
+upper = Inf
+ 
+# Set cross-validation parameters
+K = 10
+thresh = 0.0001
+tauseq = seq(0.1, 20, 0.1)
+eps = 0.001
 
-
+# Run complementary pairs stability selection
+cv = FRiSO_CV_univar2wass(X = X,
+                           Y = Y,
+                           K = K,
+                           thresh = thresh,
+                           lower = lower,
+                           upper = upper,
+                           tauseq = tauseq,
+                           eps = eps)
+ 
 
 ```
 
 ### Plotting, interpreting CV errors and optimal solution
 
 ```{r}
+# Plot errors per fold and average fold error:
+matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "CV Fold Errors")
+lines(tauseq, cv$error_sum / K, lwd = 3)
+points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
+ 
+# Identify which variables are selected in "optimal" model:
+cv$opt_selected
 
-
-
+# 1, 2, 3, 4, 8, 9
+# all correct variables 1-4, and 2 extra
 
 ```
 

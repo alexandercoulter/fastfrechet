@@ -9,7 +9,7 @@ test_that("monotoneQP output satisfies constraints", {
   y <- rnorm(m, 2 * seq(0, 1, len = m), 0.1)
   
   # Calculate monotone, box-constrained projection
-  output <- fastfrechet::monotoneQP(y, lower = lower, upper = upper)
+  output <- monotoneQP(y, lower = lower, upper = upper)
   
   # Check that the output is non-decreasing
   monotonicity_check <- round(min(diff(output$Solution[1, ])), digits = 5)
@@ -49,6 +49,50 @@ test_that("predicted QFs are monotonic and within [0, 40]", {
   output <- frechetreg_univar2wass(X = X,
                                    Y = Y,
                                    Z = NULL,
+                                   C_init = NULL,
+                                   lambda = NULL,
+                                   lower = lower,
+                                   upper = upper)
+  
+  # Extract predicted QFs
+  predicted_QFs <- output$Qhat  # Assuming this contains (n x m) matrix of QFs
+  
+  # Check monotonicity for each row (QFs should be non-decreasing)
+  apply(predicted_QFs, 1, function(row) {
+    expect_true(all(diff(row) >= -1e-5), info = "QF row is not monotonic (non-decreasing)")
+  })
+  
+  # Check lower bound for each element
+  expect_true(all(predicted_QFs >= lower - 1e-5), 
+              info = "QF values violate the lower bound")
+  
+  # Check upper bound for each element
+  expect_true(all(predicted_QFs <= upper + 1e-5), 
+              info = "QF values violate the upper bound of 40")
+})
+
+
+test_that("works with large p", {
+  # Parameters
+  lower <- 0   # Lower bound
+  upper <- 40  # Upper bound
+  
+  # Generate data
+  n <- 50
+  p <- 70
+  m <- 30
+  set.seed(31)
+  mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
+  
+  X <- mydata$X
+  Y <- mydata$Y
+  
+  Y[Y > upper] = upper
+  
+  # Estimate conditional QFs
+  output <- frechetreg_univar2wass(X = X,
+                                   Y = Y,
+                                   Z = X,
                                    C_init = NULL,
                                    lambda = NULL,
                                    lower = lower,

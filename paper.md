@@ -114,68 +114,60 @@ X_df = as.data.frame(X)
 Y_adj = Y + matrix(seq(0, 0.01, len = m), n, m, byrow = TRUE)
 
 microbenchmark(WRI::wass_regress( ~ ., X_df, "quantile", Y_adj),
-               frechet::GloDenReg(xin = X, qin = Y, optns = list("lower" = 0)),
+               frechet::GloDenReg(X, qin = Y, optns = list("lower" = 0)),
                fastfrechet::frechetreg_univar2wass(X, Y, lower = 0),
                times = 5)
 ```
 ![**Figure 1**. Fréchet regression optimization accuracy and median solve time
 (of 5 iterations) on simulated zero-inflated negative binomial responses, zoomed
 in around zero. Departures $\widehat{\mathbf{q}}_i < 0$ are violations of lower
-bound.\label{fig:frechetreg_comparison}](figures/frechetreg_comparison.png)
+bound.\label{fig:frechetreg_comparison}](figures/frechetreg_comparison.png){width="10in"}
 
 ### The Variable Selection Problem
 
-The 
+The R package `fastfrechet` solves the variable selection procedure proposed by
+@tucker_variable_2023 for Fréchet regression, specifically in 2-Wasserstein
+space. The implementation is a second-order geodesic gradient descent algorithm
+developed by @coulter_fast_2024, with two new modifications. First, the new
+implementation uses the custom dual active-set method discussed in the previous
+subsection, with warm starts. Second, the new implementation includes an option
+for the user to specify an impulse parameter for the gradient descent algorithm,
+which implements a momentum-based geodesic gradient descent.
 
-# Old writing
+The algorithm implemented by `fastfrechet` provides a fast and accurate solution
+to the variable selection problem, illustrated by comparison to the algorithm
+available from @tucker_variable_2023 (Supplementary Material) in Figure
+\autoref{fig:friso_comparison}. We use the same $\epsilon = 0.0075$ error
+tolerance for the `fastfrechet` method as @coulter_fast_2024, chosen to provide
+similar optimization accuracy so computation time comparisons are on
+approximately equal footing. Note that `fastfrechet` centers and scales
+$\mathbf{X}$ so $\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \mathbf{1}_p$, to
+remove the effect of unit choice on the variable selection outcome. We use this
+same centered-scaled $\mathbf{X}$ as input to the old method. Finally, as the
+existing code for the old method does not natively accept multiple $\tau$
+inputs, we wrote a short wrapper function which loops over the values in
+`tauseq`.
+```
+# Centering and scaling X
+X0 = X - rep(1, n) %*% crossprod(rep(1 / n, n), X)
+X0 = X0 / (rep(1, n) %*% sqrt(crossprod(rep(1 / n, n), X0 * X0)))
 
-Fréchet regression (@petersen_frechet_2019) extends Euclidean regression to the
-general setting where response $Y$ resides in a metric space $\Omega$ equipped
-with a metric $d : \Omega \times \Omega \mapsto \mathbb{R}_+$. Subsequently, variable
-selection has been proposed for Fréchet regression (@tucker_variable_2023),
-again extending a generalized ridge penalty method developed in the Euclidean
-setting (@wu_cant_2021). Finding conditional Fréchet means (i.e. solving the
-Fréchet regression problem) is a context-specific task where general solvers are
-not available; on the other hand, @tucker_variable_2023 propose a general method
-for solving their variable selection problem, so long as some method for solving
-the associated Fréchet regression problem is available.
+# Defining tau range:
+tauseq = seq(0.5, 10, 0.5)
 
-Univariate distribution responses, equipped with the 2-Wasserstein metric, serve
-as an example use case in both @petersen_frechet_2019 and @tucker_variable_2023,
-and have emerging applications to biomedical data including continuous glucose
-monitoring data [MATABUENA REFERENCE] and actigraphy data [GHOSAL REFERENCE].
-@coulter_fast_2024 developed a new algorithm for solving the variable selection
-problem in this context, obtaining empirical speed increases up to
-10,000$\times$ in simulation settings over the existing general purpose solver,
-with greater relative speed increases with increasing sample size and covariate
-count. This makes Fréchet regression methods accessible for data sets where such
-data is available for a large number of patient and covariates, such as the UK
-Biobank [DOHERTY REFERENCE].
+microbenchmark(fastfrechet::FRiSO_univar2wass(X, Y, lower = 0, tauseq = tauseq, eps = 0.0075, nudge = 0.01),
+               FRiSO_tucker(X = X0, Y = Y, tauseq = tauseq, lower = 0, upper = 1000),
+               times = 5)
+```
+![**Figure 2**. Variable selection comparison between old method and new method
+from `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. Each algorithm solved
+for $\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$ using warm starts.
+(*left*) Variable selection solution paths and computation times. (*right*)
+Optimization accuracy comparison, where values below zero (gray dotted line)
+correspond to superior optimization accuracy of `fastfrechet` method, and values
+above zero correspond to superior optimization accuracy of old method.
+\label{fig:friso_comparison}](figures/friso_comparison.png){width="8.343585in"}
 
-`fastfrechet` implements the fast variable selection algorithm of
-@coulter_fast_2024 for univariate distribution responses, as well as implements
-resampling procedures for variable selection like cross validation
-(@tucker_variable_2023) and complementary pairs stability selection
-(@coulter_fast_2024; @shah_variable_2013; @meinshausen_stability_2010). It also
-includes a new dedicated QP solver for the associated Fréchet regression
-problem, implementing the dual active-set method of @arnstrom_dual_2022 while
-taking advantage of the specific constraint structure to avoid matrix
-decomposition and multiplication operations.
-
-# Citations
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
-
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
-
-Example citation [@coulter_fast_2024].
-
-# Figures
 
 # Acknowledgements
 

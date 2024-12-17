@@ -57,7 +57,7 @@
 #'                           eps = eps)
 #' 
 #' # Plot errors per fold and average fold error:
-#' matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "CV Fold Errors)
+#' matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "CV Fold Errors")
 #' lines(tauseq, cv$error_sum / K, lwd = 3)
 #' points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
 #' 

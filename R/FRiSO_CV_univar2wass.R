@@ -1,7 +1,14 @@
 #' FRiSO_CV_univar2wass
 #' 
 #' @description
-#' 
+#' This function performs K-fold cross-validation with the Fréchet Ridge
+#' Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}),
+#' for the space of univariate distribution responses equipped with the
+#' 2-Wasserstein metric. The optimal hyperparameter \eqn{\tau} is chosen as that
+#' which minimizes out-of-sample error among a collection of user-supplied
+#' values in `tauseq`. If there are ties for the minimum error, the model formed
+#' from the smallest \eqn{\tau} is chosen. The model corresponding to the
+#' optimal \eqn{\tau} is also provided as part of the output list object.
 #' 
 #'
 #' @inheritParams frechetreg_univar2wass

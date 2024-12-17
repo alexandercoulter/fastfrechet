@@ -158,18 +158,7 @@ $$
    0 &  0 &  0 &  0 & \cdots &  0 & -1 & +1
 \end{pmatrix}.
 $$
-For $W_k \subset [m + 1]$ (strict subset), the matrix
-$\mathbf{A}_k^{\top}\mathbf{A}_k$ comprises the entries at the intersections of
-the columns/rows indexed by $W_k$, and so is also tridiagonal with possibly
-isolated diagonal entries. We implement a solver which incrementally searches
-along the indices in $W_k$ to identify isolated diagonal entries in
-$\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by indices $w \in W_k$ where
-$w+1 \notin W_k$ and $w-1\notin W_k$) where inversion reduces to a simple scalar
-division operation, or fully block tridiagonal entries in
-$\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by sequences of indices
-$(w, w+1, \dots, w + s) \subset W_k$) where we apply a simplified Thomas
-algorithm that takes advantage of the repeated diagonal entries of
-$\mathbf{A}^{\top}\mathbf{A}$.
+For $W_k \subset [m + 1]$ (strict subset), the matrix $\mathbf{A}_k^{\top}\mathbf{A}_k$ comprises the entries at the intersections of the columns/rows indexed by $W_k$, and so is also tridiagonal with possibly isolated diagonal entries. We implement a solver which incrementally searches along the indices in $W_k$ to identify isolated diagonal entries in $\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by indices $w \in W_k$ where $w+1 \notin W_k$ and $w-1\notin W_k$) where inversion reduces to a simple scalar division operation, or fully block tridiagonal entries in $\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by sequences of indices $(w, w+1, \dots, w + s) \subset W_k$) where we apply a simplified Thomas algorithm that takes advantage of the repeated diagonal entries of $\mathbf{A}^{\top}\mathbf{A}$.
 
 
 #### Evaluating $\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$
@@ -190,9 +179,7 @@ Recalling $\mathbf{A}$ is full row rank, if $\mathbf{A}^{\top}\mathbf{A}\mathbf{
 $$
 \mathbf{A} \mathbf{p}_k = (\mathbf{A}\mathbf{A}^{\top})^{-1}\mathbf{A}\pmb{0} = \pmb{0},
 $$
-implying (by the form of $\mathbf{A}$) that
-$[\mathbf{p}_k]_i = [\mathbf{p}_k]_{i+1}$ for all $i < m + 1$. But then
-$\mathbf{p}_k = p \cdot \pmb{1}$ for some $p$, and the constraint is now written
+implying (by the form of $\mathbf{A}$) that $[\mathbf{p}_k]_i = [\mathbf{p}_k]_{i+1}$ for all $i < m + 1$. But then $\mathbf{p}_k = p \cdot \pmb{1}$ for some $p$, and the constraint is now written
 $$
 \mathbf{p}^{\top}\mathbf{d} < 0 \quad \iff \quad p \cdot \pmb{1}^{\top}\mathbf{d} < 0.
 $$

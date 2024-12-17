@@ -28,6 +28,44 @@
 #' @export
 #'
 #' @examples
+#' # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
+#' n = 100  # number of samples - nrow(X) and nrow(Y).
+#' p = 10   # number of covariates - ncol(X).
+#' m = 50   # EQF grid density - ncol(Y).
+#' lower = 0
+#' upper = Inf
+#' 
+#' set.seed(31)
+#' mydata = generate_zinbinom_qf(n = n, p = p, m = m)
+#' X = mydata$X  # (n x p) matrix of covariates
+#' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+#' 
+#' # Set cross-validation parameters
+#' K = 10
+#' thresh = 0.0001
+#' tauseq = seq(0.1, 20, 0.1)
+#' eps = 0.001
+#' 
+#' # Run complementary pairs stability selection
+#' cv = FRiSO_CV_univar2wass(X = X,
+#'                           Y = Y,
+#'                           K = K,
+#'                           thresh = thresh,
+#'                           lower = lower,
+#'                           upper = upper,
+#'                           tauseq = tauseq,
+#'                           eps = eps)
+#' 
+#' # Plot errors per fold and average fold error:
+#' matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "CV Fold Errors)
+#' lines(tauseq, cv$error_sum / K, lwd = 3)
+#' points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
+#' 
+#' # Identify which variables are selected in "optimal" model:
+#' cv$opt_selected
+#' 
+#' # 1, 2, 3, 4, 8, 9
+#' # all correct variables 1-4, and 2 extra
 FRiSO_CV_univar2wass = function(X,
                                 Y,
                                 K = NULL,

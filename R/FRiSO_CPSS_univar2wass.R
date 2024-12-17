@@ -10,8 +10,6 @@
 #' threshold, which may be a function of \eqn{\tau}.
 #' 
 #' @inheritParams frechetreg_univar2wass
-#' @param X 
-#' @param Y 
 #' @param B Positive integer number of complementary pair sub-samples to take of original data set (default 50).
 #' @param thresh A finite positive scalar selection threshold, where \eqn{\hat{lambda}_k(\tau) > }`thresh` means the \eqn{k^{th}} variable is selected, and not selected otherwise.
 #' @param ... other inputs to FRiSO see [fastfrechet::FRiSO_univar2wass()].
@@ -23,7 +21,7 @@
 #' # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
 #' n = 100  # number of samples - nrow(X) and nrow(Y).
 #' p = 10   # number of covariates - ncol(X).
-#' m = 100  # EQF grid density - ncol(Y).
+#' m = 50   # EQF grid density - ncol(Y).
 #' lower = 0
 #' upper = Inf
 #' 

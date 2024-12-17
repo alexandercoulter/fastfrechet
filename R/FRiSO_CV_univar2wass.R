@@ -12,8 +12,6 @@
 #' 
 #'
 #' @inheritParams frechetreg_univar2wass
-#' @param X 
-#' @param Y 
 #' @param K Numeric whole number no bigger than `nrow(X)`.
 #' @param thresh Positive scalar that determines the selection cutoff for the `lambda` vector in the variable selection problem. 
 #' @param ... other inputs to FRiSO see [fastfrechet::FRiSO_univar2wass()].

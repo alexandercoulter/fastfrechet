@@ -405,14 +405,14 @@ arma::mat XDXt(const arma::mat& X,
 arma::colvec projA0(const arma::colvec& v,
                     const arma::colvec& h){
   
-  // The vector h corresponds to the associated i^th Lagrange multiplier,
+  // The vector h corresponds to the associated ith Lagrange multiplier,
   // which has positive entries or zero entries. The entries which are positive
   // correspond to constraints which are exactly zero, hence we preserve the
   // associated columns of A as A0 = A( , bool(h > 0)). This function is for
   // projecting onto ColSp(A0).
   // Let n = sum(h > 0). Conducting this operation with the usual projection
-  // equation [ A0 (A0' A0)^{-1} A0' v ], perhaps through SVD(A0), would be at
-  // least O(n * m^2) complexity.  However, due to the special structure of A,
+  // equation [ A0 (A0' A0){-1} A0' v ], perhaps through SVD(A0), would be at
+  // least O(n * m * m) complexity.  However, due to the special structure of A,
   // and therefore A0, the most involved operations scale with complexity
   // ~O(n log n), with ~O(m) memory access operations.
   

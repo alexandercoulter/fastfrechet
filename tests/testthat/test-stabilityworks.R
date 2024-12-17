@@ -4,7 +4,7 @@ p <- 10   # number of covariates
 m <- 50   # EQF grid density
 lower <- 0
 upper <- Inf
-B <- 50
+B <- 20
 thresh <- 0.0001
 tauseq <- 1:10
 eps <- 0.001

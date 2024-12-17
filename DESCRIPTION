@@ -19,7 +19,8 @@ LinkingTo:
     RcppArmadillo
 Imports:
     Rcpp,
-    stats
+    stats,
+    Rdpack
 Suggests: 
     knitr,
     rmarkdown,

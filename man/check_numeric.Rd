@@ -4,18 +4,25 @@
 \alias{check_numeric}
 \title{Check if input is a numeric scalar, vector, or matrix, with no missing values}
 \usage{
-check_numeric(x, object_type = c("scalar", "vector", "matrix"), finite = TRUE)
+check_numeric(
+  x,
+  object_type = c("scalar", "vector", "matrix")[1],
+  finite = TRUE
+)
 }
 \arguments{
-\item{x}{}
+\item{x}{Any R object.}
 
-\item{object_type}{}
+\item{object_type}{A character object, one of \code{scalar}, \code{vector}, or \code{matrix} (default \code{scalar}), indicating which data value type is expected. Note, for this function, a \code{1}\eqn{\times}\code{1} matrix is not a scalar, and an \code{n}\eqn{\times}\code{1} matrix is not a vector.}
 
-\item{finite}{}
+\item{finite}{A logical \code{TRUE} or \code{FALSE} (default \code{TRUE}), indicating whether the function should check for \code{-Inf} or \code{Inf}.}
 }
 \value{
 No returned value
 }
 \description{
-Check if input is a numeric scalar, vector, or matrix, with no missing values
+This function checks to see if \code{x} is a numeric object with non-missing or
+non-infinite entries. \code{x} may be a scalar, a vector, or a matrix. If \code{x} is
+one of these or has any missing or infinite (if specified) or non-numeric
+entries, the function stops the current R process and returns an error.
 }

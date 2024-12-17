@@ -7,11 +7,13 @@
 check_wholenumber(x)
 }
 \arguments{
-\item{x}{}
+\item{x}{Any R object.}
 }
 \value{
 No return output.
 }
 \description{
-Check if input is a whole number (positive integer)
+This function checks to see if \code{x} is a positive integer (a whole number).
+If \code{x} is not a whole number, the function stops the current R process and
+returns an error.
 }

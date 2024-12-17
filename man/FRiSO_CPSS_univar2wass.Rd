@@ -7,34 +7,39 @@
 FRiSO_CPSS_univar2wass(X, Y, B = 50, thresh = 1e-04, ...)
 }
 \arguments{
-\item{X}{}
+\item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{}
+\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions, row-wise monotone non-decreasing.
+Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
 \item{B}{Positive integer number of complementary pair sub-samples to take of original data set (default 50).}
 
-\item{thresh}{A finite positive scalar selection threshold, where \eqn{\hat{lambda}_k(\tau) > }\code{thresh} means the \eqn{k^{th}} variable is selected, and not selected otherwise.}
+\item{thresh}{A finite positive scalar selection threshold, where \eqn{\widehat{\lambda}_k(\tau) > } \code{thresh} means the \eqn{k^{\mathrm{th}}} variable is selected, and not selected otherwise.}
 
 \item{...}{other inputs to FRiSO see \code{\link[=FRiSO_univar2wass]{FRiSO_univar2wass()}}.}
 }
 \value{
-List containing: 'tau', a vector containing the values of tau which were fed into the function call; 'selected_variables' element, a \link{B by 2 by length(tauseq) by p} array containing 0's and 1's identifying which variables were selected by CPSS per sub-sample; 'selected_samples' element, a \link{B x 2 x length(tauseq) x n} array containing 0's and 1's identifying which samples were selected in course of CPSS; a 'stability_paths' element, a \link{length(tauseq) x p} matrix containing stability measures for each variable (column-wise) against given tauseq.
+List containing: 'tau', a vector containing the values of tau which were fed into the function call; 'selected_variables' element, a (\code{B} \eqn{\times} \code{2} \eqn{\times} \code{length(tauseq)} \eqn{\times} \code{p}) array containing 0's and 1's identifying which variables were selected by CPSS per sub-sample; 'selected_samples' element, a (\code{B} \eqn{\times} \code{2} \eqn{\times} \code{length(tauseq)} \eqn{\times} \code{n}) array containing 0's and 1's identifying which samples were selected in course of CPSS; a 'stability_paths' element, a (\code{length(tauseq)} \eqn{\times} \code{p}) matrix containing stability measures for each variable (column-wise) against given tauseq.
 }
 \description{
-Complementary Pairs Stability Selection (CPSS) for FRiSO, for Univariate Distribution Responses Equipped with the 2-Wasserstein Metric
+This function performs complementary pairs stability selection
+(\insertCite{meinshausen_stability_2010}{fastfrechet}) with the Fréchet Ridge
+Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}),
+for the space of univariate distribution responses equipped with the
+2-Wasserstein metric. Heuristically, the optimal model is identified by
+selecting covariates whose "stability paths" over \eqn{\tau} exceed a
+threshold, which may be a function of \eqn{\tau}.
 }
 \examples{
 # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
 n = 100  # number of samples - nrow(X) and nrow(Y).
 p = 10   # number of covariates - ncol(X).
-m = 100  # EQF grid density - ncol(Y).
+m = 50   # EQF grid density - ncol(Y).
 lower = 0
 upper = Inf
 
 set.seed(31)
-mydata = fastfrechet::generate_zinbinom_qf(n = n,
-                                           p = p,
-                                           m = m)
+mydata = generate_zinbinom_qf(n = n, p = p, m = m)
 X = mydata$X  # (n x p) matrix of covariates
 Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
 

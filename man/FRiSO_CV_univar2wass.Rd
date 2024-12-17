@@ -7,9 +7,10 @@
 FRiSO_CV_univar2wass(X, Y, K = NULL, thresh = 1e-04, ...)
 }
 \arguments{
-\item{X}{}
+\item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{}
+\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions, row-wise monotone non-decreasing.
+Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
 \item{K}{Numeric whole number no bigger than \code{nrow(X)}.}
 
@@ -29,5 +30,52 @@ A list object with components:
 }
 }
 \description{
-FRiSO_CV_univar2wass
+This function performs K-fold cross-validation with the Fréchet Ridge
+Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}),
+for the space of univariate distribution responses equipped with the
+2-Wasserstein metric. The optimal hyperparameter \eqn{\tau} is chosen as that
+which minimizes out-of-sample error among a collection of user-supplied
+values in \code{tauseq}. If there are ties for the minimum error, the model formed
+from the smallest \eqn{\tau} is chosen. The model corresponding to the
+optimal \eqn{\tau} is also provided as part of the output list object.
+}
+\examples{
+# Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
+n = 100  # number of samples - nrow(X) and nrow(Y).
+p = 10   # number of covariates - ncol(X).
+m = 50   # EQF grid density - ncol(Y).
+lower = 0
+upper = Inf
+
+set.seed(31)
+mydata = generate_zinbinom_qf(n = n, p = p, m = m)
+X = mydata$X  # (n x p) matrix of covariates
+Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+
+# Set cross-validation parameters
+K = 10
+thresh = 0.0001
+tauseq = seq(0.1, 20, 0.1)
+eps = 0.001
+
+# Run complementary pairs stability selection
+cv = FRiSO_CV_univar2wass(X = X,
+                          Y = Y,
+                          K = K,
+                          thresh = thresh,
+                          lower = lower,
+                          upper = upper,
+                          tauseq = tauseq,
+                          eps = eps)
+
+# Plot errors per fold and average fold error:
+matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "CV Fold Errors")
+lines(tauseq, cv$error_sum / K, lwd = 3)
+points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
+
+# Identify which variables are selected in "optimal" model:
+cv$opt_selected
+
+# 1, 2, 3, 4, 8, 9
+# all correct variables 1-4, and 2 extra
 }

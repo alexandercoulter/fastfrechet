@@ -157,7 +157,7 @@ frechetreg_univar2wass <- function(X,
       if (is.null(lambda)) {
         # For simplicity in comments, let X = Xc. The following  evaluates
         #
-        # ( 1/n J + Z( X'X ){+}X' )Y
+        # ( 1/n J + Z( X'X )^{+}X' )Y
         #
         # which requires either inverting X'X (if possible) or finding the
         # right singular vectors of X. In case X'X is not invertible, the
@@ -222,16 +222,16 @@ frechetreg_univar2wass <- function(X,
         # For simplicity in comments, let X = Xcn and Z = Zcn. The following
         # evaluates
         #
-        # ( 1/n J + Z( X'X + D{-1} ){-1}X' )Y
+        # ( 1/n J + Z( X'X + D^{-1} )^{-1}X' )Y
         #
         # which requires inverting a matrix. When p is large in comparison to
         # n, we can rewrite the above expression
         #
-        # ( 1/n J + ZDX'(XDX' + I){-1} )Y
+        # ( 1/n J + ZDX'(XDX' + I)^{-1} )Y
         #
         # which involves inverting an (n x n) matrix. When n is large, we use
         #
-        # ( 1/n J + ZB(BX'XB + I){-1}BX' )Y
+        # ( 1/n J + ZB(BX'XB + I)^{-1}BX' )Y
         #
         # where B = D{1/2}, which involves inverting a (p x p) matrix.
         if (p > (1.1 * n)) {
@@ -269,7 +269,7 @@ frechetreg_univar2wass <- function(X,
       if (is.null(lambda)) {
         # For simplicity in comments, let X = Xc. The following  evaluates
         #
-        # ( 1/n J + X( X'X ){+}X' )Y
+        # ( 1/n J + X( X'X )^{+}X' )Y
         #
         # i.e. the projection of Y onto ColSpace(1, X). This requires either
         # inverting X'X (if possible) or finding the right singular vectors of
@@ -302,7 +302,7 @@ frechetreg_univar2wass <- function(X,
           # Calculate Yhat:
           Yhat <- rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
         } else {
-          # Try to solve X(X'X){-1}X'Y through inversion method:
+          # Try to solve X(X'X)^{-1}X'Y through inversion method:
           M <- tryCatch(Xc %*% solve(crossprod(Xc), crossprod(Xc, Y)),
             error = function(e) {
               # If inversion fails, calculate SVD of Xc = USV':
@@ -326,17 +326,17 @@ frechetreg_univar2wass <- function(X,
 
         # For simplicity in comments, let X = Xcn. The following evaluates
         #
-        # ( 1/n J + X( X'X + D{-1} ){+}X' )Y
+        # ( 1/n J + X( X'X + D^{-1} )^{+}X' )Y
         #
         # which can be rewritten based on the size of n vs. p. If p is larger
         # than n, a helpful equivalent representation is
         #
-        # ( 1/n J + I - (XDX' + I){-1} )Y
+        # ( 1/n J + I - (XDX' + I)^{-1} )Y
         #
         # which involves inverting an (n x n) matrix. If n is larger than p,
         # a helpful equivalent representation is
         #
-        # ( 1/n J + X(DX'X + I){-1}DX' )Y
+        # ( 1/n J + X(DX'X + I)^{-1}DX' )Y
         #
         # which involves inverting a (p x p) matrix.
         if (p > n) {

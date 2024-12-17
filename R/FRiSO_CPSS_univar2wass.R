@@ -1,7 +1,13 @@
 #' Complementary Pairs Stability Selection (CPSS) for FRiSO, for Univariate Distribution Responses Equipped with the 2-Wasserstein Metric
 #' 
 #' @description
-#' 
+#' This function performs complementary pairs stability selection
+#' (\insertCite{meinshausen_stability_2010}{fastfrechet}) with the Fréchet Ridge
+#' Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}),
+#' for the space of univariate distribution responses equipped with the
+#' 2-Wasserstein metric. Heuristically, the optimal model is identified by
+#' selecting covariates whose "stability paths" over \eqn{\tau} exceed a
+#' threshold, which may be a function of \eqn{\tau}.
 #' 
 #' @inheritParams frechetreg_univar2wass
 #' @param X 

@@ -35,8 +35,8 @@ bibliography: inst/REFERENCES.bib
 # Summary
 
 Distribution-as-response regression problems are gaining wider attention,
-especially within biomedical settings where observation-rich patient specific data
-sets are available, such as continuous glucose monitoring
+especially within biomedical settings where observation-rich patient specific
+data sets are available, such as continuous glucose monitoring
 [@matabuena_glucodensities_2021], actigraphy [@ghosal_distributional_2023], and
 feature densities in CT scans [@petersen_wasserstein_2021].
 To accommodate the complex structure of such problems, @petersen_frechet_2019
@@ -56,24 +56,23 @@ to large data sets, such as the UK Biobank [@doherty_large_2017].
 
 No software package currently supports variable selection for 2-Wasserstein
 Fréchet regression, and until @coulter_fast_2024, existing algorithms are too
-slow for practical use. To our knowledge, there are two packages which implement
-Fréchet regression in 2-Wasserstein space: the R package `WRI`, and the R
-package `frechet`. However, these packages are computationally inefficient and
-limited in scope. For instance, `WRI` does not support user-specified box
-constraints for the support of underlying distributions, and requires strictly
-monotone quantile function inputs (or, equivalently, strictly positive density
-inputs). `frechet` allows more flexible user specifications, but its Fréchet
+slow for practical use. To our knowledge, two packages implement Fréchet
+regression in 2-Wasserstein space: the R package `WRI`, and the R package
+`frechet`. However, these packages are computationally inefficient and limited
+in scope. For example, `WRI` does not permit user-specified box constraints
+for distribution support, and requires strictly increasing quantile function
+inputs. `frechet` allows more flexible user specifications, but its Fréchet
 regression solver is slow and does not satisfy constraints to satisfactory
 accuracy.
 
 `fastfrechet` bridges these gaps by providing a fast and scalable package-ready
 implementation of variable selection for 2-Wasserstein Fréchet regression. It
-implements a customized dual active-set solver based on @arnstrom_dual_2022 to
-solve the Fréchet regression problem, which overcomes the computational and user
-specification limitations of existing packages. `fastfrechet` also includes new
-resampling tools—cross-validation as discussed in @tucker_variable_2023, and
-stability selection as discussed in @coulter_fast_2024—to supplement automatic
-variable selection.
+includes resampling tools—cross-validation as discussed in
+@tucker_variable_2023, and stability selection as discussed in
+@coulter_fast_2024—to supplement automatic variable selection. `fastfrechet`
+also implements a customized dual active-set solver based on @arnstrom_dual_2022
+to solve the Fréchet regression problem, which overcomes computational and user
+specification limitations in existing packages.
 
 # Performance Comparisons to Existing Implementations
 
@@ -81,10 +80,10 @@ We illustrate the performance of R package `fastfrechet` against existing
 implementations with simulated covariate-dependent, zero-inflated negative
 binomial distributions. The included function `generate_zinbinom_qf` allows us
 to simulate $n$ such distributions, represented as quantile functions evaluated
-on a shared $m$-grid in $(0, 1)$, generated from the first 4 of $p \geq 4$
+on a shared $m$-grid in $(0, 1)$, dependent on the first 4 of $p \geq 4$
 covariates. For a general illustration of what Fréchet regression and variable
-selection look like in 2-Wasserstein space, see the accompanying `VIGNETTE_NAME`
-vignette.
+selection look like in 2-Wasserstein space, see the accompanying
+`intro-fastfrechet` vignette.
 ```
 set.seed(31)
 n = 100          # number of QFs
@@ -102,11 +101,11 @@ The R package `fastfrechet` provides a solver for the Fréchet regression proble
 for 2-Wasserstein space, with optional user-specified box constraints to enforce
 possibly finite support on the underlying distributions. The implementation is
 a customization of the dual active-set method of @arnstrom_dual_2022 (see the
-accompanying `VIGNETTE_NAME` vignette). The resulting algorithm provides a fast
-and numerically exact solution to the Fréchet regression problem, illustrated in
-Figure \autoref{fig:frechetreg_comparison}. Note the `WRI` package requires
-strictly monotone inputs, so we add a small monotone adjustment to the response
-matrix when using that package.
+accompanying `monotoneQP-fastfrechet` vignette). The resulting algorithm
+provides a fast and numerically exact solution to the Fréchet regression
+problem, illustrated in Figure \autoref{fig:frechetreg_comparison}. Since the
+`WRI` package requires strictly monotone inputs, we add a small adjustment to
+the response matrix when using `WRI`'s solver.
 ```
 library(microbenchmark)
 
@@ -160,10 +159,10 @@ microbenchmark(fastfrechet::FRiSO_univar2wass(X, Y, lower = 0, tauseq = tauseq, 
                times = 5)
 ```
 ![**Figure 2**. Variable selection comparison between old method and new method
-from `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. Each algorithm solved
-for $\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$ using warm starts.
+from `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. Each algorithm solves
+$\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$, using warm starts.
 (*left*) Variable selection solution paths and computation times. (*right*)
-Optimization accuracy comparison, where values below zero (gray dotted line)
+Optimization accuracy comparison; values below zero (grey dotted line)
 correspond to superior optimization accuracy of `fastfrechet` method, and values
 above zero correspond to superior optimization accuracy of old method.
 \label{fig:friso_comparison}](figures/friso_comparison.png){width="8.343585in"}

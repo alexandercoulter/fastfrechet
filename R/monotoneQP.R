@@ -40,7 +40,7 @@
 #' y = rnorm(m, 2 * seq(0, 1, len = m), 0.1)
 #' 
 #' # Calculate monotone, box-constrained projection:
-#' output = fastfrechet::monotoneQP(y, lower = lower, upper = upper)
+#' output = monotoneQP(y, lower = lower, upper = upper)
 #' 
 #' # Note: to numerical precision, these QFs are non-decreasing...
 #' min(diff(output$Solution[1, ]))

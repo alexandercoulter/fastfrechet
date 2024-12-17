@@ -11,7 +11,7 @@
 #' 
 #' @inheritParams frechetreg_univar2wass
 #' @param B Positive integer number of complementary pair sub-samples to take of original data set (default 50).
-#' @param thresh A finite positive scalar selection threshold, where \eqn{\widehat{\lambda}_k(\tau) > }`thresh` means the \eqn{k^{th}} variable is selected, and not selected otherwise.
+#' @param thresh A finite positive scalar selection threshold, where \eqn{\widehat{\lambda}_k(\tau) > } `thresh` means the \eqn{k}-th variable is selected, and not selected otherwise.
 #' @param ... other inputs to FRiSO see [fastfrechet::FRiSO_univar2wass()].
 #'
 #' @return List containing: 'tau', a vector containing the values of tau which were fed into the function call; 'selected_variables' element, a (`B` \eqn{\times} `2` \eqn{\times} `length(tauseq)` \eqn{\times} `p`) array containing 0's and 1's identifying which variables were selected by CPSS per sub-sample; 'selected_samples' element, a (`B` \eqn{\times} `2` \eqn{\times} `length(tauseq)` \eqn{\times} `n`) array containing 0's and 1's identifying which samples were selected in course of CPSS; a 'stability_paths' element, a (`length(tauseq)` \eqn{\times} `p`) matrix containing stability measures for each variable (column-wise) against given tauseq.

@@ -10,7 +10,7 @@
 #'  the form of specifying an initial active-constraint matrix. Implementation
 #'  is based on the dual-active set method of
 #'  \insertCite{arnstrom_dual_2022}{fastfrechet}, taking advantage of
-#'  simplifications in this setting which avoid \eqn{LDL'} decompositions
+#'  simplifications in this setting which avoid \eqn{LDL^{\top}} decompositions
 #'  and other costly matrix product operations.
 #'  
 #' @inheritParams frechetreg_univar2wass

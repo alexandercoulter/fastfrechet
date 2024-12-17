@@ -77,13 +77,12 @@ specification limitations in existing packages.
 # Performance Comparisons to Existing Implementations
 
 We illustrate the performance of R package `fastfrechet` against existing
-implementations with simulated covariate-dependent, zero-inflated negative
-binomial distributions. The included function `generate_zinbinom_qf` allows us
-to simulate $n$ such distributions, represented as quantile functions evaluated
-on a shared $m$-grid in $(0, 1)$, dependent on the first 4 of $p \geq 4$
-covariates. For a general illustration of what Fréchet regression and variable
-selection look like in 2-Wasserstein space, see the accompanying
-`intro-fastfrechet` vignette.
+implementations with simulated zero-inflated negative binomial distributions.
+The included function `generate_zinbinom_qf` allows us to simulate $n$ such
+distributions, represented as quantile functions evaluated on a shared $m$-grid
+in $(0, 1)$, dependent on the first 4 of $p \geq 4$ covariates. For a general
+illustration of what Fréchet regression and variable selection look like in
+2-Wasserstein space, see the accompanying `intro-fastfrechet` vignette.
 ```
 set.seed(31)
 n = 100          # number of QFs

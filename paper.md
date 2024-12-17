@@ -163,8 +163,8 @@ from `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. Each algorithm solves
 $\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$, using warm starts.
 (*left*) Variable selection solution paths and computation times. (*right*)
 Optimization accuracy comparison; values below zero (grey dotted line)
-correspond to superior optimization accuracy of `fastfrechet` method, and values
-above zero correspond to superior optimization accuracy of old method.
+correspond to superior accuracy of `fastfrechet` method, and values
+above zero correspond to superior accuracy of old method.
 \label{fig:friso_comparison}](figures/friso_comparison.png){width="8.343585in"}
 
 

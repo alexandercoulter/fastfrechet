@@ -49,9 +49,7 @@
 #' m = 100  # EQF grid density - ncol(Y).
 #' 
 #' set.seed(31)
-#' mydata = fastfrechet::generate_zinbinom_qf(n = n,
-#'                                            p = p,
-#'                                            m = m)
+#' mydata = generate_zinbinom_qf(n = n, p = p, m = m)
 #'
 #' X = mydata$X  # (n x p) matrix of covariates
 #' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
@@ -61,13 +59,13 @@
 #' 
 #' # Generate estimated "allowance vector"s \lambda for each \tau, stored
 #' # column-wise in matrix `L`:
-#' L = fastfrechet::FRiSO_univar2wass(X = X,
-#'                                    Y = Y,
-#'                                    lower = 0,
-#'                                    upper = Inf,
-#'                                    tauseq = tauseq,
-#'                                    eps = 0.001,
-#'                                    nudge = 0.001)
+#' L = FRiSO_univar2wass(X = X,
+#'                       Y = Y,
+#'                       lower = 0,
+#'                       upper = Inf,
+#'                       tauseq = tauseq,
+#'                       eps = 0.001,
+#'                       nudge = 0.001)
 #'                                  
 #' # Plot FRiSO "allowance vector" solution paths:
 #' plot(x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0, max(L)),

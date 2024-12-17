@@ -13,6 +13,10 @@
 #'  simplifications in this setting which avoid \eqn{LDL^{\top}} decompositions
 #'  and other costly matrix product operations.
 #'  
+#' @details
+#' Additional details...
+#' 
+#'  
 #' @inheritParams frechetreg_univar2wass
 #' @param Y An (`m`)-long numeric vector (or (`n` \eqn{\times} `m`) matrix) with no missing, all finite entries.
 #' @param C_init An optional (`m + 1`)-long numeric vector (or (`n` \eqn{\times} `m + 1`) matrix) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.

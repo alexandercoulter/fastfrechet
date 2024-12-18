@@ -43,12 +43,12 @@ where $F_{Y|\Psi=1}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ an
 
 ### Using `fastfrechet::generate_zinbinom_qf`
 
-The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). The full function code is available by entering `fastfrechet::generate_zinbinom_qf` into the R console.
+The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). As output, we are provided the covariate matrix `X` (an `n`$\times$`p` matrix), and the response matrix `Y` (an `n`$\times$`m` matrix) which stores the quantile functions row-wise. The full function code is available by entering `fastfrechet::generate_zinbinom_qf` into the R console.
 
 ```{r}
 n = 100  # number of samples - nrow(X) and nrow(Y).
 p = 10   # number of covariates - ncol(X).
-m = 100  # EQF grid density - ncol(Y).
+m = 100  # quantile function grid density - ncol(Y).
 mseq = seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
 
 set.seed(31)
@@ -57,11 +57,13 @@ mydata = fastfrechet::generate_zinbinom_qf(n = n,
                                            m = m)
  
 X = mydata$X  # (n x p) matrix of covariates
-Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+Y = mydata$Y  # (n x m) matrix of quantile functions, stored row-wise
 ```
 
 
 ### Plotting
+
+These quantile function responses are best illustrated 
 
 ```{r}
 # Plot the EQFs:

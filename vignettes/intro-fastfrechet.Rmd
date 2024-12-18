@@ -39,7 +39,7 @@ The zero-inflated negative binomial (`zinbinom`) distribution is a mixture distr
 $$
 F_Y^{-1}(p) = F_{Y|\Psi=0}^{-1}\left( \frac{p-z}{1-z} \right),
 $$
-where $F_{Y|\Psi=1}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ and $F_{Y|\Psi=1}^{-1}(p) = 0$ for $p < 0$.
+where $F_{Y|\Psi=0}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ and $F_{Y|\Psi=0}^{-1}(p) = 0$ for $p < 0$.
 
 ### Using `fastfrechet::generate_zinbinom_qf`
 

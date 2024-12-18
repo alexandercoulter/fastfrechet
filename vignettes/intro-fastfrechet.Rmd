@@ -195,9 +195,6 @@ points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
  
 # Identify which variables are selected in "optimal" model:
 cv$opt_selected
-
-# 1, 2, 3, 4, 10, 12, 13, 19
-# all correct variables 1-4, and 4 extra
 ```
 
 ## Complementary pairs stability selection

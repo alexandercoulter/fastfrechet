@@ -43,7 +43,7 @@ where $F_{Y|\Psi=0}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ an
 
 ### Using `fastfrechet::generate_zinbinom_qf`
 
-The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). As output, we are provided the covariate matrix `X` (an `n`$\times$`p` matrix), and the response matrix `Y` (an `n`$\times$`m` matrix) which stores the quantile functions row-wise. The full function code is available by entering `fastfrechet::generate_zinbinom_qf` into the R console.
+The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). As output, we are provided the covariate matrix `X` (an `n`$\times$`p` matrix), and the response matrix `Y` (an `n`$\times$`m` matrix) which stores the quantile functions row-wise.
 
 ```{r}
 n = 200  # number of samples - nrow(X) and nrow(Y).
@@ -151,16 +151,22 @@ As functions of $\tau$, the fitted $\widehat{\pmb{\lambda}}$ values trace out "s
 # Plot FRiSO "allowance vector" solution paths:
 matplot(tauseq, t(L), type = "l", col = c(rep("red", 4), rep("black", p - 4)),
         lty = 1, xlab = expression(tau), ylab = expression(lambda*"("*tau*")"),
-        main = "FRiSO Solution Paths", las = 1, lwd = 1.5)
+        main = "Variable Selection Solution Paths", las = 1, lwd = 1.5)
 legend("topleft", lwd = 1.5, col = c("red", "black"), bty = "n",
        legend = c("Model variable", "Unimportant variable"))
 ```
 
 # Resampling for Variable Selection
 
+The variable selection procedure depends on a hyperparameter $\tau$ which is loosely related to the final model size. Choosing a final model free of this choice of $\tau$ can be accomplished in a number of ways. Two ways are cross-validation and complementary pairs stability selection. In cross-validation, detailed in @tucker_variable_2023, final model selection occurs by choosing the $\tau_{\mathrm{opt}}$ which minimizes out-of-sample error, and selecting those variables indicated by $\widehat{\pmb{\lambda}}(\tau_{\mathrm{opt}})$. In complementary pairs stability selection, detailed in @shah_variable_2013 and @coulter_fast_2024, variable selection stability is measured across repeated data splits, with the most consistently selected variables being chosen in a way to guarantee pointwise error control over $\tau$.
+
 ## Cross-validation
 
+`fastfrechet` implements K-fold cross-validation for the variable selection procedure through the function `FRiSO_CV_univar2wass`, with an option to perform leave-one-out cross-validation. Cross-validation testing is implemented with refitting, that is, the model is trained using the weighting scheme from the variable selection procedure, but the test responses are fit using the unweighted covariates. This process is described and illustrated in more detail by @tucker_variable_2023.
+
 ### Using `fastfrechet::FRiSO_CV_univar2wass`
+
+
 
 ```{r}
 # Set cross-validation parameters
@@ -170,13 +176,13 @@ eps = 0.001
 
 # Run complementary pairs stability selection
 cv = FRiSO_CV_univar2wass(X = X,
-                           Y = Y,
-                           K = K,
-                           thresh = thresh,
-                           lower = lower,
-                           upper = upper,
-                           tauseq = tauseq,
-                           eps = eps)
+                          Y = Y,
+                          K = K,
+                          thresh = thresh,
+                          lower = lower,
+                          upper = upper,
+                          tauseq = tauseq,
+                          eps = eps)
  
 
 ```

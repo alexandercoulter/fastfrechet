@@ -26,15 +26,24 @@ library(fastfrechet)
 
 `fastfrechet` is an R package providing fast and robust solutions to several computational problems associated with Fréchet regression [@petersen_frechet_2019] and an associated variable selection method [@tucker_variable_2023], focusing on a specific metric space setting. Fréchet regression generalizes regression with Euclidean covariates and Euclidean responses, to settings where responses exist in a general metric space (i.e. non-vector space). The space of univariate distribution response objects is one such example, recently gaining popularity in biomedical applications where technological advances have made rich patient-level data sets commonplace in a variety of settings. These larger data sets and complex response constraints require newer, faster algorithms for feasibility and scalability [@coulter_fast_2024], which `fastfrechet` provides.\
 
-This vignette walks through an example use case of all of the available
-functions in `fastfrechet`. This includes simulating example covariate-dependent distribution responses, implementing Fréchet regression, performing variable selection, and utilizing resampling tools to supplement automatic variable selection. Where appropriate, the mathematical problems being solved by each function are briefly described. A second vignette, `monotoneQP-fastfrechet`, provides a more detailed algorithmic exposition of the function `monotoneQP` specifically.
+This vignette walks through an example use case of all of the available functions in `fastfrechet`. This includes simulating example covariate-dependent distribution responses, implementing Fréchet regression, performing variable selection, and utilizing resampling tools to supplement automatic variable selection. Where appropriate, the mathematical problems being solved by each function are briefly described. A second vignette, `monotoneQP-fastfrechet`, provides a more detailed algorithmic exposition of the function `monotoneQP` specifically.
 
 
 # Running Through an Example
 
+Since `fastfrechet` performs regression tasks on distribution responses, we illustrate its functionality with simulated distributions. In this section we generate covariate-dependent, zero-inflated negative binomial distributions. We then perform Fréchet regression, and the basic variable selection task with the Fréchet Ridge Selection Operator (FRiSO). Detailed mathematical treatment of these topics can be found in @petersen_frechet_2019, @tucker_variable_2023, and @coulter_fast_2024.
+
 ## Generating quantile functions
 
+The zero-inflated negative binomial (`zinbinom`) distribution is a mixture distribution. It can be described as the marginal distribution of random variable $Y$ utilizing variable $\Psi \sim \mathrm{Bernoulli}(z)$ which turns "on" or "off" the zero inflation: $(Y|\Psi=1) \sim \delta_{\{0\}}$, and $(Z|\Psi=0) \sim \mathrm{nbinom}(r, p)$. As stated, there are three parameters to $Z$'s distribution: the zero-inflation parameter $z \in (0, 1)$, the size parameter of the negative binomial part $r > 0$, and the probability parameter of the negative binomial part $p > 0$. We represent the distribution of $Z$ with its quantile function, given by
+$$
+F_Y^{-1}(p) = F_{Y|\Psi=0}^{-1}\left( \frac{p-z}{1-z} \right),
+$$
+where $F_{Y|\Psi=1}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ and $F_{Y|\Psi=1}^{-1}(p) = 0$ for $p < 0$.
+
 ### Using `fastfrechet::generate_zinbinom_qf`
+
+The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). The full function code is available by entering `fastfrechet::generate_zinbinom_qf` into the R console.
 
 ```{r}
 n = 100  # number of samples - nrow(X) and nrow(Y).

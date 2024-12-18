@@ -37,6 +37,9 @@ is based on the dual-active set method of
 simplifications in this setting which avoid \eqn{LDL^{\top}} decompositions
 and other costly matrix product operations.
 }
+\details{
+Additional details...
+}
 \examples{
 # Set box constraints:
 lower = 0.5

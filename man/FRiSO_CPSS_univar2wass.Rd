@@ -19,7 +19,12 @@ Entries must obey user-specified box constraints given by \code{lower} and \code
 \item{...}{other inputs to FRiSO see \code{\link[=FRiSO_univar2wass]{FRiSO_univar2wass()}}.}
 }
 \value{
-List containing: 'tau', a vector containing the values of tau which were fed into the function call; 'selected_variables' element, a (\code{B} \eqn{\times} \code{2} \eqn{\times} \code{length(tauseq)} \eqn{\times} \code{p}) array containing 0's and 1's identifying which variables were selected by CPSS per sub-sample; 'selected_samples' element, a (\code{B} \eqn{\times} \code{2} \eqn{\times} \code{length(tauseq)} \eqn{\times} \code{n}) array containing 0's and 1's identifying which samples were selected in course of CPSS; a 'stability_paths' element, a (\code{length(tauseq)} \eqn{\times} \code{p}) matrix containing stability measures for each variable (column-wise) against given tauseq.
+\tabular{ll}{
+\code{tau} \tab returns a vector containing the values of \eqn{\tau} which were fed into the function call. \cr
+\code{selected_variables} \tab returns a (\code{B} \eqn{\times} \code{2} \eqn{\times} \code{length(tauseq)} \eqn{\times} \code{n}) array containing 0's and 1's identifying which samples were selected in course of CPSS.\cr
+\code{selected_samples} \tab returns a (\code{B} \eqn{\times} \code{2} \eqn{\times} \code{length(tauseq)} \eqn{\times} \code{n}) array containing 0's and 1's identifying which samples were selected in course of CPSS. \cr
+\code{stability_paths} \tab returns a (\code{length(tauseq)} \eqn{\times} \code{p}) matrix containing stability measures for each variable (column-wise) against given tauseq.
+}
 }
 \description{
 This function performs complementary pairs stability selection

@@ -1,6 +1,5 @@
 ---
-title: 'fastfrechet: An R package for fast implementation of Fréchet regression functions
-  for distribution responses'
+title: 'fastfrechet: An R package for fast implementation of Fréchet regression with distribution responses'
 tags:
 - Fréchet regression
 - Variable selection
@@ -171,5 +170,6 @@ above zero correspond to superior accuracy of old method.
 
 
 # Acknowledgements
+IG's research was supported by NSF DMS-2422478 and NIH R01HL172785.
 
 # References

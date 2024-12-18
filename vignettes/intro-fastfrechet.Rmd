@@ -105,7 +105,7 @@ min(output$Qhat)
 
 ### Plotting $\widehat{\mathbf{Y}}$ and $\widehat{\mathbf{Q}}$
 
-The Fréchet means associated with the Fréchet regression problem $\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise, the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function constraints of monotonicity or box constraints, whereas the solution $\widehat{\mathbf{Q}}$ does. We re-calculate the unprojected matrix from the output of `frechetreg_univar2wass`, and illustrate it beside the fitted response matrix with line plots.
+The Fréchet means associated with the Fréchet regression problem $\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise, the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function constraints of monotonicity or box constraints, whereas the solution $\widehat{\mathbf{Q}}$ does. We recover the unconstrained matrix `Yhat` from the output of `frechetreg_univar2wass`, and illustrate it beside the fitted response matrix with line plots.
 
 ```{r, fig.width = 8, fig.height = 5.5}
 # Plot the unconstrained estimators and the constrained conditional quantile functions:
@@ -120,7 +120,11 @@ matplot(mseq, t(output$Qhat), type = "l", lty = 1, col = 'black', xlab = "p", yl
 
 ## Variable selection with Fréchet ridge selection operator
 
+`fastfrechet` implements the variable selection procedure of @tucker_variable_2023 through the function `FRiSO_univar2wass`. This penalization procedure, called the Fréchet Ridge Selection Operator (FRiSO), solves for a sparse vector $\pmb{\lambda}(\tau) \in \mathbb{R}^p$. Each entry of the optimal $\widehat{\pmb{\lambda}}(\tau)$ is either positive, which indicates the corresponding covariate is selected in the final ($\tau$-dependent) model, or it is zero, which indicates the corresponding covariate is not selected. The entries of $\pmb{\lambda}(\tau)$ add up to $\tau$, so colloquially $\tau$ acts as a "total allowance", and $\widehat{\pmb{\lambda}}(\tau)$ is an optimal allocation of that allowance among the covariates. Theoretical details of this procedure are given in @wu_cant_2021 and @tucker_variable_2023; details of the $\widehat{\pmb{\lambda}}(\tau)$ estimation method implemented by `fastfrechet` are given in @coulter_fast_2024.
+
 ### Using `fastfrechet::FRiSO_univar2wass`
+
+The `frechetreg_univar2wass` function from `fastfrechet` takes as input the covariate matrix `X` and the quantile function response matrix `Y`, along with `lower` and `upper` (box constraints for the support), `tauseq` (a vector of $\tau$ values for which to evaluate $\pmb{\lambda}(\tau)$, ideally provided in-sequence), `eps` (an error tolerance parameter), and `nudge` (a parameter to "push" the numeric solver away from non-optimal saddle points). In this illustrative example, we evaluate the variable selection problem on a dense grid `tauseq = seq(0.2, 20, 0.2)`, and set `eps = 0.001` and `nudge = 0.01`. The function returns a matrix of fitted $\widehat{\pmb{\lambda}}$ values, stored column-wise, one column for each value in `tauseq`.
 
 ```{r}
 # Dense grid of "allowance" totals:
@@ -134,24 +138,22 @@ L = FRiSO_univar2wass(X = X,
                       upper = Inf,
                       tauseq = tauseq,
                       eps = 0.001,
-                      nudge = 0.001)
+                      nudge = 0.01)
 ```
 
 
 
 ### Plotting $\widehat{\pmb{\lambda}}(\tau)$ solution paths
 
+As functions of $\tau$, the fitted $\widehat{\pmb{\lambda}}$ values trace out "solution paths" that we illustrate with line plots. Each line path corresponds to a covariate: if the line is above zero, that covariate is selected, and if it is equal to zero, that covariate is not selected. We illustrate the solution paths of the first four covariates, on which the simulated quantile functions depend, with red lines. The other covariates are illustrated with black lines.
+
 ```{r}                             
 # Plot FRiSO "allowance vector" solution paths:
-plot(x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0, max(L)),
-     main = "FRiSO Selection Paths", xlab = expression(tau),
-     ylab = expression(lambda))
-for(k in 1:p) lines(tauseq, L[k, ], col = (k %in% 1:4) + 1, lwd = 2)
-legend("topleft", lwd = 2, col = 1:2, bty = "n",
-       legend = c("Unrelated variable", "Model variable"))
-
-# Note that with this sample size, there is sufficient information to
-# correctly identify the first 4 variables significantly affect the QFs.
+matplot(tauseq, t(L), type = "l", col = c(rep("red", 4), rep("black", p - 4)),
+        lty = 1, xlab = expression(tau), ylab = expression(lambda*"("*tau*")"),
+        main = "FRiSO Solution Paths", las = 1, lwd = 1.5)
+legend("topleft", lwd = 1.5, col = c("red", "black"), bty = "n",
+       legend = c("Model variable", "Unimportant variable"))
 ```
 
 # Resampling for Variable Selection

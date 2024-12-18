@@ -174,7 +174,7 @@ K = 10
 thresh = 0.0001
 eps = 0.001
 
-# Run complementary pairs stability selection
+# Run cross-validation
 cv = FRiSO_CV_univar2wass(X = X,
                           Y = Y,
                           K = K,
@@ -183,24 +183,21 @@ cv = FRiSO_CV_univar2wass(X = X,
                           upper = upper,
                           tauseq = tauseq,
                           eps = eps)
- 
-
 ```
 
 ### Plotting, interpreting CV errors and optimal solution
 
 ```{r}
 # Plot errors per fold and average fold error:
-matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "CV Fold Errors")
+matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "Cross Validation Fold Errors")
 lines(tauseq, cv$error_sum / K, lwd = 3)
 points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
  
 # Identify which variables are selected in "optimal" model:
 cv$opt_selected
 
-# 1, 2, 3, 4, 8, 9
-# all correct variables 1-4, and 2 extra
-
+# 1, 2, 3, 4, 10, 12, 13, 19
+# all correct variables 1-4, and 4 extra
 ```
 
 ## Complementary pairs stability selection

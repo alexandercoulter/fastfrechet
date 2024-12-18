@@ -35,7 +35,7 @@ Since `fastfrechet` performs regression tasks on distribution responses, we illu
 
 ## Generating quantile functions
 
-The zero-inflated negative binomial (`zinbinom`) distribution is a mixture distribution. It can be described as the marginal distribution of random variable $Y$ utilizing variable $\Psi \sim \mathrm{Bernoulli}(z)$ which turns "on" or "off" the zero inflation: $(Y|\Psi=1) \sim \delta_{\{0\}}$, and $(Z|\Psi=0) \sim \mathrm{nbinom}(r, p)$. As stated, there are three parameters to $Z$'s distribution: the zero-inflation parameter $z \in (0, 1)$, the size parameter of the negative binomial part $r > 0$, and the probability parameter of the negative binomial part $p > 0$. We represent the distribution of $Z$ with its quantile function, given by
+The zero-inflated negative binomial (`zinbinom`) distribution is a mixture distribution. It can be described as the marginal distribution of random variable $Y$ utilizing variable $\Psi \sim \mathrm{Bernoulli}(z)$ which turns "on" or "off" the zero inflation: $(Y|\Psi=1) \sim \delta_{\{0\}}$, and $(Y|\Psi=0) \sim \mathrm{nbinom}(r, p)$. As stated, there are three parameters to $Y$'s distribution: the zero-inflation parameter $z \in (0, 1)$, the size parameter of the negative binomial part $r > 0$, and the probability parameter of the negative binomial part $p > 0$. We represent the distribution of $Y$ with its quantile function, given by
 $$
 F_Y^{-1}(p) = F_{Y|\Psi=0}^{-1}\left( \frac{p-z}{1-z} \right),
 $$

@@ -43,7 +43,7 @@ where $F_{Y|\Psi=0}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ an
 
 ### Using `fastfrechet::generate_zinbinom_qf`
 
-The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). As output, we are provided the covariate matrix `X` (an `n`$\times$`p` matrix), and the response matrix `Y` (an `n`$\times$`m` matrix) which stores the quantile functions row-wise. The full function code is available by entering `fastfrechet::generate_zinbinom_qf` into the R console.
+The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). As output, we are provided the covariate matrix `X` (an `n`$\times$`p` matrix), and the response matrix `Y` (an `n`$\times$`m` matrix) which stores the quantile functions row-wise.
 
 ```{r}
 n = 200  # number of samples - nrow(X) and nrow(Y).

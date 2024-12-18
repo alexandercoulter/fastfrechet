@@ -135,7 +135,7 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
           
           if(Lw == 1){
             
-            if((w(0) == 0) | (w(0) == m)){
+            if((w(0) == 0) || (w(0) == m)){
               
               eta(w) = -d(w);
               

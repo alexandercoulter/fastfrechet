@@ -46,7 +46,7 @@
 #' tauseq = seq(0.1, 20, 0.1)
 #' eps = 0.001
 #' 
-#' # Run cross-validation
+#' # Run cross-validation:
 #' cv = FRiSO_CV_univar2wass(X = X,
 #'                           Y = Y,
 #'                           K = K,

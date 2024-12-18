@@ -46,9 +46,9 @@ where $F_{Y|\Psi=1}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ an
 The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). As output, we are provided the covariate matrix `X` (an `n`$\times$`p` matrix), and the response matrix `Y` (an `n`$\times$`m` matrix) which stores the quantile functions row-wise. The full function code is available by entering `fastfrechet::generate_zinbinom_qf` into the R console.
 
 ```{r}
-n = 100  # number of samples - nrow(X) and nrow(Y).
-p = 10   # number of covariates - ncol(X).
-m = 100  # quantile function grid density - ncol(Y).
+n = 200  # number of samples - nrow(X) and nrow(Y).
+p = 20   # number of covariates - ncol(X).
+m = 200  # quantile function grid density - ncol(Y).
 mseq = seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
 
 set.seed(31)
@@ -63,33 +63,39 @@ Y = mydata$Y  # (n x m) matrix of quantile functions, stored row-wise
 
 ### Plotting
 
-These quantile function responses are best illustrated 
+We illustrate these quantile function responses with line plots. Note the true functions are piecewise constant, where the line plots interpolate between points on the observed `m`-grid.
 
 ```{r}
-# Plot the EQFs:
-plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Y)),
-     main = "Zero-Inflated Negative Binomial QFs",
-     xlab = "p", ylab = "quantile")
-for(i in 1:n) lines(mseq, Y[i, ], lwd = 2)
-
+matplot(mseq, t(Y), xlim = c(0, 1), ylim = range(Y), type = 'l', lty = 1, col = 1,
+        main = "znbinom Quantile Functions", xlab = "p", ylab = "quantile")
 ```
 
 
 ## Fréchet regression
 
+Fréchet regression generalizes Euclidean regression to the general metric space setting. In the sample setting where we observe covariate-response pairs $\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega$, and $\Omega$ is the space of univariate quantile functions equipped with the 2-Wasserstein metric $d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}$, the conditional Fréchet mean is estimated by
+$$
+\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) = \underset{\mathbf{q}\in\Omega}{\mathrm{\arg\:min}} \frac{1}{n}\sum_{j=1}^n \left\{ 1 + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).
+$$
+This is the Fréchet regression problem, a weighted Fréchet mean problem which can be solved by quadratic programming. This is implemented by `frechetreg_univar2wass`, using a dual active-set method inspired from @arnstrom_dual_2022.
+
 ### Using `fastfrechet::frechetreg_univar2wass`
 
+The `frechetreg_univar2wass` function from `fastfrechet` takes as input the covariate matrix `X` and the quantile function response matrix `Y`, along with object `Z` (an optional "output" covariate matrix for which to evaluate the conditional Fréchet means, if not `X`), `C_init` (an optional warm-start estimate of the constraint active sets; see the `monotoneQP-fastfrechet` vignette for more details), `lambda` (an optional sparsity vector from the variable selection method; see the next section), and box constraints `lower` and `upper`.  Since the `zinbinom` distribution is bounded from below by zero, we set `lower = 0`, and use default settings for other parameters. The output list contains the set of fitted quantile functions `Qhat`, stored row-wise as in `Y`, and the matrix of Lagrange multipliers associated with the solution, also stored row-wise and of dimension `n`$\times$`m+1`.
+
 ```{r}
-# Estimate conditional QFs:
+lower = 0
+upper = Inf
+# Estimate conditional quantile functions:
 output = fastfrechet::frechetreg_univar2wass(X = X,
                                              Y = Y,
                                              Z = NULL,
-                                             #C_init = NULL,
+                                             C_init = NULL,
                                              lambda = NULL,
                                              lower = 0,
                                              upper = Inf)
  
-# Note: to numerical precision, these QFs are non-decreasing...
+# Note: to numerical precision, these quantile functions are non-decreasing...
 min(apply(output$Qhat, 1, diff))
  
 # ...and bounded from below by the lower bound, zero:
@@ -99,12 +105,16 @@ min(output$Qhat)
 
 ### Plotting $\widehat{\mathbf{Y}}$ and $\widehat{\mathbf{Q}}$
 
-```{r}
-# Plot the conditional QFs:
-plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(output$Qhat)),
-      main = "Fréchet Regression QFs", xlab = "p", ylab = "quantile")
-for(i in 1:n) lines(mseq, output$Qhat[i, ], lwd = 2)
+The Fréchet means associated with the Fréchet regression problem $\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise, the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function constraints of monotonicity or box constraints, whereas the solution $\widehat{\mathbf{Q}}$ does. We re-calculate the unprojected matrix from the output of `frechetreg_univar2wass`, and illustrate it beside the fitted response matrix with line plots.
 
+```{r, fig.width = 8, fig.height = 5.5}
+# Plot the unconstrained estimators and the constrained conditional quantile functions:
+Yhat = output$Qhat - output$Lagrange_Multiplier[ , -(m + 1)] + output$Lagrange_Multiplier[ , -1]
+par(mfrow = c(1, 2), las = 1)
+matplot(mseq, t(Yhat), type = "l", lty = 1, col = 'black', xlab = "p", ylab = "Yhat",
+        main = "Unconstrained Solution")
+matplot(mseq, t(output$Qhat), type = "l", lty = 1, col = 'black', xlab = "p", ylab = "Qhat",
+        main = "Fitted Quantile Functions")
 ```
 
 
@@ -151,15 +161,9 @@ legend("topleft", lwd = 2, col = 1:2, bty = "n",
 ### Using `fastfrechet::FRiSO_CV_univar2wass`
 
 ```{r}
-# Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
-
-lower = 0
-upper = Inf
- 
 # Set cross-validation parameters
 K = 10
 thresh = 0.0001
-tauseq = seq(0.1, 20, 0.1)
 eps = 0.001
 
 # Run complementary pairs stability selection
@@ -202,8 +206,6 @@ B = 50
 thresh = 0.0001
 tauseq = 1:10
 eps = 0.001
-lower = 0
-upper = Inf
  
 # Run complementary pairs stability selection
 cpss = FRiSO_CPSS_univar2wass(X = X,

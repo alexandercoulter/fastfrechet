@@ -164,13 +164,9 @@ available from @tucker_variable_2023 (Supplementary Material) in Figure
 \autoref{fig:friso_comparison}. We use the same $\epsilon = 0.0075$ error
 tolerance for the `fastfrechet` method as @coulter_fast_2024, chosen to provide
 similar optimization accuracy so computation time comparisons are on
-approximately equal footing. Note that `fastfrechet` centers and scales
-$\mathbf{X}$ so $\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \mathbf{1}_p$, to
-remove the effect of unit choice on the variable selection outcome. We use this
-same centered-scaled $\mathbf{X}$ as input to the old method. Finally, as the
-existing code for the old method does not natively accept multiple $\tau$
-inputs, we wrote a short wrapper function which loops over the values in
-`tauseq`.
+approximately equal footing. As existing code for the old method does not
+natively accept multiple $\tau$ inputs, we wrote a short wrapper function which
+loops over the $\tau$ values.
 ```
 # Centering and scaling X
 X0 = X - rep(1, n) %*% crossprod(rep(1 / n, n), X)

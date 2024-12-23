@@ -52,10 +52,10 @@ Rcpp::List scaleXZ_cpp(const arma::mat& X,
 
 // [[Rcpp::export]]
 arma::mat monotoneQP_cpp(const arma::mat& Y,
-                               const arma::mat& C_init,
-                               const double& lower,
-                               const double& upper,
-                               const double& eps = 1e-10){
+                         const arma::mat& C_init,
+                         const double& lower,
+                         const double& upper,
+                         const double& eps = 1e-10){
   
   int n = Y.n_rows;
   int m = Y.n_cols;

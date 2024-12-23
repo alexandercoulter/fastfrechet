@@ -2,7 +2,8 @@
 #' 
 #' @description
 #' This function performs complementary pairs stability selection
-#' (\insertCite{meinshausen_stability_2010}{fastfrechet}) with the Fréchet Ridge
+#' (\insertCite{meinshausen_stability_2010}{fastfrechet};
+#' \insertCite{shah_variable_2013}{fastfrechet}) with the Fréchet Ridge
 #' Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}),
 #' for the space of univariate distribution responses equipped with the
 #' 2-Wasserstein metric. Heuristically, the optimal model is identified by

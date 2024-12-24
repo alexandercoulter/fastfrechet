@@ -6,7 +6,7 @@
 #' @inheritParams frechetreg_univar2wass
 #' @param B Positive integer number of complementary pair sub-samples to take of original data set (default 50).
 #' @param thresh A finite positive scalar selection threshold, where \eqn{\widehat{\lambda}_k(\tau) > } `thresh` means the \eqn{k^{\mathrm{th}}} variable is selected, and not selected otherwise.
-#' @param ... other inputs to FRiSO see [fastfrechet::FRiSO_univar2wass()].
+#' @param ... other inputs to [fastfrechet::FRiSO_univar2wass()].
 #'
 #' @return 
 #' \tabular{ll}{
@@ -53,7 +53,7 @@
 #' 
 #' # Calculate thresholds using Shah and Samworth (2013) method:
 #' shahsam = Shah_Samworth_thresholds(p = p,
-#'                                    q = cpss$model_size_est,
+#'                                    q = cpss$model_size_est * p,
 #'                                    B = B,
 #'                                    E_thr = 1)
 #' 

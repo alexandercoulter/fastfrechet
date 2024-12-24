@@ -3,6 +3,7 @@
 export(FRiSO_CPSS_univar2wass)
 export(FRiSO_CV_univar2wass)
 export(FRiSO_univar2wass)
+export(Shah_Samworth_thresholds)
 export(frechetreg_univar2wass)
 export(generate_zinbinom_qf)
 export(monotoneQP)

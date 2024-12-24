@@ -24,7 +24,7 @@
 #' output = Shah_Samworth_thresholds(p = p, q = q, B = B, E_thr = E_thr)
 #' 
 #' # Plot calculated thresholds against relative model sizes:
-#' plot(output$relative_model_sizes, output$pointwise_thresholds,
+#' plot(output$relative_model_size, output$pointwise_thresholds,
 #'      type = "o", pch = 20, xlab = expression(theta),
 #'      ylab = expression(pi*"("*theta*")"),
 #'      main = "Shah and Samworth Thresholds", ylim = c(0, 1))

@@ -14,6 +14,14 @@
 #' @examples
 Shah_Samworth_thresholds = function(p, q, B = 50, E_thr = 1){
   
+  # Dimension and compatibility checks:
+  check_wholenumber(p)
+  check_numeric(q, "vector", finite = TRUE)
+  check_wholenumber(B)
+  check_numeric(E_thr, "scalar", finite = TRUE)
+  if((min(q) <= 0) | (max(q) >= p)) stop("min(q) must be strictly > 0, and max(q) must be strictly < p.")
+  if(E_thr <= 0) stop("E_thr must be positive.")
+  
   # Model size (relative):
   theta = q / p
   

@@ -43,7 +43,13 @@ where $F_{Y|\Psi=0}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ an
 
 ### Using `fastfrechet::generate_zinbinom_qf`
 
-The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. We specify the desired number of response-covariate pairs (given by `n`), the desired number of covariates (`p`), and the desired grid density to evaluate the quantile functions in the $(0, 1)$ interval (`m`). As output, we are provided the covariate matrix `X` (an `n`$\times$`p` matrix), and the response matrix `Y` (an `n`$\times$`m` matrix) which stores the quantile functions row-wise.
+The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. The function takes as inputs
+
+* `n`, the number of response-covariate pairs,
+* `p`, the number of covariates, and
+* `m`, the grid density to evaluate the quantile functions in the $(0, 1)$ interval.
+
+`generate_zinbinom_qf` also optionally takes "baseline" parameters of the `zinbinom` distribution, namely, the zero-inflation factor, and the probability and size parameters of the `nbinom` component. As output, `generate_zinbinom_qf` returns a list containing the `n` $\times$ `p` covariate matrix `X`; and the `n` $\times$ `m` response matrix `Y`, which stores the quantile functions row-wise.
 
 ```{r}
 n = 200  # number of samples - nrow(X) and nrow(Y).
@@ -63,7 +69,7 @@ Y = mydata$Y  # (n x m) matrix of quantile functions, stored row-wise
 
 ### Plotting
 
-We illustrate these quantile function responses with line plots. Note the true functions are piecewise constant, where the line plots interpolate between points on the observed `m`-grid.
+We illustrate these quantile function responses with line plots. Note the true functions are piece-wise constant, where the line plots interpolate between points on the observed `m`-grid.
 
 ```{r}
 matplot(mseq, t(Y), xlim = c(0, 1), ylim = range(Y), type = 'l', lty = 1, col = 1,
@@ -73,15 +79,24 @@ matplot(mseq, t(Y), xlim = c(0, 1), ylim = range(Y), type = 'l', lty = 1, col = 
 
 ## Fréchet regression
 
-Fréchet regression generalizes Euclidean regression to the general metric space setting. In the sample setting where we observe covariate-response pairs $\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega$, and $\Omega$ is the space of univariate quantile functions equipped with the 2-Wasserstein metric $d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}$, the conditional Fréchet mean is estimated by
+Fréchet regression generalizes Euclidean regression to the general metric space setting. In the sample setting, we observe covariate-response pairs $\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega$, where $\Omega$ is the space of univariate quantile functions equipped with the 2-Wasserstein metric $d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}$. (Generally we also only observe the distributions over a discrete grid, not as full functions.) The conditional Fréchet mean is estimated by
 $$
-\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) = \underset{\mathbf{q}\in\Omega}{\mathrm{\arg\:min}} \frac{1}{n}\sum_{j=1}^n \left\{ 1 + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).
+\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) = \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \frac{1}{n}\sum_{j=1}^n \left\{ 1 + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).
 $$
 This is the Fréchet regression problem, a weighted Fréchet mean problem which can be solved by quadratic programming. This is implemented by `frechetreg_univar2wass`, using a dual active-set method inspired from @arnstrom_dual_2022.
 
 ### Using `fastfrechet::frechetreg_univar2wass`
 
-The `frechetreg_univar2wass` function from `fastfrechet` takes as input the covariate matrix `X` and the quantile function response matrix `Y`, along with object `Z` (an optional "output" covariate matrix for which to evaluate the conditional Fréchet means, if not `X`), `C_init` (an optional warm-start estimate of the constraint active sets; see the `monotoneQP-fastfrechet` vignette for more details), `lambda` (an optional sparsity vector from the variable selection method; see the next section), and box constraints `lower` and `upper`.  Since the `zinbinom` distribution is bounded from below by zero, we set `lower = 0`, and use default settings for other parameters. The output list contains the set of fitted quantile functions `Qhat`, stored row-wise as in `Y`, and the matrix of Lagrange multipliers associated with the solution, also stored row-wise and of dimension `n`$\times$`m+1`.
+The `frechetreg_univar2wass` function from `fastfrechet` takes as input
+
+* `X`, the covariate matrix,
+* `Y`, the quantile function response matrix,
+* `Z`, an optional "output" covariate matrix for which to evaluate the conditional Fréchet means, if not `X`,
+* `C_init`, an optional warm-start estimate of the constraint active sets (see the `monotoneQP-fastfrechet` vignette for more details),
+* `lambda`, an optional sparsity vector from the variable selection method (see the next section), and
+* `lower` and `upper`, support constraints on the distributions.
+
+Since the `zinbinom` distribution is bounded from below by zero, we set `lower = 0`, and use default settings for other parameters. As output, `frechetreg_univar2wass` returns a list containing the set of fitted quantile functions `Qhat`, stored row-wise as in `Y`; and the `n` $\times$ `m+1` matrix of Lagrange multipliers associated with the solution, also stored row-wise.
 
 ```{r}
 lower = 0
@@ -105,7 +120,7 @@ min(output$Qhat)
 
 ### Plotting $\widehat{\mathbf{Y}}$ and $\widehat{\mathbf{Q}}$
 
-The Fréchet means associated with the Fréchet regression problem $\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise, the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function constraints of monotonicity or box constraints, whereas the solution $\widehat{\mathbf{Q}}$ does. We recover the unconstrained matrix `Yhat` from the output of `frechetreg_univar2wass`, and illustrate it beside the fitted response matrix with line plots.
+The Fréchet means associated with the Fréchet regression problem $\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise, the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function constraints of monotonicity or box constraints, whereas the solution $\widehat{\mathbf{Q}}$ does. We recover the unconstrained matrix `Yhat` from the output of `frechetreg_univar2wass`, and illustrate it side-by-side the fitted $\widehat{\mathbf{Q}}$.
 
 ```{r, fig.width = 8, fig.height = 5.5}
 # Plot the unconstrained estimators and the constrained conditional quantile functions:
@@ -120,11 +135,20 @@ matplot(mseq, t(output$Qhat), type = "l", lty = 1, col = 'black', xlab = "p", yl
 
 ## Variable selection with Fréchet ridge selection operator
 
-`fastfrechet` implements the variable selection procedure of @tucker_variable_2023 through the function `FRiSO_univar2wass`. This penalization procedure, called the Fréchet Ridge Selection Operator (FRiSO), solves for a sparse vector $\pmb{\lambda}(\tau) \in \mathbb{R}^p$. Each entry of the optimal $\widehat{\pmb{\lambda}}(\tau)$ is either positive, which indicates the corresponding covariate is selected in the final ($\tau$-dependent) model, or it is zero, which indicates the corresponding covariate is not selected. The entries of $\pmb{\lambda}(\tau)$ add up to $\tau$, so colloquially $\tau$ acts as a "total allowance", and $\widehat{\pmb{\lambda}}(\tau)$ is an optimal allocation of that allowance among the covariates. Theoretical details of this procedure are given in @wu_cant_2021 and @tucker_variable_2023; details of the $\widehat{\pmb{\lambda}}(\tau)$ estimation method implemented by `fastfrechet` are given in @coulter_fast_2024.
+`fastfrechet` implements the variable selection procedure of @tucker_variable_2023 through the function `FRiSO_univar2wass`. This penalization procedure, called the Fréchet Ridge Selection Operator (FRiSO), solves for a sparse vector $\pmb{\lambda}(\tau) \in \mathbb{R}^p$. Each entry of the optimal $\widehat{\pmb{\lambda}}(\tau)$ is either positive, which indicates the corresponding variable is selected in the final ($\tau$-dependent) model, or is zero, which indicates the corresponding variable is not selected. The entries of $\pmb{\lambda}(\tau)$ add up to $\tau$, so colloquially $\tau$ acts as a "total allowance", and $\widehat{\pmb{\lambda}}(\tau)$ is an optimal allocation of that allowance among the variables. Theoretical details of this procedure are given in @wu_cant_2021 and @tucker_variable_2023; details of the $\widehat{\pmb{\lambda}}(\tau)$ estimation method implemented by `fastfrechet` are given in @coulter_fast_2024.
 
 ### Using `fastfrechet::FRiSO_univar2wass`
 
-The `frechetreg_univar2wass` function from `fastfrechet` takes as input the covariate matrix `X` and the quantile function response matrix `Y`, along with `lower` and `upper` (box constraints for the support), `tauseq` (a vector of $\tau$ values for which to evaluate $\pmb{\lambda}(\tau)$, ideally provided in-sequence), `eps` (an error tolerance parameter), and `nudge` (a parameter to "push" the numeric solver away from non-optimal saddle points). In this illustrative example, we evaluate the variable selection problem on a dense grid `tauseq = seq(0.2, 20, 0.2)`, and set `eps = 0.001` and `nudge = 0.01`. The function returns a matrix of fitted $\widehat{\pmb{\lambda}}$ values, stored column-wise, one column for each value in `tauseq`.
+The `FRiSO_univar2wass` function from `fastfrechet` takes as input
+
+* `X`, the covariate matrix,
+* `Y`, the quantile function response matrix,
+* `lower` and `upper`, support constraints on the distributions,
+* `tauseq`, a vector of $\tau$ values for which to evaluate $\pmb{\lambda}(\tau)$, ideally provided in-sequence,
+* `eps`, an error tolerance parameter, and
+* `nudge`, a parameter to "push" the numeric solver away from non-optimal saddle points.
+
+In this illustrative example, we evaluate the variable selection problem on a dense grid `tauseq = seq(0.2, 20, 0.2)`, and set `eps = 0.001` and `nudge = 0.01`. Other optional parameters allow the user to control the gradient descent algorithm, including dampening, step size, momentum, and maximum number of iterations; the help page has more details. `FRiSO_univar2wass` returns a matrix of fitted $\widehat{\pmb{\lambda}}$ values, stored column-wise, one column for each value in `tauseq`.
 
 ```{r}
 # Dense grid of "allowance" totals:
@@ -158,15 +182,31 @@ legend("topleft", lwd = 1.5, col = c("red", "black"), bty = "n",
 
 # Resampling for Variable Selection
 
-The variable selection procedure depends on a hyperparameter $\tau$ which is loosely related to the final model size. Choosing a final model free of this choice of $\tau$ can be accomplished in a number of ways. Two ways are cross-validation and complementary pairs stability selection. In cross-validation, detailed in @tucker_variable_2023, final model selection occurs by choosing the $\tau_{\mathrm{opt}}$ which minimizes out-of-sample error, and selecting those variables indicated by $\widehat{\pmb{\lambda}}(\tau_{\mathrm{opt}})$. In complementary pairs stability selection, detailed in @shah_variable_2013 and @coulter_fast_2024, variable selection stability is measured across repeated data splits, with the most consistently selected variables being chosen in a way to guarantee pointwise error control over $\tau$.
+The variable selection procedure depends on a hyperparameter $\tau$ which is loosely related to the final model size. Two ways of choosing a final model free of $\tau$ are cross-validation (CV) and complementary pairs stability selection (CPSS). In CV, detailed in @tucker_variable_2023, final model selection occurs by finding $\tau_{\mathrm{opt}}$ which minimizes out-of-sample error, and selecting those variables indicated by $\widehat{\pmb{\lambda}}(\tau_{\mathrm{opt}})$. In CPSS, detailed in @shah_variable_2013 and @coulter_fast_2024, variable selection stability is measured across repeated half-splits of the data, with the most consistently selected variables being chosen in a way to guarantee pointwise error control.
 
 ## Cross-validation
 
-`fastfrechet` implements K-fold cross-validation for the variable selection procedure through the function `FRiSO_CV_univar2wass`, with an option to perform leave-one-out cross-validation. Cross-validation testing is implemented with refitting, that is, the model is trained using the weighting scheme from the variable selection procedure, but the test responses are fit using the unweighted covariates. This process is described and illustrated in more detail by @tucker_variable_2023.
+`fastfrechet` implements K-fold CV for the variable selection procedure through the function `FRiSO_CV_univar2wass`, with an option to perform leave-one-out CV. Out-of-sample testing is implemented with refitting, a procedure described and illustrated in more detail in @tucker_variable_2023.
 
 ### Using `fastfrechet::FRiSO_CV_univar2wass`
 
+The `FRiSO_CV_univar2wass` function from `fastfrechet` takes as input
 
+* `X`, the covariate matrix,
+* `Y`, the quantile function response matrix,
+* `K`, number of "folds" for K-fold CV (default 10), and
+* `thresh`, a threshold parameter, where $\widehat{\lambda}_k(\tau) >$ `thresh` means the $k^{\mathrm{th}}$ parameter is selected.
+
+`FRiSO_CV_univar2wass` calls `FRiSO_univar2wass` internally, and additionally takes any parameter which can be fed into that function. This includes box constraint parameters `lower` and `upper`, the parameter for $\tau$ values `tauseq`, and optimization algorithm control parameters. The help page for `FRiSO_univar2wass` contains information on how all of these further parameters can be utilized. As output, `FRiSO_CV_univar2wass` returns a list containing
+
+* `tauseq`, the sequence of $\tau$ values as provided to the function,
+* `errors`, a matrix of per-fold CV errors across `tauseq`,
+* `error_sum`, a vector of fold-aggregate CV errors across `tauseq`,
+* `opt_tau`, the value in `tauseq` minimizing `error_sum`,
+* `opt_lambda`, the fitted $\widehat{\pmb{\lambda}}(\tau_{\mathrm{opt}})$ vector for the optimally chosen $\tau$, and
+* `opt_selected`, the indices of the variables in the model corresponding to $\widehat{\pmb{\lambda}}(\tau_{\mathrm{opt}})$.
+
+In this example, we use 10-fold CV, and set a selection threshold of `thresh = 0.0001`.
 
 ```{r}
 # Set cross-validation parameters
@@ -187,9 +227,11 @@ cv = FRiSO_CV_univar2wass(X = X,
 
 ### Plotting, interpreting CV errors and optimal solution
 
+We plot the CV errors in each fold, along with the average CV error across `tauseq`. This lets us see for which $\tau$ value the minimum CV error occurs. We also can print the indices of the variables selected by the model fit with this optimal $\tau$.
+
 ```{r}
 # Plot errors per fold and average fold error:
-matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "Cross Validation Fold Errors")
+matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "Cross-Validation Fold Errors")
 lines(tauseq, cv$error_sum / K, lwd = 3)
 points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
  
@@ -197,9 +239,30 @@ points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
 cv$opt_selected
 ```
 
+As we can see, 10-fold CV correctly identifies the first four variables, which are known ahead of time to be the only ones which influence the Fréchet means. However, in this example the final model selects more variables as well; it is larger than the true model.
+
 ## Complementary pairs stability selection
 
+`fastfrechet` implements complementary pairs stability selection (CPSS) for the variable selection procedure through the function `FRiSO_CPSS_univar2wass`. @shah_variable_2013 demonstrate that CPSS allows pointwise (i.e. across $\tau$) control on "low selection probability" variables. This process for establishing a minimum selection threshold for error control is described and illustrated in more detail by @shah_variable_2013, and @coulter_fast_2024 as applied to Fréchet regression. `fastfrechet` calculates these CPSS selection thresholds through the function `Shah_Samworth_thresholds`.
+
 ### Using `fastfrechet::FRiSO_CPSS_univar2wass`
+
+The `FRiSO_CPSS_univar2wass` function from `fastfrechet` is used analogously as `FRiSO_CV_univar2wass`. It takes as input
+
+* `X`, the covariate matrix,
+* `Y`, the quantile function response matrix `Y`,
+* `B`, the number of data half-splits to perform (default 50), and
+* `thresh`, the same selection threshold parameter as in `FRiSO_CV_univar2wass`.
+
+`FRiSO_CPSS_univar2wass` also calls `FRiSO_univar2wass` internally, and additionally takes any parameter which can be fed into that function. As output, `FRiSO_CV_univar2wass` returns a list containing
+
+* `tauseq`, the sequence of $\tau$ values as provided to the function,
+* `selected_variables`, a `B` $\times$ `2` $\times$ `length(tauseq)` $\times$ `p` array indicating which variables were selected in the $2B$ split halves, across `tauseq`,
+* `selected_samples`, a `B` $\times$ `2` $\times$ `length(tauseq)` $\times$ `n` array indicating how samples were sorted in the $2B$ split halves,
+* `stability_paths`, a `length(tauseq)` $\times$ `p` matrix containing the empirical selection proportions of all variables across `tauseq`, and
+* `model_size_est`. a `length(tauseq)`-long vector containing the average model size, i.e. number of selected parameters, across `tauseq`.
+
+In this example, we use `B = 50` half-splits, and evaluate CPSS on a coarser $\tau$ grid, `tauseq = 1:10`.
 
 ```{r}
 
@@ -223,6 +286,8 @@ cpss = FRiSO_CPSS_univar2wass(X = X,
 
 ### Plotting, interpreting stability paths
 
+We plot the CPSS "stability path" for each variable, which is the empirical proportion of split halves ($2B=100$ total) the variable is selected by FRiSO. This lets us see which variables are most frequently selected.
+
 ```{r}
 # Plot stability paths
 matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
@@ -231,7 +296,42 @@ matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
         xlab = bquote(tau))
 ```
 
+As we can see, the four model variables are all selected with high probability across $\tau$. However, as $\tau$ increases, the model size tends to increase. In practice, it is advisable to perform CPSS up to a limit on the `p`-relative model size.
+
 ### Shah and Samworth error control
 
+The function `Shah_Samworth_thresholds` calculates the error control thresholds from @shah_variable_2013 by using the model size estimates from the CPSS output. The control is on the number of final variables selected which have "low selection probability" (LSP). `Shah_Samworth_thresholds` uses the recommendation from @shah_variable_2013 to define "low" as below the average relative model size. As input, `Shah_Samworth_thresholds` takes
 
+* `p`, the number of covariates in the full model,
+* `q`, the average model size (possibly estimated) after variable selection,
+* `B`, the number of data half-splits in the CPSS procedure, and
+* `E_thr`, the limit on the expected number of selected LSP variables.
 
+As output, `Shah_Samworth_thresholds` returns a list containing
+
+* `E_thr`, the LSP selection limit as provided to the function,
+* `B`, the number of data half-splits as provided to the function,
+* `relative_model_size`, the estimated $\theta = q/p$ relative model sizes based on inputs `p` and `q`, and
+* `pointwise_thresholds`, the calculated selection thresholds for each $q$ which pointwise control expected LSP variables.
+
+As the threshold is a function of model size, and hence a function of $\tau$, a final variable set could be selected from those variables whose "stability paths" exceed the "threshold path". We set the error control at `E_thr = 1`, that is, pointwise the expected number of LSP variables is bounded above by 1.
+
+```{r}
+# Calculate thresholds using Shah and Samworth (2013) method:
+shahsam = Shah_Samworth_thresholds(p = p,
+                                   q = cpss$model_size_est,
+                                   B = B,
+                                   E_thr = 1)
+
+# Redraw the line plot, but add the threshold path:
+matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
+        col = c(rep('red', 4), rep('black', p - 4)),
+        ylab = "Stability Paths",
+        xlab = bquote(tau))
+lines(cpss$tau, shahsam$pointwise_thresholds, type = "o", pch = 16)
+```
+
+The "stability path" of each of the four true model variables exceeds the "threshold path" at some point. If we select variables on that basis, the final model contains each of the true variables, and no incorrect variable. For reference, the range of relative model sizes over `tauseq` is approximately 0.15 to 0.45.
+```{r}
+range(cpss$model_size_est / p)
+```

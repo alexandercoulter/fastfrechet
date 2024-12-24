@@ -1,5 +1,8 @@
-#' Calculate tail probabilities for r-concave functions from from \insertCite{shah_variable_2013}{fastfrechet}
+#' Calculate tail probabilities for r-concave functions.
 #'
+#' @description
+#' See \insertCite{shah_variable_2013}{fastfrechet}, Appendix A4.
+#' 
 #' @param B number of complementary pairs splits
 #' @param eta false discovery rate threshold
 #' @param r r-concavity parameter (negative, e.g. -1/2, -1/4)

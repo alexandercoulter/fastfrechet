@@ -1,5 +1,8 @@
-#' Calculate pointwise selection thresholds for complementary pairs stability selection
-#'
+#' Pointwise Selection Thresholds for Complementary Pairs Stability Selection (CPSS)
+#' 
+#' @description
+#' This function calculates pointwise selection thresholds for CPSS from \insertCite{shah_variable_2013}{fastfrechet}. Empirical CPSS selection proportions above these thresholds have pointwise control on the number of selected variables which have "low selection probability" \eqn{\theta}. This function uses the default \eqn{\theta = q/p} where `q` is the estimated model size after variable selection.
+#' 
 #' @param p a positive integer giving the total number of variables
 #' @param q a numeric vector giving average model size(s) after variable selection, each entry strictly within `(0, p)`
 #' @param B a positive integer giving the number of complementary pairs splits (default `B = 50`)

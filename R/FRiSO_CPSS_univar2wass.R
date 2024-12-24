@@ -53,7 +53,7 @@
 #' 
 #' # Calculate thresholds using Shah and Samworth (2013) method:
 #' shahsam = Shah_Samworth_thresholds(p = p,
-#'                                    q = cpss$model_size_est * p,
+#'                                    q = cpss$model_size_est,
 #'                                    B = B,
 #'                                    E_thr = 1)
 #' 
@@ -140,11 +140,11 @@ FRiSO_CPSS_univar2wass = function(X,
   # Stability paths over full_tauseq:
   stability_paths = apply(sv, c(3, 4), mean)
   
-  # Return outputs: tau sequence, selected variables, selected samples, and stability paths
+  # Return outputs: tau sequence, selected variables, selected samples stability paths, and model size estimate
   return(list('tauseq' = full_tauseq,
               'selected_variables' = sv,
               'selected_samples' = ss,
               'stability_paths' = stability_paths,
-              'model_size_est' = rowMeans(stability_paths)))
+              'model_size_est' = rowSums(stability_paths)))
   
 }

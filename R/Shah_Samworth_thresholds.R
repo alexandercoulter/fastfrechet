@@ -12,6 +12,22 @@
 #' @export
 #'
 #' @examples
+#' # Specify number of parameters and vector of post-selection model sizes:
+#' p = 30
+#' q = 1:10
+#' 
+#' # Specify number of CPSS splits, and desired error control:
+#' B = 50
+#' E_thr = 1
+#' 
+#' # Calculate thresholds:
+#' output = Shah_Samworth_thresholds(p = p, q = q, B = B, E_thr = E_thr)
+#' 
+#' # Plot calculated thresholds against relative model sizes:
+#' plot(output$relative_model_sizes, output$pointwise_thresholds,
+#'      type = "o", pch = 20, xlab = expression(theta),
+#'      ylab = expression(pi*"("*theta*")"),
+#'      main = "Shah and Samworth Thresholds", ylim = c(0, 1))
 Shah_Samworth_thresholds = function(p, q, B = 50, E_thr = 1){
   
   # Dimension and compatibility checks:

@@ -1,5 +1,6 @@
 ---
-title: 'fastfrechet: An R package for fast implementation of Fréchet regression with distribution responses'
+title: 'fastfrechet: An R package for fast implementation of Fréchet regression with
+  distribution responses'
 tags:
 - Fréchet regression
 - Variable selection
@@ -8,12 +9,10 @@ tags:
 - Metric space
 - R
 - C++
-date: "27 November 2024"
-affiliations:
-- name: Department of Statistics, Texas A&M University, United States
-  index: 1
-- name: Department of Biostatistics, University of Michigan, United States
-  index: 2
+date: "24 December 2024"
+output:
+  html_document:
+    df_print: paged
 authors:
 - name: Alexander Coulter
   orcid: "0009-0001-9116-6588"
@@ -29,6 +28,11 @@ authors:
   affiliation: 2
   corresponding: yes
 bibliography: inst/REFERENCES.bib
+affiliations:
+- name: Department of Statistics, Texas A&M University, United States
+  index: 1
+- name: Department of Biostatistics, University of Michigan, United States
+  index: 2
 ---
 
 # Summary

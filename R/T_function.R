@@ -9,8 +9,6 @@
 #'
 #' @return calculated \eqn{T_t(g_{a,k})} value, eq. (17) in Appendix A4 of
 #' Shah and Samworth (2013)
-#'
-#' @examples
 T_function = function(a, k, B, r, eta, t){
   
   # Calculate numerator and denominator of T{t}(g{a,k}), eq. (17) in

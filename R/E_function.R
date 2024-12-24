@@ -7,8 +7,6 @@
 #' @param eta false discovery rate threshold, e.g. \eqn{\theta = q/p} - the target mean for \eqn{E(f_{a,k})}.
 #'
 #' @return logit-difference between \eqn{E(f_{a,k})} and \eqn{\eta}
-#'
-#' @examples
 E_function = function(loga, k, B, r, eta){
   
   # Calculate scaling factor for logit transformation:

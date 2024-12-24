@@ -5,8 +5,6 @@
 #' @param r r-concavity parameter (negative, e.g. -1/2, -1/4)
 #'
 #' @return a list containing thresholds and calculated tail probabilities
-#'
-#' @examples
 tail_prob = function(B, eta, r){
   
   # This function implements the algorithm to find the tail probabilities

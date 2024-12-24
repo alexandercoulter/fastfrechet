@@ -1,5 +1,8 @@
-#' Calculate \eqn{T_t(g_{a,k})} from \insertCite{shah_variable_2013}{fastfrechet}, Appendix A4.
+#' Calculate \eqn{T_t(g_{a,k})}.
 #'
+#' @description
+#' See \insertCite{shah_variable_2013}{fastfrechet}, Appendix A4.
+#' 
 #' @param a a value, to optimize over
 #' @param k integer value between k_min, ..., B
 #' @param B number of complementary pairs splits

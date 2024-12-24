@@ -1,4 +1,7 @@
-#' Calculate min(D...) values from Shah and Samworth (2013).
+#' Calculate min(D...) values.
+#' 
+#' @description
+#' See \insertCite{shah_variable_2013}{fastfrechet}, eq. 8.
 #'
 #' @param theta false discovery rate threshold
 #' @param B number of complementary pairs splits

@@ -1,4 +1,7 @@
-#' Calculate stability condition for \eqn{E(f_{a,k}) = \eta} from \insertCite{shah_variable_2013}{fastfrechet}, Appendix A4.
+#' Calculate stability condition for \eqn{E(f_{a,k}) = \eta}.
+#' 
+#' @description
+#' See \insertCite{shah_variable_2013}{fastfrechet}, Appendix A4.
 #'
 #' @param loga log(a) value, to optimize over
 #' @param k integer value between k_min, ..., B

@@ -50,6 +50,15 @@
 #' # Plot stability paths
 #' matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
 #'         col = c(rep('red', 4), rep('black', p - 4)))
+#' 
+#' # Calculate thresholds using Shah and Samworth (2013) method:
+#' shahsam = Shah_Samworth_thresholds(p = p,
+#'                                    q = cpss$model_size_est,
+#'                                    B = B,
+#'                                    E_thr = 1)
+#' 
+#' # Add lines to plot:
+#' lines(cpss$tau, shahsam$pointwise_thresholds, type = "o", pch = 16)
 FRiSO_CPSS_univar2wass = function(X,
                                   Y,
                                   B = 50,

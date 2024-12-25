@@ -1,26 +1,44 @@
-#' R Wrapper for Custom QP Solver for Nearest Empirical Quantile Function in Frobenius Norm
+#' Wrapper for QP solver for nearest empirical quantile function in Frobenius norm
 #' 
 #' @description
-#' `monotoneQP()` wraps an [Rcpp] implementation of a custom active set method for
-#'  solving a specific quadratic programming (QP) problem, of finding the nearest
-#'  vector in Frobenius norm to an input vector, with the constraints that the 
-#'  output vector should be monotone non-decreasing across its entries,
-#'  and obey user-specified box constraints. The function permits a matrix input,
-#'  where this QP problem is solved row-wise, and also permits warm starts, in
-#'  the form of specifying an initial active-constraint matrix. Implementation
-#'  is based on the dual-active set method of
-#'  \insertCite{arnstrom_dual_2022}{fastfrechet}, taking advantage of
-#'  simplifications in this setting which avoid \eqn{LDL^{\top}} decompositions
-#'  and other costly matrix product operations.
+#' `Rcpp` implementation of a custom dual active-set algorithm for finding the nearest
+#' discretized quantile function in Frobenius norm to an input vector. The function
+#' permits a matrix input, where the optimization problem is solved across the
+#' rows of the matrix. is solved row-wise, and also permits warm starts, in
+#' the form of specifying an initial active-constraint matrix. Implementation
+#' is based on the dual-active set method of
+#' \insertCite{arnstrom_dual_2022}{fastfrechet}, taking advantage of
+#' simplifications in this setting which avoid \eqn{LDL^{\top}} decompositions
+#' and other costly matrix product operations.
 #'  
 #' @details
-#' Additional details...
+#' This function solves \deqn{\widehat{\mathbf{q}} := \underset{\mathbf{q} \in \mathbb{R}^m}{\mathrm{argmin}}\lVert \mathbf{q} - \mathbf{y} \rVert_2^2}
+#' for input vector \eqn{\mathbf{y}}, with the constraints \eqn{b_L \leq q_1 \leq \dots \leq q_m \leq b_U} for \eqn{b_L < b_U}.
+#' The fitted vector \eqn{\widehat{\mathbf{q}}} is thus a discretized quantile function
+#' with box constraints, which can be found through quadratic programming. This
+#' function implements a customized dual active-set method inspired by
+#' \insertCite{arnstrom_dual_2022}{fastfrechet}, which takes advantage of
+#' sparsity in the constraints to avoid \eqn{LDL^{\top}} decompositions and other
+#' costly matrix operations.
 #' 
+#' The user can specify a warm start for the algorithm in the form of an `m + 1`-long
+#' vector (or an `n` \eqn{times} `m + 1` matrix, if `Y` is an `n` \eqn{times} `m`
+#' matrix) which gives an estimate of the solution's active set(s), i.e. which
+#' of the `m + 1` constraints per row of `Y` are exact equalities. Positive
+#' entries in the optional input `C_init` indicate active constraints, and zero
+#' entries indicate inactive constraints. (If `C_init` contains any negative
+#' entries, the function will stop with an error message.) The default is to
+#' assume no constraints are active.
+#' 
+#' As this function implements an active-set method, the solution should be
+#' exact to numerical precision. For stability, however, it is advised to keep
+#' the error tolerance parameter `eps` at a very small, positive number, such
+#' as the default `1e-10`.
 #'  
 #' @inheritParams frechetreg_univar2wass
 #' @param Y An (`m`)-long numeric vector (or (`n` \eqn{\times} `m`) matrix) with no missing, all finite entries.
 #' @param C_init An optional (`m + 1`)-long numeric vector (or (`n` \eqn{\times} `m + 1`) matrix) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.
-#' @param eps tolerance level (default `1e-10`).
+#' @param eps A positive numeric scalar error tolerance (default `1e-10`).
 #' 
 #' @references 
 #' \insertRef{arnstrom_dual_2022}{fastfrechet}

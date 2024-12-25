@@ -12,14 +12,6 @@
 #' @param B A positive integer giving the number of complementary pairs splits (default `50`).
 #' @param E_thr A positive numeric scalar giving the desired constraint on the number of final selected variables with "low selection probability" (default `1`).
 #'
-#' @return A list object with components:
-#' \tabular{ll}{
-#'   `E_thr` \tab returns the selection constraint, as provided to the function. \cr
-#'   `B` \tab returns the number of complementary pairs splits, as provided to the function. \cr
-#'   `relative_model_size` \tab returns the relative model size, i.e. `q / p` from the function inputs. \cr
-#'   `pointwise_thresholds` \tab returns a `p`-long vector of calculated selection thresholds. See details. \cr
-#' }
-#' 
 #' @details
 #' CPSS obtains a final selected model by identifying variables selected a high
 #' proportion of times during repeated data splits. It is a meta-procedure that
@@ -37,7 +29,18 @@
 #' is, the number of selected variables `q` divided by the number of total
 #' variables `p`. This function takes `p` and `q` as inputs (`q` may be a vector),
 #' as well as the number of CPSS data splits `B` and desired control level `E_thr`.
+#' Note that error control is pointwise per `q`.
 #' 
+#' @return A list object with components:
+#' \tabular{ll}{
+#'   `E_thr` \tab returns the selection constraint, as provided to the function. \cr
+#'   `B` \tab returns the number of complementary pairs splits, as provided to the function. \cr
+#'   `relative_model_size` \tab returns the relative model size, i.e. `q / p` from the function inputs. \cr
+#'   `pointwise_thresholds` \tab returns a `p`-long vector of calculated selection thresholds. See details. \cr
+#' }
+#' 
+#' @references 
+#' \insertRef{shah_variable_2013}{fastfrechet}
 #' 
 #' @export
 #'

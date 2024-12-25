@@ -22,7 +22,7 @@
 #' costly matrix operations.
 #' 
 #' The user can specify a warm start for the algorithm in the form of an `m + 1`-long
-#' vector (or an `n` \eqn{times} `m + 1` matrix, if `Y` is an `n` \eqn{times} `m`
+#' vector (or an `n` \eqn{\times} `m + 1` matrix, if `Y` is an `n` \eqn{\times} `m`
 #' matrix) which gives an estimate of the solution's active set(s), i.e. which
 #' of the `m + 1` constraints per row of `Y` are exact equalities. Positive
 #' entries in the optional input `C_init` indicate active constraints, and zero

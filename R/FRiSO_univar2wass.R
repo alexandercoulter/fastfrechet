@@ -35,9 +35,9 @@
 #' FRiSO performs variable selection for Fréchet regression, in this case for the
 #' space of univariate distributions \eqn{\Omega} equipped with the 2-Wasserstein
 #' metric \eqn{d_W}. FRiSO solves the optimization problem given by
-#' \deqn{\widehat{\pmb{\lambda}}(\tau) &:= \underset{\pmb{\lambda} \in \mathbb{R}^p}{\mathrm{argmin}} \sum_{i=1}^n d_W^2\left(\widehat{\mathbf{q}}(\mathbf{x}_i, \pmb{\lambda}), \: \mathbf{y}_i \right), \qquad \pmb{\lambda} \geq \pmb{0}, \quad \pmb{1}^{\top}\pmb{\lambda} = \tau,}
+#' \deqn{\widehat{\pmb{\lambda}}(\tau) := \underset{\pmb{\lambda} \in \mathbb{R}^p}{\mathrm{argmin}} \sum_{i=1}^n d_W^2\left(\widehat{\mathbf{q}}(\mathbf{x}_i, \pmb{\lambda}), \: \mathbf{y}_i \right), \qquad \pmb{\lambda} \geq \pmb{0}, \quad \pmb{1}^{\top}\pmb{\lambda} = \tau,}
 #' which entails solving the embedded optimization problem
-#' \deqn{\widehat{\mathbf{q}}(\mathbf{x}_i,\pmb{\lambda}) &:= \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left( \frac{1}{n} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X} + \mathbf{D}_{\pmb{\lambda}}^{-1})^{-1}\mathbf{x}_j \right) d_W^2(\mathbf{q}, \: \mathbf{y}_j).}
+#' \deqn{\widehat{\mathbf{q}}(\mathbf{x}_i,\pmb{\lambda}) := \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left( \frac{1}{n} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X} + \mathbf{D}_{\pmb{\lambda}}^{-1})^{-1}\mathbf{x}_j \right) d_W^2(\mathbf{q}, \: \mathbf{y}_j).}
 #' The final vector \eqn{\widehat{\pmb{\lambda}}(\tau)} has positive entries, which
 #' correspond to selected variables, and zero entries, which correspond to non-selected variables.
 #' Function options include user-specified simplex constraints in `tauseq`,

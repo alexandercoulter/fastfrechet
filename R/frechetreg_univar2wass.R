@@ -1,17 +1,14 @@
-#' (Global) Fréchet Regression for Univariate Distributions with 2-Wasserstein Metric
+#' (Global) Fréchet regression for univariate distributions with 2-Wasserstein metric
 #'
 #' @description
-#' `frechetreg_univar2wass()` calculates global Fréchet regression mean
-#' objects \insertCite{petersen_frechet_2019}{fastfrechet},
+#' Calculate global Fréchet regression mean objects \insertCite{petersen_frechet_2019}{fastfrechet},
 #' for the space of univariate distribution responses equipped
 #' with the 2-Wasserstein metric. Observed distributions are assumed
 #' to be quantile functions evaluated on a common, equally spaced `m`-grid
-#' in \eqn{(0, 1)}. Options include user-specified output covariate matrix,
-#' generalized ridge sparsity vector \insertCite{tucker_variable_2023}{fastfrechet},
-#' and box constraints. The Fréchet regression problem in this context is reducible
-#' to a quadratic programming problem; the workhorse of this function is a custom
-#' active set method based on \insertCite{arnstrom_dual_2022}{fastfrechet}.
-#'
+#' in \eqn{(0, 1)}. Default is to calculate Fréchet regression means conditioned
+#' on input covariate row-vectors, but can calculate Fréchet means on different
+#' set of covariate vectors. Accommodates the regularization scheme from
+#' \insertCite{tucker_variable_2023}{fastfrechet}.
 #'
 #' @param X A (`n` \eqn{\times} `p`) "input" covariate matrix with no missing, all finite entries.
 #' @param Y A (`n` \eqn{\times} `m`) matrix of observed quantile functions, row-wise monotone non-decreasing.
@@ -24,8 +21,32 @@
 #' @param upper An optional numeric scalar (default `Inf`) upper box constraint; must be strictly greater than `lower`.
 #' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
 #'
-#' @return A (`n` \eqn{\times} `m`) matrix that is the unique solution to the Fréchet Regression problem for univariate distribution responses.
-#'  The solution has rows that are monotone non-decreasing and bounded between the `lower` and `upper` arguments.
+#' @details
+#' Fréchet regression generalizes Euclidean regression to the general metric space setting.
+#' In the sample setting, we observe covariate-response pairs \eqn{\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega},
+#' where \eqn{\mathbf{x}_i}'s are rows of matrix \eqn{\mathbf{X}} column-centered
+#' and scaled such that \eqn{\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}},
+#' and \eqn{\Omega} is the space of univariate quantile functions equipped with
+#' the 2-Wasserstein metric \eqn{d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}}.
+#' (Generally we also only observe the distributions over a discrete grid, not as
+#' full functions.) The conditional Fréchet mean is estimated by
+#' \deqn{\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) = \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left\{ n^{-1} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).}
+#' This is the Fréchet regression problem, a weighted-mean and quadratic programming
+#' problem which this function solves with a customized dual active-set method
+#' inspired by \insertCite{arnstrom_dual_2022}{fastfrechet}.
+#' 
+#' Options include box constraints on distribution support, an option to evaluate
+#' quantile function estimates on a different set of covariate vectors than the
+#' "input" vectors, and an option to include an initial estimate of the active
+#' constraint sets. The function accommodates non-full rank covariate matrices,
+#' as well as the regularization used in the variable selection method of
+#' \insertCite{tucker_variable_2023}{fastfrechet} through the parameter `lambda`.
+#' By default, the function will perform non-regularized regression.
+#' 
+#' @return A (`n` \eqn{\times} `m`) matrix that is the unique solution to the Fréchet
+#' Regression problem for univariate distribution responses. The solution has rows
+#' that are monotone non-decreasing and bounded between the `lower` and `upper` arguments.
+#'
 #'
 #' @references
 #' \insertRef{arnstrom_dual_2022}{fastfrechet}

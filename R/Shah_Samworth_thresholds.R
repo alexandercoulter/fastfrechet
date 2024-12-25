@@ -1,14 +1,44 @@
 #' Pointwise Selection Thresholds for Complementary Pairs Stability Selection (CPSS)
 #' 
 #' @description
-#' This function calculates pointwise selection thresholds for CPSS from \insertCite{shah_variable_2013}{fastfrechet}. Empirical CPSS selection proportions above these thresholds have pointwise control on the number of selected variables which have "low selection probability" \eqn{\theta}. This function uses the default \eqn{\theta = q/p} where `q` is the estimated model size after variable selection.
+#' This function calculates pointwise selection thresholds for CPSS from
+#' \insertCite{shah_variable_2013}{fastfrechet}. Empirical CPSS selection proportions
+#' above these thresholds have pointwise control on the number of selected variables
+#' which have "low selection probability" \eqn{\theta}. This function uses the default
+#' \eqn{\theta = q/p}, where `q` is the estimated model size after variable selection.
 #' 
-#' @param p a positive integer giving the total number of variables
-#' @param q a numeric vector giving average model size(s) after variable selection, each entry strictly within `(0, p)`
-#' @param B a positive integer giving the number of complementary pairs splits (default `B = 50`)
-#' @param E_thr a positive scalar giving the desired constraint on the number of selected "low-probability variables" (default `E_thr = 1`)
+#' @param p A positive integer giving the total number of variables.
+#' @param q A numeric vector giving average model size(s) after variable selection, each entry strictly within `(0, p)`.
+#' @param B A positive integer giving the number of complementary pairs splits (default `50`).
+#' @param E_thr A positive numeric scalar giving the desired constraint on the number of final selected variables with "low selection probability" (default `1`).
 #'
-#' @return list with the following entries: (1) `E_thr`, same as input, (2) `B`, same as input, (3) `relative_model_size`, i.e. q / p from inputs, (4) `pointwise_thresholds`, a `length(q)`-long vector of calculated selection thresholds
+#' @return A list object with components:
+#' \tabular{ll}{
+#'   `E_thr` \tab returns the selection constraint, as provided to the function. \cr
+#'   `B` \tab returns the number of complementary pairs splits, as provided to the function. \cr
+#'   `relative_model_size` \tab returns the relative model size, i.e. `q / p` from the function inputs. \cr
+#'   `pointwise_thresholds` \tab returns a `p`-long vector of calculated selection thresholds. See details. \cr
+#' }
+#' 
+#' @details
+#' CPSS obtains a final selected model by identifying variables selected a high
+#' proportion of times during repeated data splits. It is a meta-procedure that
+#' works independent of the baseline variable selection procedure, such as LASSO
+#' or, in the case of variable selection for Fréchet regression, FRiSO. Under
+#' certain conditions, \insertCite{shah_variable_2013}{fastfrechet} derived
+#' thresholds for this empirical selection proportion that control the expected
+#' number of variables which have "low selection probability", i.e. are disfavored
+#' by the baseline procedure like FRiSO. This function inverts the problem by
+#' identifying the minimum threshold necessary to control the selection procedure.
+#' 
+#' \insertCite{shah_variable_2013}{fastfrechet} recommend defining "low selection
+#' probability" as relative to model size. A variable has low selection probability
+#' if it is selected less frequently than the average relative model size, that
+#' is, the number of selected variables `q` divided by the number of total
+#' variables `p`. This function takes `p` and `q` as inputs (`q` may be a vector),
+#' as well as the number of CPSS data splits `B` and desired control level `E_thr`.
+#' 
+#' 
 #' @export
 #'
 #' @examples

@@ -1,4 +1,4 @@
-#' Fréchet Ridge Selection Operator (FRiSO)
+#' Fréchet Ridge Selection Operator (FRiSO) for univariate distributions with 2-Wasserstein metric
 #' 
 #' @description
 #' This function calculates the Fréchet Ridge Selection Operator
@@ -12,7 +12,6 @@
 #' is solved at each entry with warm starts; initial sparsity vector; box
 #' constraints; and gradient descent tuning parameters, including adjustable
 #' impulse parameter to utilize gradient descent with momentum.
-#' 
 #'
 #' @inheritParams frechetreg_univar2wass
 #' @param tauseq A numeric vector containing 'tau' values at
@@ -22,7 +21,7 @@
 #'  will be scaled to sit on tau-simplex for first entry of `tauseq`.
 #' @param eps A non-negative error tolerance parameter (default `1e-5`).
 #' @param nudge A non-negative numeric scalar to offset warm starts to avoid
-#'  spurious boundary values (default `0`).
+#'  spurious boundary values (default `0.01`).
 #' @param alpha A non-negative dampening parameter (default `0.9`).
 #' @param max_iter An integer giving the maximum number of iterations for the
 #'  algorithm to run (default `1000`).
@@ -31,15 +30,51 @@
 #' @param impulse A scalar between `0` and `1` which controls the "impulse" in
 #'  gradient descent with momentum (default `1`). `impulse` equal to `1` means
 #'  no momentum and `impulse <1` means with momentum.
-#'
+#'  
+#' @details
+#' FRiSO performs variable selection for Fréchet regression, in this case for the
+#' space of univariate distributions \eqn{\Omega} equipped with the 2-Wasserstein
+#' metric \eqn{d_W}. FRiSO solves the optimization problem given by
+#' \deqn{\widehat{\pmb{\lambda}}(\tau) &:= \underset{\pmb{\lambda} \in \mathbb{R}^p}{\mathrm{argmin}} \sum_{i=1}^n d_W^2\left(\widehat{\mathbf{q}}(\mathbf{x}_i, \pmb{\lambda}), \: \mathbf{y}_i \right), \qquad \pmb{\lambda} \geq \pmb{0}, \quad \pmb{1}^{\top}\pmb{\lambda} = \tau,}
+#' which entails solving the embedded optimization problem
+#' \deqn{\widehat{\mathbf{q}}(\mathbf{x}_i,\pmb{\lambda}) &:= \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left( \frac{1}{n} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X} + \mathbf{D}_{\pmb{\lambda}}^{-1})^{-1}\mathbf{x}_j \right) d_W^2(\mathbf{q}, \: \mathbf{y}_j).}
+#' The final vector \eqn{\widehat{\pmb{\lambda}}(\tau)} has positive entries, which
+#' correspond to selected variables, and zero entries, which correspond to non-selected variables.
+#' Function options include user-specified simplex constraints in `tauseq`,
+#' which can take a vector input (recommended increasing sequence to utilize warm
+#' starts); initial sparsity vector; box constraints; and gradient descent tuning parameters.
+#' 
+#' The gradient descent algorithm performs rotational steps in the transformed
+#' space \deqn{S_{\sqrt{\tau}} := \left\{ \pmb{\gamma} : \lvert\pmb{\gamma}\rvert^2_2 = \tau \right\}}.
+#' Parameter `max_theta` is a step size parameter capping the angle of rotation.
+#' 
+#' Parameter `nudge` "pushes" the previous solution toward the positive orthant
+#' during warm starts between \eqn{\tau} values, to avoid saddle points on the
+#' coordinate hyperplanes. It is recommended this value be a small positive number.
+#' 
+#' Parameter `alpha` controls the dampening of the gradient descent algorithm.
+#' From experience, a mild dampening `alpha = 0.9` (the default) seems to perform
+#' better for most applications than non-damped gradient descent.
+#' 
+#' Parameter `impulse` controls optional momentum functionality. Each gradient step,
+#' being a rotation, also identifies a tangential direction of movement around
+#' \eqn{S_{\sqrt{\tau}}}. Gradient steps can proceed using purely the local tangential
+#' gradient information; or can proceed as a convex combination of the local
+#' tangential gradient and the tangential motion of the previous step, called gradient
+#' descent with momentum. `impulse` can be thought of as the share of the convex
+#' combination attributed to the local tangential gradient, the "new force". The
+#' default `impulse = 1` implements non-momentum gradient descent, and the user
+#' can specify `0 < impulse < 1` to implement gradient descent with momentum.
+#'  
+#' @return A (`p` \eqn{\times} `length(tauseq)`) matrix column-wise containing
+#' fitted 'allowance vectors' \eqn{\widehat{\pmb{\lambda}}(\tau)} per \eqn{\tau}
+#' value in `tauseq`.
 #'
 #' @references 
 #' \insertRef{coulter_fast_2024}{fastfrechet}
 #' 
 #' \insertRef{tucker_variable_2023}{fastfrechet}
 #' 
-#' @return A (`p` \eqn{\times} `length(tauseq)`) matrix column-wise containing
-#'  fitted 'allowance vectors' lambda per 'tau' in `tauseq`.
 #' @export
 #'
 #' @examples
@@ -84,7 +119,7 @@ FRiSO_univar2wass = function(X,
                              tauseq,
                              lambda_init = NULL,
                              eps = 1e-5,
-                             nudge = 0,
+                             nudge = 0.01,
                              alpha = 0.9,
                              max_iter = 1000,
                              max_theta = pi / 4,

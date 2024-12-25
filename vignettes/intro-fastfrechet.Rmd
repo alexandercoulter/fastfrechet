@@ -79,9 +79,9 @@ matplot(mseq, t(Y), xlim = c(0, 1), ylim = range(Y), type = 'l', lty = 1, col = 
 
 ## Fréchet regression
 
-Fréchet regression generalizes Euclidean regression to the general metric space setting. In the sample setting, we observe covariate-response pairs $\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega$, where $\Omega$ is the space of univariate quantile functions equipped with the 2-Wasserstein metric $d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}$. (Generally we also only observe the distributions over a discrete grid, not as full functions.) The conditional Fréchet mean is estimated by
+Fréchet regression generalizes Euclidean regression to the general metric space setting. In the sample setting, we observe covariate-response pairs $\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega$, where $\Omega$ is the space of univariate quantile functions equipped with the 2-Wasserstein metric $d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}$. (Generally we also only observe the distributions over a discrete grid, not as full functions.) We treat the covariate vectors $\mathbf{x}_i$ as rows of matrix $\mathbf{X}$, which is column-centered and scaled so that $\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}$. The conditional Fréchet mean is estimated by
 $$
-\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) = \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \frac{1}{n}\sum_{j=1}^n \left\{ 1 + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).
+\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) := \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left\{ \frac{1}{n} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).
 $$
 This is the Fréchet regression problem, a weighted Fréchet mean problem which can be solved by quadratic programming. This is implemented by `frechetreg_univar2wass`, using a dual active-set method inspired from @arnstrom_dual_2022.
 
@@ -135,7 +135,14 @@ matplot(mseq, t(output$Qhat), type = "l", lty = 1, col = 'black', xlab = "p", yl
 
 ## Variable selection with Fréchet ridge selection operator
 
-`fastfrechet` implements the variable selection procedure of @tucker_variable_2023 through the function `FRiSO_univar2wass`. This penalization procedure, called the Fréchet Ridge Selection Operator (FRiSO), solves for a sparse vector $\pmb{\lambda}(\tau) \in \mathbb{R}^p$. Each entry of the optimal $\widehat{\pmb{\lambda}}(\tau)$ is either positive, which indicates the corresponding variable is selected in the final ($\tau$-dependent) model, or is zero, which indicates the corresponding variable is not selected. The entries of $\pmb{\lambda}(\tau)$ add up to $\tau$, so colloquially $\tau$ acts as a "total allowance", and $\widehat{\pmb{\lambda}}(\tau)$ is an optimal allocation of that allowance among the variables. Theoretical details of this procedure are given in @wu_cant_2021 and @tucker_variable_2023; details of the $\widehat{\pmb{\lambda}}(\tau)$ estimation method implemented by `fastfrechet` are given in @coulter_fast_2024.
+`fastfrechet` implements the variable selection procedure of @tucker_variable_2023 through the function `FRiSO_univar2wass`. This penalization procedure, called the Fréchet Ridge Selection Operator (FRiSO), solves for a sparse vector $\widehat{\pmb{\lambda}}(\tau) \in \mathbb{R}^p$, defined via
+$$
+\begin{align}
+\widehat{\pmb{\lambda}}(\tau) &:= \underset{\pmb{\lambda} \in \mathbb{R}^p}{\mathrm{argmin}} \sum_{i=1}^n d_W^2\left(\widehat{\mathbf{q}}(\mathbf{x}_i, \pmb{\lambda}), \: \mathbf{y}_i \right), \qquad \pmb{\lambda} \geq \pmb{0}, \quad \pmb{1}^{\top}\pmb{\lambda} = \tau, \\
+\widehat{\mathbf{q}}(\mathbf{x}_i,\pmb{\lambda}) &:= \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left( \frac{1}{n} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X} + \mathbf{D}_{\pmb{\lambda}}^{-1})^{-1}\mathbf{x}_j \right) d_W^2(\mathbf{q}, \: \mathbf{y}_j).
+\end{align}
+$$
+Each entry of the optimal $\widehat{\pmb{\lambda}}(\tau)$ is either positive, which indicates the corresponding variable is selected in the final ($\tau$-dependent) model, or is zero, which indicates the corresponding variable is not selected. The entries of $\pmb{\lambda}(\tau)$ add up to $\tau$, so colloquially $\tau$ acts as a "total allowance", and $\widehat{\pmb{\lambda}}(\tau)$ is an optimal allocation of that allowance among the variables. Theoretical details of this variable selection procedure are given in @wu_cant_2021 and @tucker_variable_2023. Details of the $\widehat{\pmb{\lambda}}(\tau)$ estimation method implemented by `fastfrechet` are given in @coulter_fast_2024.
 
 ### Using `fastfrechet::FRiSO_univar2wass`
 

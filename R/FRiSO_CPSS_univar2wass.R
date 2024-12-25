@@ -1,7 +1,13 @@
-#' Complementary Pairs Stability Selection (CPSS) for FRiSO, for Univariate Distribution Responses Equipped with the 2-Wasserstein Metric
+#' Complementary pairs stability selection (CPSS) for FRiSO, for univariate distributions with 2-Wasserstein metric
 #' 
 #' @description
-#' This function performs complementary pairs (\insertCite{shah_variable_2013}{fastfrechet}) stability selection (\insertCite{meinshausen_stability_2010}{fastfrechet}) with the Fréchet Ridge Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}), for the space of univariate distribution responses equipped with the 2-Wasserstein metric. Heuristically, the optimal model is identified by selecting covariates whose "stability paths" over \eqn{\tau} exceed a threshold, which may itself be a function of \eqn{\tau}.
+#' This function performs complementary pairs (\insertCite{shah_variable_2013}{fastfrechet})
+#' stability selection (\insertCite{meinshausen_stability_2010}{fastfrechet})
+#' with the Fréchet Ridge Selection Operator (FRiSO; \insertCite{tucker_variable_2023}{fastfrechet}),
+#' for the space of univariate distribution responses equipped with the 2-Wasserstein
+#' metric. Heuristically, the optimal model is identified by selecting covariates
+#' whose "stability paths" over \eqn{\tau} exceed a threshold, which may itself
+#' be a function of \eqn{\tau}.
 #' 
 #' @inheritParams frechetreg_univar2wass
 #' @param B A positive integer number of complementary pair sub-samples to generate from the original data set (default `50`).
@@ -15,6 +21,13 @@
 #'   `selected_samples` \tab returns a (`B` \eqn{\times} `2` \eqn{\times} `length(tauseq)` \eqn{\times} `n`) array containing 0's and 1's identifying which samples were selected in course of CPSS. \cr
 #'   `stability_paths` \tab returns a (`length(tauseq)` \eqn{\times} `p`) matrix containing stability measures for each variable (column-wise) against given tauseq.
 #' }
+#' 
+#' @references
+#' \insertRef{shah_variable_2013}{fastfrechet}
+#' 
+#' \insertRef{meinshausen_stability_2010}{fastfrechet}
+#' 
+#' \insertRef{tucker_variable_2023}{fastfrechet}
 #' 
 #' @export
 #'

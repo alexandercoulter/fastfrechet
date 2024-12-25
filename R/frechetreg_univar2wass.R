@@ -47,7 +47,6 @@
 #' Regression problem for univariate distribution responses. The solution has rows
 #' that are monotone non-decreasing and bounded between the `lower` and `upper` arguments.
 #'
-#'
 #' @references
 #' \insertRef{arnstrom_dual_2022}{fastfrechet}
 #'

@@ -1,4 +1,4 @@
-#' FRiSO_CV_univar2wass
+#' K-fold cross-validation (CV) for FRiSO, for univariate distributions with 2-Wasserstein metric
 #' 
 #' @description
 #' This function performs K-fold cross-validation with the Fréchet Ridge
@@ -9,12 +9,11 @@
 #' values in `tauseq`. If there are ties for the minimum error, the model formed
 #' from the smallest \eqn{\tau} is chosen. The model corresponding to the
 #' optimal \eqn{\tau} is also provided as part of the output list object.
-#' 
 #'
 #' @inheritParams frechetreg_univar2wass
 #' @param K Numeric whole number no bigger than `nrow(X)`.
 #' @param thresh Positive scalar that determines the selection cutoff for the `lambda` vector in the variable selection problem. 
-#' @param ... other inputs to FRiSO see [fastfrechet::FRiSO_univar2wass()].
+#' @param ... other inputs to [fastfrechet::FRiSO_univar2wass()].
 #'
 #' @return A list object with components:
 #' \tabular{ll}{
@@ -25,6 +24,10 @@
 #'   `opt_lambda` \tab returns a `p`-long numeric vector that is the high-precision 'allowance vector'. \cr
 #'   `opt_selected` \tab returns a numeric vector (up to `p`-long) that contains the indices of the variables selected in the optimal model. \cr
 #' }
+#' 
+#' @references
+#' \insertRef{tucker_variable_2023}{fastfrechet}
+#' 
 #' @export
 #'
 #' @examples

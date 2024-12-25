@@ -46,7 +46,7 @@
 #' # Set cross-validation parameters
 #' K = 10
 #' thresh = 0.0001
-#' tauseq = seq(0.1, 20, 0.1)
+#' tauseq = seq(0.2, 20, 0.2)
 #' eps = 0.001
 #' 
 #' # Run cross-validation:
@@ -57,6 +57,7 @@
 #'                           lower = lower,
 #'                           upper = upper,
 #'                           tauseq = tauseq,
+#'                           nudge = 0.001,
 #'                           eps = eps)
 #' 
 #' # Plot errors per fold and average fold error:
@@ -66,9 +67,6 @@
 #' 
 #' # Identify which variables are selected in "optimal" model:
 #' cv$opt_selected
-#' 
-#' # 1, 2, 3, 4, 8, 9
-#' # all correct variables 1-4, and 2 extra
 FRiSO_CV_univar2wass = function(X,
                                 Y,
                                 K = NULL,

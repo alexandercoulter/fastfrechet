@@ -246,11 +246,11 @@ points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
 cv$opt_selected
 ```
 
-As we can see, 10-fold CV correctly identifies the first four variables, which are known ahead of time to be the only ones which influence the Fréchet means. However, in this example the final model selects more variables as well; it is larger than the true model.
+As we can see, 10-fold CV correctly identifies the first three variables, however it fails to correctly identify the fourth variable.
 
 ## Complementary pairs stability selection
 
-`fastfrechet` implements complementary pairs stability selection (CPSS) for the variable selection procedure through the function `FRiSO_CPSS_univar2wass`. @shah_variable_2013 demonstrate that CPSS allows pointwise (i.e. across $\tau$) control on "low selection probability" variables. This process for establishing a minimum selection threshold for error control is described and illustrated in more detail by @shah_variable_2013, and @coulter_fast_2024 as applied to Fréchet regression. `fastfrechet` calculates these CPSS selection thresholds through the function `Shah_Samworth_thresholds`.
+`fastfrechet` implements complementary pairs stability selection (CPSS) for the variable selection procedure through the function `FRiSO_CPSS_univar2wass`. @shah_variable_2013 demonstrate that CPSS allows pointwise (i.e. across $\tau$) control on "low selection probability" (LSP) variables. This process for establishing a minimum selection threshold for error control is described and illustrated in more detail by @shah_variable_2013, and @coulter_fast_2024 as applied to Fréchet regression. `fastfrechet` calculates these CPSS selection thresholds through the function `Shah_Samworth_thresholds`.
 
 ### Using `fastfrechet::FRiSO_CPSS_univar2wass`
 
@@ -269,7 +269,7 @@ The `FRiSO_CPSS_univar2wass` function from `fastfrechet` is used analogously as 
 * `stability_paths`, a `length(tauseq)` $\times$ `p` matrix containing the empirical selection proportions of all variables across `tauseq`, and
 * `model_size_est`. a `length(tauseq)`-long vector containing the average model size, i.e. number of selected parameters, across `tauseq`.
 
-In this example, we use `B = 50` half-splits, and evaluate CPSS on a coarser $\tau$ grid, `tauseq = 1:10`.
+In this example, we use `B = 50`  data half-splits, and evaluate CPSS on a coarser $\tau$ grid, `tauseq = 1:10`.
 
 ```{r}
 
@@ -296,18 +296,18 @@ cpss = FRiSO_CPSS_univar2wass(X = X,
 We plot the CPSS "stability path" for each variable, which is the empirical proportion of split halves ($2B=100$ total) the variable is selected by FRiSO. This lets us see which variables are most frequently selected.
 
 ```{r}
-# Plot stability paths
+# Plot stability paths:
 matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
         col = c(rep('red', 4), rep('black', p - 4)),
-        ylab = "Stability Paths",
-        xlab = bquote(tau))
+        ylab = "Selection Proportions", xlab = bquote(tau),
+        main = "CPSS Stability Paths")
 ```
 
 As we can see, the four model variables are all selected with high probability across $\tau$. However, as $\tau$ increases, the model size tends to increase. In practice, it is advisable to perform CPSS up to a limit on the `p`-relative model size.
 
 ### Shah and Samworth error control
 
-The function `Shah_Samworth_thresholds` calculates the error control thresholds from @shah_variable_2013 by using the model size estimates from the CPSS output. The control is on the number of final variables selected which have "low selection probability" (LSP). `Shah_Samworth_thresholds` uses the recommendation from @shah_variable_2013 to define "low" as below the average relative model size. As input, `Shah_Samworth_thresholds` takes
+The function `Shah_Samworth_thresholds` calculates the error control thresholds from @shah_variable_2013 by using the model size estimates from the CPSS output. The control is on the number of final selected LSP variables. `Shah_Samworth_thresholds` uses the recommendation from @shah_variable_2013 to define "low" as below the average relative model size. As input, `Shah_Samworth_thresholds` takes
 
 * `p`, the number of covariates in the full model,
 * `q`, the average model size (possibly estimated) after variable selection,
@@ -333,8 +333,8 @@ shahsam = Shah_Samworth_thresholds(p = p,
 # Redraw the line plot, but add the threshold path:
 matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
         col = c(rep('red', 4), rep('black', p - 4)),
-        ylab = "Stability Paths",
-        xlab = bquote(tau))
+        ylab = "Selection Proportions", xlab = bquote(tau),
+        main = "CPSS Stability Paths with Selection Threshold")
 lines(cpss$tau, shahsam$pointwise_thresholds, type = "o", pch = 16)
 ```
 

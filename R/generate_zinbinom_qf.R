@@ -1,24 +1,22 @@
 #' Generate Random Zero-Inflated Negative Binomial Quantile Functions
 #'
 #' @description
-#' This function generates random zero-inflated negative binomial (zinbinom)
+#' This function generates random zero-inflated negative binomial (`zinbinom`)
 #' quantile functions, as functions of covariates \eqn{X_1}, \eqn{X_2}, \eqn{X_3}, and \eqn{X_4}.
-#' Quantile function matrix \eqn{Y} and covariate matrix \eqn{X} are generated as in Experiment B in
+#' Quantile function matrix `Y` and covariate matrix `X` are generated as in Experiment B in
 #' \insertCite{coulter_fast_2024}{fastfrechet}, and are evaluated on a common,
 #' equally spaced `m`-grid in \eqn{(0, 1)}. Options include number of samples
 #' (covariate vectors, and response quantile functions), number of total 
 #' covariates (at least 4; generated iid from \eqn{N(0, 1)}), grid density `m`,
-#' and baseline zinbinom parameters.
+#' and baseline `zinbinom` parameters.
 #' 
-#' @param n A positive integer. Determines the number of 
-#' rows in the covariate matrix.
-#' @param p A positive integer greater than or equal to 4. Determines the number of
-#' columns in the covariate matrix.
-#' @param m A positive integer.
-#' @param zero_inflation A numeric value in the range \eqn{[0,1]}.
-#' @param prob A numeric value in the range \eqn{(0,1]}.
-#' @param size A numeric value strictly greater than 0.
-#' 
+#' @param n A positive integer giving the sample size (i.e. rows in the covariate matrix and response matrix).
+#' @param p A positive integer greater than or equal to 4 giving the number of covariates.
+#' @param m A positive integer giving the grid density of the quantile functions in \eqn{(0, 1)}.
+#' @param zero_inflation A numeric value in the range \eqn{[0, 1]} giving the zero inflation parameter of the `zinbinom` distribution.
+#' @param prob A numeric scalar in the range \eqn{(0,1]} giving the probability parameter of the `nbinom` part.
+#' @param size A positive numeric scalar giving the size parameter of the `nbinom` part.
+#'
 #' @references 
 #' \insertRef{coulter_fast_2024}{fastfrechet}
 #' 
@@ -27,6 +25,7 @@
 #'   `X` \tab returns a `(n` \eqn{\times} `p)` covariate matrix. \cr
 #'   `Y` \tab returns an `(n` \eqn{\times} `m)` quantile function matrix. \cr
 #' }
+#' 
 #' @import stats
 #' @export
 #'

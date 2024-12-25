@@ -14,22 +14,22 @@
 #' impulse parameter to utilize gradient descent with momentum.
 #'
 #' @inheritParams frechetreg_univar2wass
-#' @param tauseq A numeric vector containing 'tau' values at
+#' @param tauseq A numeric vector containing \eqn{\tau} values at
 #'  which to solve FRiSO problem.
 #' @param lambda_init An optional `p`-long numeric vector giving the 
-#'  initial allowance vector' lambda for FRiSO algorithm (default `NULL`);
-#'  will be scaled to sit on tau-simplex for first entry of `tauseq`.
-#' @param eps A non-negative error tolerance parameter (default `1e-5`).
+#'  initial allowance vector \eqn{\pmb{lambda}_0(\tau)} for FRiSO algorithm (default `NULL`);
+#'  will be scaled to sit on \eqn{tau}-simplex for first entry of `tauseq`.
+#' @param eps A non-negative numeric scalar error tolerance (default `1e-5`).
 #' @param nudge A non-negative numeric scalar to offset warm starts to avoid
 #'  spurious boundary values (default `0.01`).
-#' @param alpha A non-negative dampening parameter (default `0.9`).
+#' @param alpha A non-negative numeric scalar dampening parameter (default `0.9`).
 #' @param max_iter An integer giving the maximum number of iterations for the
 #'  algorithm to run (default `1000`).
-#' @param max_theta A step-size scalar parameter no larger than `pi / 4`
+#' @param max_theta A positive scalar step-size parameter no larger than `pi / 4`
 #'  (default `pi / 4`).
-#' @param impulse A scalar between `0` and `1` which controls the "impulse" in
-#'  gradient descent with momentum (default `1`). `impulse` equal to `1` means
-#'  no momentum and `impulse <1` means with momentum.
+#' @param impulse A positive numeric scalar no larger than `1` which controls
+#'  the "impulse" in gradient descent with momentum (default `1`). `impulse = 1`
+#'  means no momentum, and `impulse < 1` means gradient descent with momentum. See details.
 #'  
 #' @details
 #' FRiSO performs variable selection for Fréchet regression, in this case for the
@@ -174,6 +174,7 @@ FRiSO_univar2wass = function(X,
   # Numeric scalar and constraint checks for max_theta:
   check_numeric(max_theta, "scalar", finite = FALSE)
   if (max_theta <= 0) stop("'max_theta' must be strictly positive.")
+  if (max_theta > pi / 4) stop("'max_theta' should be less than pi / 4.")
 
   # Numeric scalar and constraint checks for impulse:
   check_numeric(impulse, "scalar", finite = TRUE)

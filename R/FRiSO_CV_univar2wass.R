@@ -43,10 +43,11 @@
 #' X = mydata$X  # (n x p) matrix of covariates
 #' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
 #' 
-#' # Set cross-validation parameters
+#' # Set cross-validation and FRiSO parameters
 #' K = 10
 #' thresh = 0.0001
 #' tauseq = seq(0.2, 20, 0.2)
+#' nudge = 0.001
 #' eps = 0.001
 #' 
 #' # Run cross-validation:
@@ -57,7 +58,7 @@
 #'                           lower = lower,
 #'                           upper = upper,
 #'                           tauseq = tauseq,
-#'                           nudge = 0.001,
+#'                           nudge = nudge,
 #'                           eps = eps)
 #' 
 #' # Plot errors per fold and average fold error:

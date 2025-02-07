@@ -43,7 +43,7 @@ test_that("predicted QFs are monotonic and within [0, 40]", {
   X <- mydata$X
   Y <- mydata$Y
   
-  Y[Y > upper] = upper
+  Y[Y > upper] <- upper
   
   # Estimate conditional QFs
   output <- frechetreg_univar2wass(X = X,
@@ -87,7 +87,7 @@ test_that("works with large p", {
   X <- mydata$X
   Y <- mydata$Y
   
-  Y[Y > upper] = upper
+  Y[Y > upper] <- upper
   
   # Estimate conditional QFs
   output <- frechetreg_univar2wass(X = X,
@@ -131,7 +131,7 @@ test_that("works with lambda", {
   X <- mydata$X
   Y <- mydata$Y
   
-  Y[Y > upper] = upper
+  Y[Y > upper] <- upper
   
   # Generate random lambda vector with \tau sum
   tau <- 10
@@ -181,7 +181,7 @@ test_that("works with lambda and large p", {
   X <- mydata$X
   Y <- mydata$Y
   
-  Y[Y > upper] = upper
+  Y[Y > upper] <- upper
   
   # Generate random lambda vector with \tau sum
   tau <- 10
@@ -213,4 +213,47 @@ test_that("works with lambda and large p", {
   # Check upper bound for each element
   expect_true(all(predicted_QFs <= upper + 1e-5), 
               info = "QF values violate the upper bound of 40")
+})
+
+
+test_that("works with nonsense C_init", {
+  # Parameters
+  lower <- 0   # Lower bound
+  upper <- 40  # Upper bound
+  
+  # Generate data
+  n <- 100
+  p <- 10
+  m <- 100
+  set.seed(31)
+  mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
+  
+  X <- mydata$X
+  Y <- mydata$Y
+  
+  Y[Y > upper] <- upper
+  
+  # Estimate conditional QFs with random initial active constraint matrix:
+  output1 <- frechetreg_univar2wass(X = X,
+                                    Y = Y,
+                                    Z = X,
+                                    C_init = matrix(rbinom(n * (m + 1), 1, 0.5), n, m + 1),
+                                    lambda = NULL,
+                                    lower = lower,
+                                    upper = upper)
+  # Estimate conditional QFs with default active constraint matrix (all zeros):
+  output2 <- frechetreg_univar2wass(X = X,
+                                    Y = Y,
+                                    Z = X,
+                                    C_init = NULL,
+                                    lambda = NULL,
+                                    lower = lower,
+                                    upper = upper)
+  
+  # Extract predicted QFs and take difference:
+  predicted_QF_diff <- output1$Qhat - output2$Qhat # Assuming these contain (n x m) matrices of QFs
+  
+  # Check L-infinity norm is bounded to high tolerance:
+  expect_true(max(abs(predicted_QF_diff)) <= 1e-10, 
+              info = "QF values violate the lower bound")
 })

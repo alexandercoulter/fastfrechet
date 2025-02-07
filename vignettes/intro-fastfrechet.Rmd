@@ -13,9 +13,11 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-knitr::opts_chunk$set(fig.align = "center", 
-               out.width = "70%",
-               fig.width = 6, fig.height = 5.5)
+knitr::opts_chunk$set(
+  fig.align = "center",
+  out.width = "70%",
+  fig.width = 6, fig.height = 5.5
+)
 ```
 
 ```{r setup}
@@ -52,18 +54,20 @@ The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-depen
 `generate_zinbinom_qf` also optionally takes "baseline" parameters of the `zinbinom` distribution, namely, the zero-inflation factor, and the probability and size parameters of the `nbinom` component. As output, `generate_zinbinom_qf` returns a list containing the `n` $\times$ `p` covariate matrix `X`; and the `n` $\times$ `m` response matrix `Y`, which stores the quantile functions row-wise.
 
 ```{r}
-n = 200  # number of samples - nrow(X) and nrow(Y).
-p = 20   # number of covariates - ncol(X).
-m = 200  # quantile function grid density - ncol(Y).
-mseq = seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
+n <- 200 # number of samples - nrow(X) and nrow(Y).
+p <- 20 # number of covariates - ncol(X).
+m <- 200 # quantile function grid density - ncol(Y).
+mseq <- seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
 
 set.seed(31)
-mydata = fastfrechet::generate_zinbinom_qf(n = n,
-                                           p = p,
-                                           m = m)
- 
-X = mydata$X  # (n x p) matrix of covariates
-Y = mydata$Y  # (n x m) matrix of quantile functions, stored row-wise
+mydata <- fastfrechet::generate_zinbinom_qf(
+  n = n,
+  p = p,
+  m = m
+)
+
+X <- mydata$X # (n x p) matrix of covariates
+Y <- mydata$Y # (n x m) matrix of quantile functions, stored row-wise
 ```
 
 
@@ -72,8 +76,10 @@ Y = mydata$Y  # (n x m) matrix of quantile functions, stored row-wise
 We illustrate these quantile function responses with line plots. Note the true functions are piece-wise constant, where the line plots interpolate between points on the observed `m`-grid.
 
 ```{r}
-matplot(mseq, t(Y), xlim = c(0, 1), ylim = range(Y), type = 'l', lty = 1, col = 1,
-        main = "znbinom Quantile Functions", xlab = "p", ylab = "quantile")
+matplot(mseq, t(Y),
+  xlim = c(0, 1), ylim = range(Y), type = "l", lty = 1, col = 1,
+  main = "znbinom Quantile Functions", xlab = "p", ylab = "quantile"
+)
 ```
 
 
@@ -99,20 +105,22 @@ The `frechetreg_univar2wass` function from `fastfrechet` takes as input
 Since the `zinbinom` distribution is bounded from below by zero, we set `lower = 0`, and use default settings for other parameters. As output, `frechetreg_univar2wass` returns a list containing the set of fitted quantile functions `Qhat`, stored row-wise as in `Y`; and the `n` $\times$ `m+1` matrix of Lagrange multipliers associated with the solution, also stored row-wise.
 
 ```{r}
-lower = 0
-upper = Inf
+lower <- 0
+upper <- Inf
 # Estimate conditional quantile functions:
-output = fastfrechet::frechetreg_univar2wass(X = X,
-                                             Y = Y,
-                                             Z = NULL,
-                                             C_init = NULL,
-                                             lambda = NULL,
-                                             lower = 0,
-                                             upper = Inf)
- 
+output <- fastfrechet::frechetreg_univar2wass(
+  X = X,
+  Y = Y,
+  Z = NULL,
+  C_init = NULL,
+  lambda = NULL,
+  lower = 0,
+  upper = Inf
+)
+
 # Note: to numerical precision, these quantile functions are non-decreasing...
 min(apply(output$Qhat, 1, diff))
- 
+
 # ...and bounded from below by the lower bound, zero:
 min(output$Qhat)
 ```
@@ -124,12 +132,16 @@ The Fréchet means associated with the Fréchet regression problem $\widehat{\ma
 
 ```{r, fig.width = 8, fig.height = 5.5}
 # Plot the unconstrained estimators and the constrained conditional quantile functions:
-Yhat = output$Qhat - output$Lagrange_Multiplier[ , -(m + 1)] + output$Lagrange_Multiplier[ , -1]
+Yhat <- output$Qhat - output$Lagrange_Multiplier[, -(m + 1)] + output$Lagrange_Multiplier[, -1]
 par(mfrow = c(1, 2), las = 1)
-matplot(mseq, t(Yhat), type = "l", lty = 1, col = 'black', xlab = "p", ylab = "Yhat",
-        main = "Unconstrained Solution")
-matplot(mseq, t(output$Qhat), type = "l", lty = 1, col = 'black', xlab = "p", ylab = "Qhat",
-        main = "Fitted Quantile Functions")
+matplot(mseq, t(Yhat),
+  type = "l", lty = 1, col = "black", xlab = "p", ylab = "Yhat",
+  main = "Unconstrained Solution"
+)
+matplot(mseq, t(output$Qhat),
+  type = "l", lty = 1, col = "black", xlab = "p", ylab = "Qhat",
+  main = "Fitted Quantile Functions"
+)
 ```
 
 
@@ -159,17 +171,19 @@ In this illustrative example, we evaluate the variable selection problem on a de
 
 ```{r}
 # Dense grid of "allowance" totals:
-tauseq = seq(0.2, 20, 0.2)
+tauseq <- seq(0.2, 20, 0.2)
 
 # Generate estimated "allowance vector"s \lambda for each \tau, stored
 # column-wise in matrix `L`:
-L = FRiSO_univar2wass(X = X,
-                      Y = Y,
-                      lower = 0,
-                      upper = Inf,
-                      tauseq = tauseq,
-                      eps = 0.001,
-                      nudge = 0.01)
+L <- FRiSO_univar2wass(
+  X = X,
+  Y = Y,
+  lower = 0,
+  upper = Inf,
+  tauseq = tauseq,
+  eps = 0.001,
+  nudge = 0.01
+)
 ```
 
 
@@ -180,11 +194,15 @@ As functions of $\tau$, the fitted $\widehat{\pmb{\lambda}}$ values trace out "s
 
 ```{r}                             
 # Plot FRiSO "allowance vector" solution paths:
-matplot(tauseq, t(L), type = "l", col = c(rep("red", 4), rep("black", p - 4)),
-        lty = 1, xlab = expression(tau), ylab = expression(lambda*"("*tau*")"),
-        main = "Variable Selection Solution Paths", las = 1, lwd = 1.5)
-legend("topleft", lwd = 1.5, col = c("red", "black"), bty = "n",
-       legend = c("Model variable", "Unimportant variable"))
+matplot(tauseq, t(L),
+  type = "l", col = c(rep("red", 4), rep("black", p - 4)),
+  lty = 1, xlab = expression(tau), ylab = expression(lambda * "(" * tau * ")"),
+  main = "Variable Selection Solution Paths", las = 1, lwd = 1.5
+)
+legend("topleft",
+  lwd = 1.5, col = c("red", "black"), bty = "n",
+  legend = c("Model variable", "Unimportant variable")
+)
 ```
 
 # Resampling for Variable Selection
@@ -217,19 +235,21 @@ In this example, we use 10-fold CV, and set a selection threshold of `thresh = 0
 
 ```{r}
 # Set cross-validation parameters
-K = 10
-thresh = 0.0001
-eps = 0.001
+K <- 10
+thresh <- 0.0001
+eps <- 0.001
 
 # Run cross-validation
-cv = FRiSO_CV_univar2wass(X = X,
-                          Y = Y,
-                          K = K,
-                          thresh = thresh,
-                          lower = lower,
-                          upper = upper,
-                          tauseq = tauseq,
-                          eps = eps)
+cv <- FRiSO_CV_univar2wass(
+  X = X,
+  Y = Y,
+  K = K,
+  thresh = thresh,
+  lower = lower,
+  upper = upper,
+  tauseq = tauseq,
+  eps = eps
+)
 ```
 
 ### Plotting, interpreting CV errors and optimal solution
@@ -238,10 +258,10 @@ We plot the CV errors in each fold, along with the average CV error across `taus
 
 ```{r}
 # Plot errors per fold and average fold error:
-matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "Cross-Validation Fold Errors")
+matplot(tauseq, cv$errors, type = "l", lty = 1, main = "Cross-Validation Fold Errors")
 lines(tauseq, cv$error_sum / K, lwd = 3)
 points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
- 
+
 # Identify which variables are selected in "optimal" model:
 cv$opt_selected
 ```
@@ -272,23 +292,23 @@ The `FRiSO_CPSS_univar2wass` function from `fastfrechet` is used analogously as 
 In this example, we use `B = 50`  data half-splits, and evaluate CPSS on a coarser $\tau$ grid, `tauseq = 1:10`.
 
 ```{r}
-
 # Set complementary pairs stability selection parameters
-B = 50
-thresh = 0.0001
-tauseq = 1:10
-eps = 0.001
- 
-# Run complementary pairs stability selection
-cpss = FRiSO_CPSS_univar2wass(X = X,
-                              Y = Y,
-                              B = B,
-                              thresh = thresh,
-                              lower = lower,
-                              upper = upper,
-                              tauseq = tauseq,
-                              eps = eps)
+B <- 50
+thresh <- 0.0001
+tauseq <- 1:10
+eps <- 0.001
 
+# Run complementary pairs stability selection
+cpss <- FRiSO_CPSS_univar2wass(
+  X = X,
+  Y = Y,
+  B = B,
+  thresh = thresh,
+  lower = lower,
+  upper = upper,
+  tauseq = tauseq,
+  eps = eps
+)
 ```
 
 ### Plotting, interpreting stability paths
@@ -297,10 +317,12 @@ We plot the CPSS "stability path" for each variable, which is the empirical prop
 
 ```{r}
 # Plot stability paths:
-matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
-        col = c(rep('red', 4), rep('black', p - 4)),
-        ylab = "Selection Proportions", xlab = bquote(tau),
-        main = "CPSS Stability Paths")
+matplot(cpss$tau, cpss$stability_paths,
+  type = "l", lty = 1, lwd = 2,
+  col = c(rep("red", 4), rep("black", p - 4)),
+  ylab = "Selection Proportions", xlab = bquote(tau),
+  main = "CPSS Stability Paths"
+)
 ```
 
 As we can see, the four model variables are all selected with high probability across $\tau$. However, as $\tau$ increases, the model size tends to increase. In practice, it is advisable to perform CPSS up to a limit on the `p`-relative model size.
@@ -325,16 +347,20 @@ As the threshold is a function of model size, and hence a function of $\tau$, a 
 
 ```{r}
 # Calculate thresholds using Shah and Samworth (2013) method:
-shahsam = Shah_Samworth_thresholds(p = p,
-                                   q = cpss$model_size_est,
-                                   B = B,
-                                   E_thr = 1)
+shahsam <- Shah_Samworth_thresholds(
+  p = p,
+  q = cpss$model_size_est,
+  B = B,
+  E_thr = 1
+)
 
 # Redraw the line plot, but add the threshold path:
-matplot(cpss$tau, cpss$stability_paths, type = 'l', lty = 1, lwd = 2,
-        col = c(rep('red', 4), rep('black', p - 4)),
-        ylab = "Selection Proportions", xlab = bquote(tau),
-        main = "CPSS Stability Paths with Selection Threshold")
+matplot(cpss$tau, cpss$stability_paths,
+  type = "l", lty = 1, lwd = 2,
+  col = c(rep("red", 4), rep("black", p - 4)),
+  ylab = "Selection Proportions", xlab = bquote(tau),
+  main = "CPSS Stability Paths with Selection Threshold"
+)
 lines(cpss$tau, shahsam$pointwise_thresholds, type = "o", pch = 16)
 ```
 

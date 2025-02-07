@@ -44,20 +44,20 @@ which does not necessarily sit in the target space. The final projected vector $
 To first visualize what `monotoneQP` does, we specify a set of box constraints $b_L = 0.5$ and $b_U = 1.5$, and generate an example vector which does not obey those constraints and does not exhibit monotonicity.
 ```{r}
 # Set box constraints:
-lower = 0.5
-upper = 1.5
+lower <- 0.5
+upper <- 1.5
 
 # Generate example vector:
-m = 100
+m <- 100
 
 set.seed(31)
-y = rnorm(m, seq(0, 2, len = m), 0.1)
+y <- rnorm(m, seq(0, 2, len = m), 0.1)
 ```
 
 We next calculate the fitted vector...
 ```{r}
 # Calculate monotone, box-constrained projection:
-output = fastfrechet::monotoneQP(y, lower = 0.5, upper = 1.5)
+output <- fastfrechet::monotoneQP(y, lower = 0.5, upper = 1.5)
 ```
 which fits inside the box constraints...
 ```{r}
@@ -74,15 +74,19 @@ min(diff(output$Solution[1, ]))
 The original vector and the fitted vector are plotted together.
 ```{r, fig.width = 6.25, fig.height = 5}
 # Plot values of the generated vector:
-plot(y, main = "Monotone and Box Constrained", las = 1,
-     xlab = "Vector Entry", ylab = expression("y, "*hat("q")))
+plot(y,
+  main = "Monotone and Box Constrained", las = 1,
+  xlab = "Vector Entry", ylab = expression("y, " * hat("q"))
+)
 abline(h = c(lower, upper), lty = 2, col = "gray80")
 
 # Add values of monotone projection:
 points(output$Solution[1, ], pch = 20)
 
-legend("topleft", pch = c(1, 20), bty = "n",
-       legend = c("Unconstrained", "Monotone Constrained"))
+legend("topleft",
+  pch = c(1, 20), bty = "n",
+  legend = c("Unconstrained", "Monotone Constrained")
+)
 ```
 
 ## Algorithm

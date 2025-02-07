@@ -60,3 +60,7 @@ inst/doc
 # paper.md and paper.html
 paper.md
 paper.html
+
+# .DS_Store files
+R/.DS_Store
+tests/.DS_Store

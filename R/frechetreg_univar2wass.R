@@ -34,7 +34,7 @@
 #' This is the Fréchet regression problem, a weighted-mean and quadratic programming
 #' problem which this function solves with a customized dual active-set method
 #' inspired by \insertCite{arnstrom_dual_2022}{fastfrechet}.
-#' 
+#'
 #' Options include box constraints on distribution support, an option to evaluate
 #' quantile function estimates on a different set of covariate vectors than the
 #' "input" vectors, and an option to include an initial estimate of the active
@@ -42,7 +42,7 @@
 #' as well as the regularization used in the variable selection method of
 #' \insertCite{tucker_variable_2023}{fastfrechet} through the parameter `lambda`.
 #' By default, the function will perform non-regularized regression.
-#' 
+#'
 #' @return A (`n` \eqn{\times} `m`) matrix that is the unique solution to the Fréchet
 #' Regression problem for univariate distribution responses. The solution has rows
 #' that are monotone non-decreasing and bounded between the `lower` and `upper` arguments.
@@ -58,36 +58,40 @@
 #'
 #' @examples
 #' # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
-#' n = 100  # number of samples - nrow(X) and nrow(Y).
-#' p = 10   # number of covariates - ncol(X).
-#' m = 100  # EQF grid density - ncol(Y).
-#' mseq = seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
-#' 
+#' n <- 100 # number of samples - nrow(X) and nrow(Y).
+#' p <- 10 # number of covariates - ncol(X).
+#' m <- 100 # EQF grid density - ncol(Y).
+#' mseq <- seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
+#'
 #' set.seed(31)
-#' mydata = generate_zinbinom_qf(n = n, p = p, m = m)
-#' 
-#' X = mydata$X  # (n x p) matrix of covariates
-#' Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
-#' 
+#' mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
+#'
+#' X <- mydata$X # (n x p) matrix of covariates
+#' Y <- mydata$Y # (n x m) matrix of EQFs, stored row-wise
+#'
 #' # Estimate conditional QFs:
-#' output = frechetreg_univar2wass(X = X,
-#'                                 Y = Y,
-#'                                 Z = NULL,
-#'                                 C_init = NULL,
-#'                                 lambda = NULL,
-#'                                 lower = 0,
-#'                                 upper = Inf)
-#' 
+#' output <- frechetreg_univar2wass(
+#'   X = X,
+#'   Y = Y,
+#'   Z = NULL,
+#'   C_init = NULL,
+#'   lambda = NULL,
+#'   lower = 0,
+#'   upper = Inf
+#' )
+#'
 #' # Note: to numerical precision, these QFs are non-decreasing...
 #' min(apply(output$Qhat, 1, diff))
-#' 
+#'
 #' # ...and bounded from below by the lower bound, zero:
 #' min(output$Qhat)
-#' 
+#'
 #' # Plot the conditional QFs:
-#' plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(output$Qhat)),
-#'      main = "Fréchet Regression QFs", xlab = "p", ylab = "quantile")
-#' for(i in 1:n) lines(mseq, output$Qhat[i, ], lwd = 2)
+#' plot(
+#'   x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(output$Qhat)),
+#'   main = "Fréchet Regression QFs", xlab = "p", ylab = "quantile"
+#' )
+#' for (i in 1:n) lines(mseq, output$Qhat[i, ], lwd = 2)
 frechetreg_univar2wass <- function(X,
                                    Y,
                                    Z = NULL,
@@ -96,7 +100,6 @@ frechetreg_univar2wass <- function(X,
                                    lower = -Inf,
                                    upper = Inf,
                                    eps = 1e-10) {
-  
   # Compatibility and dimension checks:
 
   # Numeric matrix checks for X and Y, Z if provided:
@@ -107,14 +110,12 @@ frechetreg_univar2wass <- function(X,
   if (nrow(X) != nrow(Y)) stop("'X' and 'Y' must have the same number of rows.")
 
   # Numeric vector and dimension/constraint checks for lambda, if provided:
-  if (!is.null(lambda)){
-    
+  if (!is.null(lambda)) {
     check_numeric(lambda, "vector", finite = TRUE)
     if (ncol(X) != length(lambda)) stop("'lambda' must have the same length as 'X' has columns.")
     if (any(lambda < 0)) stop("'lambda' must have non-negative entries.")
-    
   }
-  
+
   # Numeric scalar check and compatibility checks for lower/upper:
   check_numeric(lower, "scalar", finite = FALSE)
   check_numeric(upper, "scalar", finite = FALSE)
@@ -126,35 +127,31 @@ frechetreg_univar2wass <- function(X,
 
   # Check for column matching between X and Z, if provided:
   if (!is.null(Z)) if (ncol(X) != ncol(Z)) stop("'X' and 'Z' must have the same number of columns.")
-  
+
   # Numeric check and conversion for optional C_init:
-  if(!is.null(C_init)){
-    
+  if (!is.null(C_init)) {
     # Check it is a numeric matrix; infinite entries (specifically +Inf) are OK
     check_numeric(C_init, "matrix", FALSE)
-    
+
     # Check for row-matching with X or Z, depending on whether Z is specified
-    if(is.null(Z)) if(nrow(C_init) != nrow(X)) stop("'X' and 'C_init' must have same number of rows, if 'Z' is not provided.")
-    if(!is.null(Z)) if(nrow(C_init) != nrow(Z)) stop("'Z' and 'C_init', if both provided, must have same number of rows.")
-    
+    if (is.null(Z)) if (nrow(C_init) != nrow(X)) stop("'X' and 'C_init' must have same number of rows, if 'Z' is not provided.")
+    if (!is.null(Z)) if (nrow(C_init) != nrow(Z)) stop("'Z' and 'C_init', if both provided, must have same number of rows.")
+
     # Check ncol(C_init) = ncol(Y) + 1
-    if(ncol(C_init) != (ncol(Y) + 1)) stop("'C_init' must have one more column than 'Y'.")
-    
+    if (ncol(C_init) != (ncol(Y) + 1)) stop("'C_init' must have one more column than 'Y'.")
+
     # Convert with sign operator
-    C_init = sign(C_init)
-    
+    C_init <- sign(C_init)
+
     # If there are negative entries, exit with error
-    if(min(C_init) < 0) stop("'C_init' must contain non-negative entries.")
-    
+    if (min(C_init) < 0) stop("'C_init' must contain non-negative entries.")
   } else {
-    
     # If not provided, initialize with zero-matrix, with appropriate nrow
-    C_init = if(is.null(Z)) matrix(0, nrow(X), ncol(Y) + 1) else matrix(0, nrow(Z), ncol(Y) + 1)
-    
+    C_init <- if (is.null(Z)) matrix(0, nrow(X), ncol(Y) + 1) else matrix(0, nrow(Z), ncol(Y) + 1)
   }
 
   # Check for monotonicity of Y values:
-  if (ncol(Y) > 1) if (min(Y[ , -1] - Y[ , -ncol(Y)]) < 0) stop("'Y' must be row-wise monotone non-decreasing.")
+  if (ncol(Y) > 1) if (min(Y[, -1] - Y[, -ncol(Y)]) < 0) stop("'Y' must be row-wise monotone non-decreasing.")
 
   # Check for box constraints on Y values:
   if ((max(Y) > upper) | (min(Y) < lower)) stop("'Y' must obey box constraints given by 'lower' and 'upper'.")
@@ -167,7 +164,7 @@ frechetreg_univar2wass <- function(X,
       output <- scaleXZ_cpp(X, Z, tol = 1e-10)
       Xc <- output$Xc
       Zc <- output$Zc
-      
+
       # Grab dimensions:
       n <- nrow(Xc)
       p <- ncol(Xc)
@@ -195,11 +192,13 @@ frechetreg_univar2wass <- function(X,
             error = function(e) {
               S <- svd(Xc)
               g <- which(S$d > 1e-10)
-              
+
               # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-              if(length(g) == 0) return(list(matrix(0, p, 1), matrix(0, 1, m)))
-              
-              return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g]^2)))
+              if (length(g) == 0) {
+                return(list(matrix(0, p, 1), matrix(0, 1, m)))
+              }
+
+              return(list(S$v[, g, drop = FALSE], crossprod(S$v[, g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g]^2)))
             }
           )
 
@@ -217,11 +216,13 @@ frechetreg_univar2wass <- function(X,
             error = function(e) {
               S <- svd(crossprod(Xc))
               g <- which(S$d > 1e-10)
-              
+
               # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-              if(length(g) == 0) return(matrix(0, p, m))
-              
-              return(list(S$v[ , g, drop = FALSE], crossprod(S$v[ , g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g])))
+              if (length(g) == 0) {
+                return(matrix(0, p, m))
+              }
+
+              return(list(S$v[, g, drop = FALSE], crossprod(S$v[, g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g])))
             }
           )
 
@@ -279,7 +280,7 @@ frechetreg_univar2wass <- function(X,
     } else {
       # Center and scale X matrix:
       Xc <- scaleX_cpp(X)
-      
+
       # Grab dimensions:
       n <- nrow(Xc)
       p <- ncol(Xc)
@@ -306,17 +307,13 @@ frechetreg_univar2wass <- function(X,
           # Immediately calculate SVD of Xc = USV':
           S <- svd(Xc)
           g <- which(S$d > 1e-10)
-          
+
           # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-          if (length(g) == 0){
-            
+          if (length(g) == 0) {
             M <- 0
-            
           } else {
-            
             # Evaluate UU'Y, ordering the multiplication based on n > m:
-            M <- if (n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
-            
+            M <- if (n > m) S$u[, g, drop = FALSE] %*% crossprod(S$u[, g, drop = FALSE], Y) else tcrossprod(S$u[, g, drop = FALSE]) %*% Y
           }
 
           # Calculate Yhat:
@@ -328,12 +325,14 @@ frechetreg_univar2wass <- function(X,
               # If inversion fails, calculate SVD of Xc = USV':
               S <- svd(Xc)
               g <- which(S$d > 1e-10)
-              
+
               # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-              if (length(g) == 0) return(0)
-              
+              if (length(g) == 0) {
+                return(0)
+              }
+
               # Evaluate UU'Y, ordering the multiplication based on n > m:
-              if (n > m) S$u[ , g, drop = FALSE] %*% crossprod(S$u[ , g, drop = FALSE], Y) else tcrossprod(S$u[ , g, drop = FALSE]) %*% Y
+              if (n > m) S$u[, g, drop = FALSE] %*% crossprod(S$u[, g, drop = FALSE], Y) else tcrossprod(S$u[, g, drop = FALSE]) %*% Y
             }
           )
 
@@ -391,7 +390,7 @@ frechetreg_univar2wass <- function(X,
     )
 
     # Calculate Qhat from stability optimality condition:
-    Qhat <- Yhat + (Eta[ , -ncol(Eta)] - Eta[ , -1])
+    Qhat <- Yhat + (Eta[, -ncol(Eta)] - Eta[, -1])
   }
 
   # Return Qhat value:

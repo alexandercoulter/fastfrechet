@@ -181,16 +181,14 @@ natively accept multiple $\tau$ inputs, we wrote a short wrapper function which
 loops over the $\tau$ values.
 ```
 # Centering and scaling X
-X0 = X - rep(1, n) %*% crossprod(rep(1 / n, n), X)
-X0 = X0 / (rep(1, n) %*% sqrt(crossprod(rep(1 / n, n), X0 * X0)))
+X0 = (scale(X) * sqrt(n / (n - 1)))[,]
 
 # Defining tau range:
 tauseq = seq(0.5, 10, 0.5)
 
 microbenchmark(FRiSO_univar2wass(X, Y, lower = 0, tauseq = tauseq,
                                  eps = 0.0075, nudge = 0.01),
-               FRiSO_tucker(X = X0, Y = Y, tauseq = tauseq, lower = 0,
-                            upper = 1000),
+               FRiSO_tucker(X0, Y, tauseq = tauseq, lower = 0, upper = 1000),
                times = 5)
 ```
 
@@ -208,7 +206,7 @@ $\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$, using warm starts.
 Optimization accuracy comparison; values below zero (grey dotted line)
 correspond to superior accuracy of `fastfrechet` method, and values
 above zero correspond to superior accuracy of old method.
-\label{fig:friso_comparison}](figures/friso_comparison.png){width="5.5in"}
+\label{fig:friso_comparison}](figures/friso_comparison.png){width="5.4in"}
 
 
 # Acknowledgements

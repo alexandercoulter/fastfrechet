@@ -206,7 +206,7 @@ $\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$, using warm starts.
 Optimization accuracy comparison; values below zero (grey dotted line)
 correspond to superior accuracy of `fastfrechet` method, and values
 above zero correspond to superior accuracy of old method.
-\label{fig:friso_comparison}](figures/friso_comparison.png){width="5.4in"}
+\label{fig:friso_comparison}](figures/friso_comparison.png){width="4.5in"}
 
 
 # Acknowledgements

@@ -26,3 +26,27 @@ test_that("monotoneQP output satisfies constraints", {
   expect_true(upper_bound_diff <= 0, 
               sprintf("The Solution violates the upper bound: max(Solution) - upper = %.5f", upper_bound_diff))
 })
+
+
+test_that("monotoneQP works with random active constraint estimate C_init", {
+  # Set parameters
+  lower <- 0.5
+  upper <- 1.5
+  
+  # Generate example vector
+  m <- 100
+  set.seed(31)
+  y <- rnorm(m, 2 * seq(0, 1, len = m), 0.1)
+  
+  # Generate random C_init matrix:
+  C_init = matrix(rbinom(m + 1, 1, 0.5), 1, m + 1)
+  
+  # Calculate monotone, box-constrained projection
+  output1 <- monotoneQP(y, lower = lower, upper = upper, C_init = C_init)
+  output2 <- monotoneQP(y, lower = lower, upper = upper, C_init = NULL)
+  
+  predicted_QF_diff = output1$Solution - output2$Solution
+  
+  expect_true(max(abs(predicted_QF_diff)) <= 1e-10, 
+              info = "QF values differ by C_init")
+})

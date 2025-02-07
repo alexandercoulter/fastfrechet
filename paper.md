@@ -9,7 +9,7 @@ tags:
 - Metric space
 - R
 - C++
-date: "07 February 2025"
+date: 7 February 2025
 output:
   html_document:
     df_print: paged
@@ -194,12 +194,12 @@ microbenchmark(FRiSO_univar2wass(X, Y, lower = 0, tauseq = tauseq,
 
 # Figures
 
-![**Figure 1**. Fréchet regression optimization accuracy and median solve time
+![Fréchet regression optimization accuracy and median solve time
 (of 5 iterations) on simulated zero-inflated negative binomial responses, zoomed
 in around zero. Departures $\widehat{\mathbf{q}}_i < 0$ are violations of lower
 bound.\label{fig:frechetreg_comparison}](figures/frechetreg_comparison.png){width="5.4in"}
 
-![**Figure 2**. Variable selection comparison between old method and new method
+![Variable selection comparison between old method and new method
 from `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. Each algorithm solves
 $\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$, using warm starts.
 (*left*) Variable selection solution paths and computation times. (*right*)

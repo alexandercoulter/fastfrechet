@@ -132,7 +132,7 @@ The R package `fastfrechet` provides a solver for the Fréchet regression proble
 for 2-Wasserstein space, with optional user-specified  `lower` and `upper` box constraints to enforce finite support on the underlying distributions. The implementation is a customization of the dual active-set method of @arnstrom_dual_2022 (see the
 accompanying `monotoneQP-fastfrechet` vignette). The resulting algorithm
 provides a fast and numerically exact solution to the Fréchet regression
-problem, illustrated in Figure \autoref{fig:frechetreg_comparison}. Since the
+problem, illustrated in \autoref{fig:frechetreg_comparison}. Since the
 `WRI` package requires strictly monotone inputs, we add a small adjustment to
 the response matrix when using `WRI`'s solver.
 ```
@@ -149,7 +149,7 @@ microbenchmark(WRI::wass_regress( ~ ., X_df, "quantile", Y_adj),
 ![**Figure 1**. Fréchet regression optimization accuracy and median solve time
 (of 5 iterations) on simulated zero-inflated negative binomial responses, zoomed
 in around zero. Departures $\widehat{\mathbf{q}}_i < 0$ are violations of lower
-bound.\label{fig:frechetreg_comparison}](figures/frechetreg_comparison.png){width="10in"}
+bound.\label{fig:frechetreg_comparison}](figures/frechetreg_comparison.png)
 
 ### The Variable Selection Problem
 
@@ -164,7 +164,7 @@ which implements a momentum-based geodesic gradient descent.
 
 The algorithm implemented by `fastfrechet` provides a fast and accurate solution
 to the variable selection problem, illustrated by comparison to the algorithm
-available from @tucker_variable_2023 (Supplementary Material) in Figure
+available from @tucker_variable_2023 (Supplementary Material) in 
 \autoref{fig:friso_comparison}. We use the same $\epsilon = 0.0075$ error
 tolerance for the `fastfrechet` method as @coulter_fast_2024, chosen to provide
 similar optimization accuracy so computation time comparisons are on
@@ -190,7 +190,7 @@ $\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$, using warm starts.
 Optimization accuracy comparison; values below zero (grey dotted line)
 correspond to superior accuracy of `fastfrechet` method, and values
 above zero correspond to superior accuracy of old method.
-\label{fig:friso_comparison}](figures/friso_comparison.png){width="8.343585in"}
+\label{fig:friso_comparison}](figures/friso_comparison.png)
 
 
 # Acknowledgements

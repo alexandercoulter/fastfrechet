@@ -197,11 +197,11 @@ test_that("works with sequence of tau's and a given lambda_init", {
                                impulse = 1)
   
   # Check all lambda values are non-negative:
-  expect_true(all(output >= 0), 
+  expect_true(all(output1 >= 0), 
               info = "lambda values violate non-negativity")
   
   # Check lambda vectors add to tauseq values:
-  expect_true(all(max(abs(colSums(output) - tauseq)) <= 1e-10), 
+  expect_true(all(max(abs(colSums(output1) - tauseq)) <= 1e-10), 
               info = "lambda values do not add to tau")
   
   # Check lambda vectors do not differ too much based on hyperparameters:

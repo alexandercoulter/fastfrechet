@@ -228,6 +228,56 @@ test_that("works with lambda", {
 })
 
 
+test_that("works with lambda and large p", {
+  # Parameters
+  lower <- 0   # Lower bound
+  upper <- 40  # Upper bound
+  
+  # Generate data
+  n <- 50
+  p <- 70
+  m <- 30
+  set.seed(31)
+  mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
+  
+  X <- mydata$X
+  Y <- mydata$Y
+  
+  Y[Y > upper] <- upper
+  
+  # Generate random lambda vector with \tau sum
+  tau <- 10
+  g <- rnorm(p)
+  g <- g / sqrt(sum(g * g))
+  lambda <- g * g * tau
+  
+  # Estimate conditional QFs
+  output <- frechetreg_univar2wass(X = X,
+                                   Y = Y,
+                                   Z = NULL,
+                                   C_init = NULL,
+                                   lambda = lambda,
+                                   lower = lower,
+                                   upper = upper)
+  
+  # Extract predicted QFs
+  predicted_QFs <- output$Qhat  # Assuming this contains (n x m) matrix of QFs
+  
+  # Check monotonicity for each row (QFs should be non-decreasing)
+  apply(predicted_QFs, 1, function(row) {
+    expect_true(all(diff(row) >= -1e-5), info = "QF row is not monotonic (non-decreasing)")
+  })
+  
+  # Check lower bound for each element
+  expect_true(all(predicted_QFs >= lower - 1e-5), 
+              info = "QF values violate the lower bound")
+  
+  # Check upper bound for each element
+  expect_true(all(predicted_QFs <= upper + 1e-5), 
+              info = "QF values violate the upper bound of 40")
+})
+
+
 test_that("works with lambda and Z", {
   # Parameters
   lower <- 0   # Lower bound
@@ -282,7 +332,7 @@ test_that("works with lambda and Z", {
 })
 
 
-test_that("works with lambda and large p", {
+test_that("works with lambda, Z, and large p", {
   # Parameters
   lower <- 0   # Lower bound
   upper <- 40  # Upper bound
@@ -305,10 +355,14 @@ test_that("works with lambda and large p", {
   g <- g / sqrt(sum(g * g))
   lambda <- g * g * tau
   
+  # Generate Z matrix
+  nz = 10
+  Z <- matrix(rnorm(nz * p), nz, p)
+  
   # Estimate conditional QFs
   output <- frechetreg_univar2wass(X = X,
                                    Y = Y,
-                                   Z = X,
+                                   Z = Z,
                                    C_init = NULL,
                                    lambda = lambda,
                                    lower = lower,

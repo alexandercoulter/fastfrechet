@@ -62,7 +62,7 @@ test_that("works with large p", {
   # Estimate conditional QFs
   output <- frechetreg_univar2wass(X = X,
                                    Y = Y,
-                                   Z = X,
+                                   Z = NULL,
                                    C_init = NULL,
                                    lambda = NULL,
                                    lower = lower,

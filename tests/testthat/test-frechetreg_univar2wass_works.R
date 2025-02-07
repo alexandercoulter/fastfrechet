@@ -225,7 +225,7 @@ test_that("works with nonsense C_init", {
   
   # Check L-infinity norm is bounded to high tolerance:
   expect_true(max(abs(predicted_QF_diff)) <= 1e-10, 
-              info = "QF values violate the lower bound")
+              info = "QF values differ by C_init")
 })
 
 

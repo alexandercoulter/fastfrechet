@@ -21,6 +21,14 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install Dependencies
+        run: |
+          install.packages("remotes")
+          remotes::install_github("alexandercoulter/fastfrechet", auth_token = Sys.getenv("GITHUB_PAT"), dependencies = TRUE)
+        shell: Rscript {0}
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run R Script
         run: Rscript scripts/rangeL.R  # Run your R script
 

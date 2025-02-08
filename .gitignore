@@ -65,3 +65,7 @@ paper.html
 R/.DS_Store
 tests/.DS_Store
 README_files/.DS_Store
+
+# scripts and output folder for Linux testing etc.
+/scripts/
+/output/

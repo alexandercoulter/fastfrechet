@@ -8,3 +8,5 @@
 ^README.Rmd$
 ^paper.md$
 ^paper.html$
+^scripts
+^output

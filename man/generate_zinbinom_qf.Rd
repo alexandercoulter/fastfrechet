@@ -7,19 +7,17 @@
 generate_zinbinom_qf(n, p, m, zero_inflation = 0.2, prob = 0.5, size = 10)
 }
 \arguments{
-\item{n}{A positive integer. Determines the number of
-rows in the covariate matrix.}
+\item{n}{A positive integer giving the sample size (i.e. rows in the covariate matrix and response matrix).}
 
-\item{p}{A positive integer greater than or equal to 4. Determines the number of
-columns in the covariate matrix.}
+\item{p}{A positive integer greater than or equal to 4 giving the number of covariates.}
 
-\item{m}{A positive integer.}
+\item{m}{A positive integer giving the grid density of the quantile functions in \eqn{(0, 1)}.}
 
-\item{zero_inflation}{A numeric value in the range \eqn{[0,1]}.}
+\item{zero_inflation}{A numeric value in the range \eqn{[0, 1]} giving the zero inflation parameter of the \code{zinbinom} distribution.}
 
-\item{prob}{A numeric value in the range \eqn{(0,1]}.}
+\item{prob}{A numeric scalar in the range \eqn{(0,1]} giving the probability parameter of the \code{nbinom} part.}
 
-\item{size}{A numeric value strictly greater than 0.}
+\item{size}{A positive numeric scalar giving the size parameter of the \code{nbinom} part.}
 }
 \value{
 A list object with components:
@@ -29,32 +27,34 @@ A list object with components:
 }
 }
 \description{
-This function generates random zero-inflated negative binomial (zinbinom)
+This function generates random zero-inflated negative binomial (\code{zinbinom})
 quantile functions, as functions of covariates \eqn{X_1}, \eqn{X_2}, \eqn{X_3}, and \eqn{X_4}.
-Quantile function matrix \eqn{Y} and covariate matrix \eqn{X} are generated as in Experiment B in
+Quantile function matrix \code{Y} and covariate matrix \code{X} are generated as in Experiment B in
 \insertCite{coulter_fast_2024}{fastfrechet}, and are evaluated on a common,
 equally spaced \code{m}-grid in \eqn{(0, 1)}. Options include number of samples
 (covariate vectors, and response quantile functions), number of total
 covariates (at least 4; generated iid from \eqn{N(0, 1)}), grid density \code{m},
-and baseline zinbinom parameters.
+and baseline \code{zinbinom} parameters.
 }
 \examples{
-n = 100  # number of samples - nrow(X) and nrow(Y).
-p = 10   # number of covariates - ncol(X).
-m = 100  # EQF grid density - ncol(Y).
-mseq = seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
+n <- 100 # number of samples - nrow(X) and nrow(Y).
+p <- 10 # number of covariates - ncol(X).
+m <- 100 # EQF grid density - ncol(Y).
+mseq <- seq(1 / (2 * m), 1 - 1 / (2 * m), length.out = m)
 
 set.seed(31)
-mydata = generate_zinbinom_qf(n = n, p = p, m = m)
+mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
 
-X = mydata$X  # (n x p) matrix of covariates
-Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+X <- mydata$X # (n x p) matrix of covariates
+Y <- mydata$Y # (n x m) matrix of EQFs, stored row-wise
 
 # Plot the EQFs:
-plot(x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Y)),
-     main = "Zero-Inflated Negative Binomial QFs",
-     xlab = "p", ylab = "quantile")
-for(i in 1:n) lines(mseq, Y[i, ], lwd = 2)
+plot(
+  x = c(), y = c(), xlim = c(0, 1), ylim = c(0, max(Y)),
+  main = "Zero-Inflated Negative Binomial QFs",
+  xlab = "p", ylab = "quantile"
+)
+for (i in 1:n) lines(mseq, Y[i, ], lwd = 2)
 }
 \references{
 \insertRef{coulter_fast_2024}{fastfrechet}

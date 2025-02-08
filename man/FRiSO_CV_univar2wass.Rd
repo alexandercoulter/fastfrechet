@@ -2,7 +2,7 @@
 % Please edit documentation in R/FRiSO_CV_univar2wass.R
 \name{FRiSO_CV_univar2wass}
 \alias{FRiSO_CV_univar2wass}
-\title{FRiSO_CV_univar2wass}
+\title{K-fold cross-validation (CV) for FRiSO, for univariate distributions with 2-Wasserstein metric}
 \usage{
 FRiSO_CV_univar2wass(X, Y, K = NULL, thresh = 1e-04, ...)
 }
@@ -16,7 +16,7 @@ Entries must obey user-specified box constraints given by \code{lower} and \code
 
 \item{thresh}{Positive scalar that determines the selection cutoff for the \code{lambda} vector in the variable selection problem.}
 
-\item{...}{other inputs to FRiSO see \code{\link[=FRiSO_univar2wass]{FRiSO_univar2wass()}}.}
+\item{...}{other inputs to \code{\link[=FRiSO_univar2wass]{FRiSO_univar2wass()}}.}
 }
 \value{
 A list object with components:
@@ -41,41 +41,45 @@ optimal \eqn{\tau} is also provided as part of the output list object.
 }
 \examples{
 # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
-n = 100  # number of samples - nrow(X) and nrow(Y).
-p = 10   # number of covariates - ncol(X).
-m = 50   # EQF grid density - ncol(Y).
-lower = 0
-upper = Inf
+n <- 100 # number of samples - nrow(X) and nrow(Y).
+p <- 10 # number of covariates - ncol(X).
+m <- 50 # EQF grid density - ncol(Y).
+lower <- 0
+upper <- Inf
 
 set.seed(31)
-mydata = generate_zinbinom_qf(n = n, p = p, m = m)
-X = mydata$X  # (n x p) matrix of covariates
-Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
+X <- mydata$X # (n x p) matrix of covariates
+Y <- mydata$Y # (n x m) matrix of EQFs, stored row-wise
 
-# Set cross-validation parameters
-K = 10
-thresh = 0.0001
-tauseq = seq(0.1, 20, 0.1)
-eps = 0.001
+# Set cross-validation and FRiSO parameters
+K <- 10
+thresh <- 0.0001
+tauseq <- seq(0.2, 20, 0.2)
+nudge <- 0.001
+eps <- 0.001
 
-# Run complementary pairs stability selection
-cv = FRiSO_CV_univar2wass(X = X,
-                          Y = Y,
-                          K = K,
-                          thresh = thresh,
-                          lower = lower,
-                          upper = upper,
-                          tauseq = tauseq,
-                          eps = eps)
+# Run cross-validation:
+cv <- FRiSO_CV_univar2wass(
+  X = X,
+  Y = Y,
+  K = K,
+  thresh = thresh,
+  lower = lower,
+  upper = upper,
+  tauseq = tauseq,
+  nudge = nudge,
+  eps = eps
+)
 
 # Plot errors per fold and average fold error:
-matplot(tauseq, cv$errors, type = 'l', lty = 1, main = "CV Fold Errors")
+matplot(tauseq, cv$errors, type = "l", lty = 1, main = "CV Fold Errors")
 lines(tauseq, cv$error_sum / K, lwd = 3)
 points(cv$opt_tau, min(cv$error_sum) / K, pch = 1, lwd = 2, cex = 1.5)
 
 # Identify which variables are selected in "optimal" model:
 cv$opt_selected
-
-# 1, 2, 3, 4, 8, 9
-# all correct variables 1-4, and 2 extra
+}
+\references{
+\insertRef{tucker_variable_2023}{fastfrechet}
 }

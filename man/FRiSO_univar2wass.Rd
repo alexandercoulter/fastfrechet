@@ -2,7 +2,7 @@
 % Please edit documentation in R/FRiSO_univar2wass.R
 \name{FRiSO_univar2wass}
 \alias{FRiSO_univar2wass}
-\title{Fréchet Ridge Selection Operator (FRiSO)}
+\title{Fréchet Ridge Selection Operator (FRiSO) for univariate distributions with 2-Wasserstein metric}
 \usage{
 FRiSO_univar2wass(
   X,
@@ -12,7 +12,7 @@ FRiSO_univar2wass(
   tauseq,
   lambda_init = NULL,
   eps = 1e-05,
-  nudge = 0,
+  nudge = 0.01,
   alpha = 0.9,
   max_iter = 1000,
   max_theta = pi/4,
@@ -29,33 +29,34 @@ Entries must obey user-specified box constraints given by \code{lower} and \code
 
 \item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint; must be strictly greater than \code{lower}.}
 
-\item{tauseq}{A numeric vector containing 'tau' values at
+\item{tauseq}{A numeric vector containing \eqn{\tau} values at
 which to solve FRiSO problem.}
 
 \item{lambda_init}{An optional \code{p}-long numeric vector giving the
-initial allowance vector' lambda for FRiSO algorithm (default \code{NULL});
-will be scaled to sit on tau-simplex for first entry of \code{tauseq}.}
+initial allowance vector \eqn{\pmb{lambda}_0(\tau)} for FRiSO algorithm (default \code{NULL});
+will be scaled to sit on \eqn{tau}-simplex for first entry of \code{tauseq}.}
 
-\item{eps}{A non-negative error tolerance parameter (default \code{1e-5}).}
+\item{eps}{A non-negative numeric scalar error tolerance (default \code{1e-5}).}
 
 \item{nudge}{A non-negative numeric scalar to offset warm starts to avoid
-spurious boundary values (default \code{0}).}
+spurious boundary values (default \code{0.01}).}
 
-\item{alpha}{A non-negative dampening parameter (default \code{0.9}).}
+\item{alpha}{A non-negative numeric scalar dampening parameter (default \code{0.9}).}
 
 \item{max_iter}{An integer giving the maximum number of iterations for the
 algorithm to run (default \code{1000}).}
 
-\item{max_theta}{A step-size scalar parameter no larger than \code{pi / 4}
+\item{max_theta}{A positive scalar step-size parameter no larger than \code{pi / 4}
 (default \code{pi / 4}).}
 
-\item{impulse}{A scalar between \code{0} and \code{1} which controls the "impulse" in
-gradient descent with momentum (default \code{1}). \code{impulse} equal to \code{1} means
-no momentum and \code{impulse <1} means with momentum.}
+\item{impulse}{A positive numeric scalar no larger than \code{1} which controls
+the "impulse" in gradient descent with momentum (default \code{1}). \code{impulse = 1}
+means no momentum, and \code{impulse < 1} means gradient descent with momentum. See details.}
 }
 \value{
 A (\code{p} \eqn{\times} \code{length(tauseq)}) matrix column-wise containing
-fitted 'allowance vectors' lambda per 'tau' in \code{tauseq}.
+fitted 'allowance vectors' \eqn{\widehat{\pmb{\lambda}}(\tau)} per \eqn{\tau}
+value in \code{tauseq}.
 }
 \description{
 This function calculates the Fréchet Ridge Selection Operator
@@ -70,38 +71,79 @@ is solved at each entry with warm starts; initial sparsity vector; box
 constraints; and gradient descent tuning parameters, including adjustable
 impulse parameter to utilize gradient descent with momentum.
 }
+\details{
+FRiSO performs variable selection for Fréchet regression, in this case for the
+space of univariate distributions \eqn{\Omega} equipped with the 2-Wasserstein
+metric \eqn{d_W}. FRiSO solves the optimization problem given by
+\deqn{\widehat{\pmb{\lambda}}(\tau) := \underset{\pmb{\lambda} \in \mathbb{R}^p}{\mathrm{argmin}} \sum_{i=1}^n d_W^2\left(\widehat{\mathbf{q}}(\mathbf{x}_i, \pmb{\lambda}), \: \mathbf{y}_i \right), \qquad \pmb{\lambda} \geq \pmb{0}, \quad \pmb{1}^{\top}\pmb{\lambda} = \tau,}
+which entails solving the embedded optimization problem
+\deqn{\widehat{\mathbf{q}}(\mathbf{x}_i,\pmb{\lambda}) := \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left( \frac{1}{n} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X} + \mathbf{D}_{\pmb{\lambda}}^{-1})^{-1}\mathbf{x}_j \right) d_W^2(\mathbf{q}, \: \mathbf{y}_j).}
+The final vector \eqn{\widehat{\pmb{\lambda}}(\tau)} has positive entries, which
+correspond to selected variables, and zero entries, which correspond to non-selected variables.
+Function options include user-specified simplex constraints in \code{tauseq},
+which can take a vector input (recommended increasing sequence to utilize warm
+starts); initial sparsity vector; box constraints; and gradient descent tuning parameters.
+
+The gradient descent algorithm performs rotational steps in the transformed
+space \deqn{S_{\sqrt{\tau}} := \left\{ \pmb{\gamma} : \lvert\pmb{\gamma}\rvert^2_2 = \tau \right\}}.
+Parameter \code{max_theta} is a step size parameter capping the angle of rotation.
+
+Parameter \code{nudge} "pushes" the previous solution toward the positive orthant
+during warm starts between \eqn{\tau} values, to avoid saddle points on the
+coordinate hyperplanes. It is recommended this value be a small positive number.
+
+Parameter \code{alpha} controls the dampening of the gradient descent algorithm.
+From experience, a mild dampening \code{alpha = 0.9} (the default) seems to perform
+better for most applications than non-damped gradient descent.
+
+Parameter \code{impulse} controls optional momentum functionality. Each gradient step,
+being a rotation, also identifies a tangential direction of movement around
+\eqn{S_{\sqrt{\tau}}}. Gradient steps can proceed using purely the local tangential
+gradient information; or can proceed as a convex combination of the local
+tangential gradient and the tangential motion of the previous step, called gradient
+descent with momentum. \code{impulse} can be thought of as the share of the convex
+combination attributed to the local tangential gradient, the "new force". The
+default \code{impulse = 1} implements non-momentum gradient descent, and the user
+can specify \verb{0 < impulse < 1} to implement gradient descent with momentum.
+}
 \examples{
 # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`
-n = 100  # number of samples - nrow(X) and nrow(Y).
-p = 10   # number of covariates - ncol(X).
-m = 100  # EQF grid density - ncol(Y).
+n <- 100 # number of samples - nrow(X) and nrow(Y).
+p <- 10 # number of covariates - ncol(X).
+m <- 100 # EQF grid density - ncol(Y).
 
 set.seed(31)
-mydata = generate_zinbinom_qf(n = n, p = p, m = m)
+mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
 
-X = mydata$X  # (n x p) matrix of covariates
-Y = mydata$Y  # (n x m) matrix of EQFs, stored row-wise
+X <- mydata$X # (n x p) matrix of covariates
+Y <- mydata$Y # (n x m) matrix of EQFs, stored row-wise
 
 # Dense grid of "allowance" totals:
-tauseq = seq(0.2, 20, 0.2)
+tauseq <- seq(0.2, 20, 0.2)
 
 # Generate estimated "allowance vector"s \lambda for each \tau, stored
 # column-wise in matrix `L`:
-L = FRiSO_univar2wass(X = X,
-                      Y = Y,
-                      lower = 0,
-                      upper = Inf,
-                      tauseq = tauseq,
-                      eps = 0.001,
-                      nudge = 0.001)
-                                 
+L <- FRiSO_univar2wass(
+  X = X,
+  Y = Y,
+  lower = 0,
+  upper = Inf,
+  tauseq = tauseq,
+  eps = 0.001,
+  nudge = 0.001
+)
+
 # Plot FRiSO "allowance vector" solution paths:
-plot(x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0, max(L)),
-     main = "FRiSO Selection Paths", xlab = expression(tau),
-     ylab = expression(lambda))
-for(k in 1:p) lines(tauseq, L[k, ], col = (k \%in\% 1:4) + 1, lwd = 2)
-legend("topleft", lwd = 2, col = 1:2, bty = "n",
-       legend = c("Unrelated variable", "Model variable"))
+plot(
+  x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0, max(L)),
+  main = "FRiSO Selection Paths", xlab = expression(tau),
+  ylab = expression(lambda)
+)
+for (k in 1:p) lines(tauseq, L[k, ], col = (k \%in\% 1:4) + 1, lwd = 2)
+legend("topleft",
+  lwd = 2, col = 1:2, bty = "n",
+  legend = c("Unrelated variable", "Model variable")
+)
 
 # Note that with this sample size, there is sufficient information to
 # correctly identify the first 4 variables significantly affect the QFs.

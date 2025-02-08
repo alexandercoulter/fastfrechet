@@ -60,20 +60,20 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
   int n = Y.n_rows;
   int m = Y.n_cols;
   int m1 = m + 1;
-  arma::vec y(m);
-  arma::vec d(m1);
+  arma::vec y(m, arma::fill::zeros);
+  arma::vec d(m1, arma::fill::zeros);
   
   // Initialize some variables
   double neps = -1 * eps;
-  arma::vec eta(m1);
-  arma::vec eta_old(m1);
-  arma::mat Eta(n, m1);
+  arma::vec eta(m1, arma::fill::zeros);
+  arma::vec eta_old(m1, arma::fill::zeros);
+  arma::mat Eta(n, m1, arma::fill::zeros);
   arma::uvec w;
   arma::uvec wc;
   arma::vec x;
-  arma::vec mu(m1);
+  arma::vec mu(m1, arma::fill::zeros);
   arma::vec mu_wc;
-  arma::vec p(m1);
+  arma::vec p(m1, arma::fill::zeros);
   arma::vec etap_ratio;
   arma::uvec inds;
   arma::vec a = arma::regspace(1, m) / arma::regspace(2, m1);
@@ -96,7 +96,7 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
     wc = find(C_init.row(k) == 0);
     
     // Calculate d
-    arma::vec d(m + 1);
+    arma::vec d(m + 1, arma::fill::zeros);
     std::copy(y.begin(), y.end(), d.begin());
     d(m) = upper;
     d(0) -= lower;
@@ -526,30 +526,30 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
   arma::uvec w;                        // vector for defining A0
   arma::colvec gamma_new = gamma_init; // gamma vector for looping
   arma::colvec gamma_old = gamma_init; // other gamma vector for looping
-  arma::colvec u(p);                   // normal vector for rotations
-  arma::colvec v(p);                   // tangent vector for rotations
-  arma::colvec sum_C(n);               // vector samples w/active constraints
-  arma::colvec dn(p);                  // diagonal of N matrix
-  arma::colvec grad(p);                // gradient vector
-  arma::colvec grad_tan(p);            // tangent component of gradient vector
+  arma::colvec u(p, arma::fill::zeros);                   // normal vector for rotations
+  arma::colvec v(p, arma::fill::zeros);                   // tangent vector for rotations
+  arma::colvec sum_C(n, arma::fill::zeros);               // vector samples w/active constraints
+  arma::colvec dn(p, arma::fill::zeros);                  // diagonal of N matrix
+  arma::colvec grad(p, arma::fill::zeros);                // gradient vector
+  arma::colvec grad_tan(p, arma::fill::zeros);            // tangent component of gradient vector
   arma::colvec L(n, arma::fill::value(lower)); // lower box constraint vector
   arma::colvec U(n, arma::fill::value(upper)); // upper box constraint vector
   
   // Set up matrices and vectors for function:
-  arma::mat Xn = X / sqrt(n); // scaled X matrix (i.e. tilX)
-  arma::mat Yt = Y.t();       // transposed Y (calculate once)
-  arma::mat Xnt = Xn.t();     // transposed scaled X matrix (calculate once)
-  arma::mat H(n, m + 1);      // Lagrange multiplier (capital Eta)
-  arma::mat C(n, m + 1);      // Active constraint matrix
-  arma::mat Yhat(n, m);       // unconstrained quantile (embedded) solution
-  arma::mat Q(n, m);          // constrained quantile (embedded) solution
-  arma::mat E(n, m);          // residuals matrix
-  arma::mat tilE(m, n);       // adjusted residuals matrix
-  arma::mat V(m, n);          // matrix for second derivative
-  arma::mat W(m, n);          // other matrix for second derivative
+  arma::mat Xn = X / sqrt(n);                    // scaled X matrix (i.e. tilX)
+  arma::mat Yt = Y.t();                          // transposed Y (calculate once)
+  arma::mat Xnt = Xn.t();                        // transposed scaled X matrix (calculate once)
+  arma::mat H(n, m + 1, arma::fill::zeros);      // Lagrange multiplier (capital Eta)
+  arma::mat C(n, m + 1, arma::fill::zeros);      // Active constraint matrix
+  arma::mat Yhat(n, m, arma::fill::zeros);       // unconstrained quantile (embedded) solution
+  arma::mat Q(n, m, arma::fill::zeros);          // constrained quantile (embedded) solution
+  arma::mat E(n, m, arma::fill::zeros);          // residuals matrix
+  arma::mat tilE(m, n, arma::fill::zeros);       // adjusted residuals matrix
+  arma::mat V(m, n, arma::fill::zeros);          // matrix for second derivative
+  arma::mat W(m, n, arma::fill::zeros);          // other matrix for second derivative
   
   // Set up objects to store outputs:
-  arma::mat GAMMA(p, tauseq.n_elem); // matrix to store all FRiSO solutions (as
+  arma::mat GAMMA(p, tauseq.n_elem, arma::fill::zeros); // matrix to store all FRiSO solutions (as
   // gammas)
   
   // Two routes depending on how p and n compare:
@@ -557,14 +557,14 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
     
     // Initialize for (p > 1.2 * n) case:
     arma::mat YbarY = arma::mat(n, 1, arma::fill::ones) * (arma::mat(1, n, arma::fill::value(1 / n)) * Y) + Y;
-    arma::mat Ginv(n, n);       // Xn D Xn' + I
-    arma::mat GX(n, p);         // solve(Xn D Xn' + I, Xn)
-    arma::mat GY(n, m);         // solve(Xn D Xn' + I, Y)
-    arma::mat XtG(p, n);        // solve(Xn D Xn' + I, Xn)'
-    arma::mat G_XnY_(n, p + m); // solve(Xn D Xn' + I, [Xn, Y])
-    arma::mat DuvXtG(p, n);     // solve(Xn D Xn' + I, Xn Du Dv)'
-    arma::mat YtGX(m, p);       // Y' solve(Xn D Xn' + I, Xn)
-    arma::mat XtGY(p, m);       // Xn' solve(Xn D Xn' + I, Y)
+    arma::mat Ginv(n, n, arma::fill::zeros);       // Xn D Xn' + I
+    arma::mat GX(n, p, arma::fill::zeros);         // solve(Xn D Xn' + I, Xn)
+    arma::mat GY(n, m, arma::fill::zeros);         // solve(Xn D Xn' + I, Y)
+    arma::mat XtG(p, n, arma::fill::zeros);        // solve(Xn D Xn' + I, Xn)'
+    arma::mat G_XnY_(n, p + m, arma::fill::zeros); // solve(Xn D Xn' + I, [Xn, Y])
+    arma::mat DuvXtG(p, n, arma::fill::zeros);     // solve(Xn D Xn' + I, Xn Du Dv)'
+    arma::mat YtGX(m, p, arma::fill::zeros);       // Y' solve(Xn D Xn' + I, Xn)
+    arma::mat XtGY(p, m, arma::fill::zeros);       // Xn' solve(Xn D Xn' + I, Y)
     
     // Loop through tau:
     for(int t = 0; t < n_tau; t++){
@@ -764,15 +764,15 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
     
     // Initialize for (p <= 1.2 * n) case:
     arma::mat Ybar = arma::mat(n, 1, arma::fill::ones) * (arma::mat(1, n, arma::fill::value(1 / n)) * Y);
-    arma::mat XtY = Xnt * Y;                      // Xn' Y
-    arma::mat XtXty = arma::join_rows(Xnt, XtY); // [Xn', Xn'Y]
-    arma::mat Sigma = Xnt * Xn;                   // Xn' Xn (estimated cov(X))
-    arma::mat Ftinv(p, p);                        // Sigma D + I
-    arma::mat FtXt(p, n);                         // solve(Sigma D + I, Xn')
-    arma::mat FtXtY(p, m);                        // solve(Sigma D + I, Xn' Y)
-    arma::mat Ft_XtXty_(p, n + m);                 // solve(Sigma D + I, [Xn', Xn' Y])
-    arma::mat DFtXtY(p, m);                       // D solve(Sigma D + I, Xn' Y)
-    arma::mat DuvFtXt(p, n);                      // Du Dv solve(Sigma D + I, Xn')
+    arma::mat XtY = Xnt * Y;                            // Xn' Y
+    arma::mat XtXty = arma::join_rows(Xnt, XtY);        // [Xn', Xn'Y]
+    arma::mat Sigma = Xnt * Xn;                         // Xn' Xn (estimated cov(X))
+    arma::mat Ftinv(p, p, arma::fill::zeros);           // Sigma D + I
+    arma::mat FtXt(p, n, arma::fill::zeros);            // solve(Sigma D + I, Xn')
+    arma::mat FtXtY(p, m, arma::fill::zeros);           // solve(Sigma D + I, Xn' Y)
+    arma::mat Ft_XtXty_(p, n + m, arma::fill::zeros);   // solve(Sigma D + I, [Xn', Xn' Y])
+    arma::mat DFtXtY(p, m, arma::fill::zeros);          // D solve(Sigma D + I, Xn' Y)
+    arma::mat DuvFtXt(p, n, arma::fill::zeros);         // Du Dv solve(Sigma D + I, Xn')
     
     // Loop through tau:
     for(int t = 0; t < n_tau; t++){

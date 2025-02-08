@@ -523,30 +523,30 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
   int n_tau = tauseq.n_elem; // number of tau values to evaluate at
   
   // Initialize common vectors for algorithm:
-  arma::uvec w;                        // vector for defining A0
-  arma::colvec gamma_new = gamma_init; // gamma vector for looping
-  arma::colvec gamma_old = gamma_init; // other gamma vector for looping
-  arma::colvec u(p, arma::fill::zeros);                   // normal vector for rotations
-  arma::colvec v(p, arma::fill::zeros);                   // tangent vector for rotations
-  arma::colvec sum_C(n, arma::fill::zeros);               // vector samples w/active constraints
-  arma::colvec dn(p, arma::fill::zeros);                  // diagonal of N matrix
-  arma::colvec grad(p, arma::fill::zeros);                // gradient vector
-  arma::colvec grad_tan(p, arma::fill::zeros);            // tangent component of gradient vector
-  arma::colvec L(n, arma::fill::value(lower)); // lower box constraint vector
-  arma::colvec U(n, arma::fill::value(upper)); // upper box constraint vector
+  arma::uvec w;                                 // vector for defining A0
+  arma::colvec gamma_new = gamma_init;          // gamma vector for looping
+  arma::colvec gamma_old = gamma_init;          // other gamma vector for looping
+  arma::colvec u(p, arma::fill::zeros);         // normal vector for rotations
+  arma::colvec v(p, arma::fill::zeros);         // tangent vector for rotations
+  arma::colvec sum_C(n, arma::fill::zeros);     // vector samples w/active constraints
+  arma::colvec dn(p, arma::fill::zeros);        // diagonal of N matrix
+  arma::colvec grad(p, arma::fill::zeros);      // gradient vector
+  arma::colvec grad_tan(p, arma::fill::zeros);  // tangent component of gradient vector
+  arma::colvec L(n, arma::fill::value(lower));  // lower box constraint vector
+  arma::colvec U(n, arma::fill::value(upper));  // upper box constraint vector
   
   // Set up matrices and vectors for function:
-  arma::mat Xn = X / sqrt(n);                    // scaled X matrix (i.e. tilX)
-  arma::mat Yt = Y.t();                          // transposed Y (calculate once)
-  arma::mat Xnt = Xn.t();                        // transposed scaled X matrix (calculate once)
-  arma::mat H(n, m + 1, arma::fill::zeros);      // Lagrange multiplier (capital Eta)
-  arma::mat C(n, m + 1, arma::fill::zeros);      // Active constraint matrix
-  arma::mat Yhat(n, m, arma::fill::zeros);       // unconstrained quantile (embedded) solution
-  arma::mat Q(n, m, arma::fill::zeros);          // constrained quantile (embedded) solution
-  arma::mat E(n, m, arma::fill::zeros);          // residuals matrix
-  arma::mat tilE(m, n, arma::fill::zeros);       // adjusted residuals matrix
-  arma::mat V(m, n, arma::fill::zeros);          // matrix for second derivative
-  arma::mat W(m, n, arma::fill::zeros);          // other matrix for second derivative
+  arma::mat Xn = X / sqrt(n);                   // scaled X matrix (i.e. tilX)
+  arma::mat Yt = Y.t();                         // transposed Y (calculate once)
+  arma::mat Xnt = Xn.t();                       // transposed scaled X matrix (calculate once)
+  arma::mat H(n, m + 1, arma::fill::zeros);     // Lagrange multiplier (capital Eta)
+  arma::mat C(n, m + 1, arma::fill::zeros);     // Active constraint matrix
+  arma::mat Yhat(n, m, arma::fill::zeros);      // unconstrained quantile (embedded) solution
+  arma::mat Q(n, m, arma::fill::zeros);         // constrained quantile (embedded) solution
+  arma::mat E(n, m, arma::fill::zeros);         // residuals matrix
+  arma::mat tilE(m, n, arma::fill::zeros);      // adjusted residuals matrix
+  arma::mat V(m, n, arma::fill::zeros);         // matrix for second derivative
+  arma::mat W(m, n, arma::fill::zeros);         // other matrix for second derivative
   
   // Set up objects to store outputs:
   arma::mat GAMMA(p, tauseq.n_elem, arma::fill::zeros); // matrix to store all FRiSO solutions (as
@@ -557,14 +557,14 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
     
     // Initialize for (p > 1.2 * n) case:
     arma::mat YbarY = arma::mat(n, 1, arma::fill::ones) * (arma::mat(1, n, arma::fill::value(1 / n)) * Y) + Y;
-    arma::mat Ginv(n, n, arma::fill::zeros);       // Xn D Xn' + I
-    arma::mat GX(n, p, arma::fill::zeros);         // solve(Xn D Xn' + I, Xn)
-    arma::mat GY(n, m, arma::fill::zeros);         // solve(Xn D Xn' + I, Y)
-    arma::mat XtG(p, n, arma::fill::zeros);        // solve(Xn D Xn' + I, Xn)'
-    arma::mat G_XnY_(n, p + m, arma::fill::zeros); // solve(Xn D Xn' + I, [Xn, Y])
-    arma::mat DuvXtG(p, n, arma::fill::zeros);     // solve(Xn D Xn' + I, Xn Du Dv)'
-    arma::mat YtGX(m, p, arma::fill::zeros);       // Y' solve(Xn D Xn' + I, Xn)
-    arma::mat XtGY(p, m, arma::fill::zeros);       // Xn' solve(Xn D Xn' + I, Y)
+    arma::mat Ginv(n, n, arma::fill::zeros);        // Xn D Xn' + I
+    arma::mat GX(n, p, arma::fill::zeros);          // solve(Xn D Xn' + I, Xn)
+    arma::mat GY(n, m, arma::fill::zeros);          // solve(Xn D Xn' + I, Y)
+    arma::mat XtG(p, n, arma::fill::zeros);         // solve(Xn D Xn' + I, Xn)'
+    arma::mat G_XnY_(n, p + m, arma::fill::zeros);  // solve(Xn D Xn' + I, [Xn, Y])
+    arma::mat DuvXtG(p, n, arma::fill::zeros);      // solve(Xn D Xn' + I, Xn Du Dv)'
+    arma::mat YtGX(m, p, arma::fill::zeros);        // Y' solve(Xn D Xn' + I, Xn)
+    arma::mat XtGY(p, m, arma::fill::zeros);        // Xn' solve(Xn D Xn' + I, Y)
     
     // Loop through tau:
     for(int t = 0; t < n_tau; t++){
@@ -621,14 +621,10 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
         // Residuals matrix:
         E = Q - Y;
         
-        ////////////////////////////////////////////////////////////////////////
-        // Step 1: Calculate YtGX:
-        // XtGY = Xnt * GY;
-        // YtGX = Y.t() * GX;
-        
-        // Step 3: Loop through i = {1 ... n} to calculate tilE:
+        // Loop through i = {1 ... n} to calculate tilE:
         tilE = E.t();
         if(sum(sum_C) == 0){}else{
+          
           for(int i = 0; i < n; i++){
             
             // If sum_C(i) is non-zero, we need to adjust this row of Eadj:
@@ -639,36 +635,38 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
             }
             
           }
+          
         }
         
-        // Step 4: Calculate dn:
+        // Calculate dn:
         dn = sum(XtG % (XtGY * tilE), 1);
         
-        // Step 4.25: Calculate gradient:
+        // Calculate gradient:
         grad = 4 * gamma_old % dn;
         
-        // Step 4.5: Calculate tangential gradient:
+        // Calculate tangential gradient:
         grad_tan = grad - u * arma::dot(u, grad);
         
-        // Step 4.75: Calculate v:
+        // Calculate v:
         normv = arma::norm(grad_tan);
         v = -grad_tan / normv;
         
-        // Step 5: Calculate GXDuDv.t():
+        // Calculate sub-matrix for V, W:
         DuvXtG = XtG;
         DuvXtG.each_col() %= (u % v);
         
-        // Step 6: Calculate V:
+        // Calculate V:
         V = XtGY.t() * DuvXtG;
         
-        // Step 7: Calculate W:
+        // Calculate W:
         W = V * (Xn * DuvXtG);
         
-        // Step 8: Calculate sum(W % tilE):
+        // Calculate sum(W % tilE):
         der2 = -16 * tau_sq * arma::accu(W % tilE);
         
-        // Step 9: Loop through i = {1 ... n} to calculate tilV and sum(V % tilV):
+        // Loop through i = {1 ... n} to calculate tilV and sum(V % tilV):
         if(sum(sum_C) == 0){}else{
+          
           for(int i = 0; i < n; i++){
             
             // If sum_C(i) is non-zero, we need to adjust this row of Eadj:
@@ -679,6 +677,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
             }
             
           }
+          
         }
         
         der2 += 8 * tau_sq * arma::accu(V % V);
@@ -706,10 +705,9 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
           
         }
         
-        if(false){ // without momentum:
+        if(impulse == 1){ // without momentum:
           
           // Rotate gamma_old:
-          // Rcout << theta << arma::endl;
           gamma_new = cos(theta) * gamma_old + sin(theta) * v * tau_root;
           gamma_new = gamma_new * tau_root / arma::norm(gamma_new);
           
@@ -730,7 +728,6 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
           theta = arma::norm(tc) / tau_root;
           
           // We now rotate gamma_old in the direction of tc by theta:
-          // Rcout << theta << arma::endl;
           gamma_new = cos(theta) * gamma_old + tc * (sin(theta) * tau_root / arma::norm(tc));
           gamma_new = gamma_new * tau_root / arma::norm(gamma_new);
           
@@ -756,7 +753,6 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
       
       // Set the solution for the current tau:
       GAMMA.col(t) = gamma_new;
-      // Rcout << j << arma::endl;
       
     }
     
@@ -764,15 +760,15 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
     
     // Initialize for (p <= 1.2 * n) case:
     arma::mat Ybar = arma::mat(n, 1, arma::fill::ones) * (arma::mat(1, n, arma::fill::value(1 / n)) * Y);
-    arma::mat XtY = Xnt * Y;                            // Xn' Y
-    arma::mat XtXty = arma::join_rows(Xnt, XtY);        // [Xn', Xn'Y]
-    arma::mat Sigma = Xnt * Xn;                         // Xn' Xn (estimated cov(X))
-    arma::mat Ftinv(p, p, arma::fill::zeros);           // Sigma D + I
-    arma::mat FtXt(p, n, arma::fill::zeros);            // solve(Sigma D + I, Xn')
-    arma::mat FtXtY(p, m, arma::fill::zeros);           // solve(Sigma D + I, Xn' Y)
-    arma::mat Ft_XtXty_(p, n + m, arma::fill::zeros);   // solve(Sigma D + I, [Xn', Xn' Y])
-    arma::mat DFtXtY(p, m, arma::fill::zeros);          // D solve(Sigma D + I, Xn' Y)
-    arma::mat DuvFtXt(p, n, arma::fill::zeros);         // Du Dv solve(Sigma D + I, Xn')
+    arma::mat XtY = Xnt * Y;                           // Xn' Y
+    arma::mat XtXty = arma::join_rows(Xnt, XtY);       // [Xn', Xn'Y]
+    arma::mat Sigma = Xnt * Xn;                        // Xn' Xn (estimated cov(X))
+    arma::mat Ftinv(p, p, arma::fill::zeros);          // Sigma D + I
+    arma::mat FtXt(p, n, arma::fill::zeros);           // solve(Sigma D + I, Xn')
+    arma::mat FtXtY(p, m, arma::fill::zeros);          // solve(Sigma D + I, Xn' Y)
+    arma::mat Ft_XtXty_(p, n + m, arma::fill::zeros);  // solve(Sigma D + I, [Xn', Xn' Y])
+    arma::mat DFtXtY(p, m, arma::fill::zeros);         // D solve(Sigma D + I, Xn' Y)
+    arma::mat DuvFtXt(p, n, arma::fill::zeros);        // Du Dv solve(Sigma D + I, Xn')
     
     // Loop through tau:
     for(int t = 0; t < n_tau; t++){
@@ -806,21 +802,14 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
         u = gamma_old / tau_root;
         
         ////////////////////////////////////////////////////////////////////////
-        // Step 1: Calculate FtXt:
+        // Calculate FtXt:
         Ftinv = Sigma;
         Ftinv.each_row() %= (gamma_old % gamma_old).t();
         Ftinv.diag() += 1;
         
-        // below: [p, p] [p, n + m]
         Ft_XtXty_ = arma::solve(Ftinv, XtXty, arma::solve_opts::fast);
         FtXt = Ft_XtXty_.head_cols(n);
         FtXtY = Ft_XtXty_.tail_cols(m);
-        // FtXt = arma::solve(Ftinv, Xnt, arma::solve_opts::fast);
-        
-        // XF = FtXt.t(), [n, p] [p, p]
-        
-        // Step 2: Calculate FtXtY:
-        // FtXtY = arma::solve(Ftinv, XtY, arma::solve_opts::fast);
         
         // Global solution:
         DFtXtY = FtXtY;
@@ -836,7 +825,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
         // Residuals matrix:
         E = Q - Y;
         
-        // Step 3: Loop through i = {1 ... n} to calculate tilE:
+        // Loop through i = {1 ... n} to calculate tilE:
         tilE = E.t();
         if(sum(sum_C) == 0){}else{
           for(int i = 0; i < n; i++){
@@ -849,36 +838,36 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
             }
             
           }
+          
         }
         
-        // Step 4: Calculate dn:
-        // [p, n] % ( [p, m] * [m, n] )
+        // Calculate dn:
         dn = sum(FtXt % (FtXtY * tilE), 1);
         
-        // Step 4.25: Calculate gradient:
+        // Calculate gradient:
         grad = 4 * gamma_old % dn;
         
-        // Step 4.5: Calculate tangential gradient:
+        // Calculate tangential gradient:
         grad_tan = grad - u * arma::dot(u, grad);
         
-        // Step 4.75: Calculate v:
+        // Calculate v:
         normv = arma::norm(grad_tan);
         v = -grad_tan / normv;
         
-        // Step 5: Calculate DuvFtXt:
+        // Calculate sub-matrices for V, W:
         DuvFtXt = FtXt;
         DuvFtXt.each_col() %= (u % v);
         
-        // Step 6: Calculate V:
+        // Calculate V:
         V = FtXtY.t() * DuvFtXt;
         
-        // Step 7: Calculate W:
+        // Calculate W:
         W = (V * Xn) * DuvFtXt;
         
-        // Step 8: Calculate sum(W % tilE):
+        // Calculate sum(W % tilE):
         der2 = -16 * tau_sq * arma::accu(W % tilE);
         
-        // Step 9: Loop through i = {1 ... n} to calculate tilV and sum(V % tilV):
+        // Loop through i = {1 ... n} to calculate tilV and sum(V % tilV):
         if(sum(sum_C) == 0){}else{
           for(int i = 0; i < n; i++){
             
@@ -890,6 +879,7 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
             }
             
           }
+          
         }
         
         der2 += 8 * tau_sq * arma::accu(V % V);
@@ -917,10 +907,9 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
           
         }
         
-        if(false){ // without momentum:
+        if(impulse == 1){ // without momentum:
           
           // Rotate gamma_old:
-          // Rcout << theta << arma::endl;
           gamma_new = cos(theta) * gamma_old + sin(theta) * v * tau_root;
           gamma_new = gamma_new * tau_root / arma::norm(gamma_new);
           
@@ -940,7 +929,6 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
           theta = arma::norm(tc) / tau_root;
           
           // We now rotate gamma_old in the direction of tc by theta:
-          // Rcout << theta << arma::endl;
           gamma_new = cos(theta) * gamma_old + tc * (sin(theta) * tau_root / arma::norm(tc));
           gamma_new = gamma_new * tau_root / arma::norm(gamma_new);
           
@@ -965,7 +953,6 @@ Rcpp::List FRiSO_GSD(const arma::mat& X,
       
       // Set the solution for the current tau:
       GAMMA.col(t) = gamma_new;
-      // Rcout << j << arma::endl;
       
     }
     

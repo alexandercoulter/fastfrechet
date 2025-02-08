@@ -34,8 +34,12 @@ L <- FRiSO_univar2wass(
   nudge = 0.01
 )
 
-# Calculate range of L
+# Calculate range of L:
 rangeL = range(L)
 
-write.csv(L, file = "L.csv")
-write.csv(rangeL, file = "rangeL.csv")
+# Create output directory:
+output_dir <- "output"
+if (!dir.exists(output_dir)) dir.create(output_dir)
+
+write.csv(L, file = file.path(output_dir, "L.csv"))
+write.csv(rangeL, file = file.path(output_dir, "rangeL.csv"))

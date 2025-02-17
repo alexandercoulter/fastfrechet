@@ -1,6 +1,6 @@
 ---
 title: 'fastfrechet: An R package for fast implementation of Fréchet regression with
-  distribution responses'
+  distributional responses'
 tags:
 - Fréchet regression
 - Variable selection
@@ -9,7 +9,7 @@ tags:
 - Metric space
 - R
 - C++
-date: 7 February 2025
+date: 15 February 2025
 output:
   html_document:
     df_print: paged
@@ -18,6 +18,7 @@ authors:
   orcid: "0009-0001-9116-6588"
   equal-contrib: yes
   affiliation: 1
+  corresponding: yes
 - name: Rebecca Lee
   orcid: "0000-0001-8162-6555"
   equal-contrib: yes
@@ -26,7 +27,6 @@ authors:
   orcid: "0000-0002-4116-0268"
   equal-contrib: yes
   affiliation: 2
-  corresponding: yes
 bibliography: inst/REFERENCES.bib
 affiliations:
 - name: Department of Statistics, Texas A&M University, United States
@@ -44,10 +44,10 @@ data sets are available, such as continuous glucose monitoring
 feature densities in CT scans [@petersen_wasserstein_2021].
 To accommodate the complex structure of such problems, @petersen_frechet_2019
 proposed a regression framework called *Fréchet regression* which allows
-constrained responses. This regression framework was further extended for
+non-Euclidean responses, including distributional responses. This regression framework was further extended for
 variable selection by @tucker_variable_2023, and @coulter_fast_2024 developed a
 fast variable selection algorithm for the specific setting of univariate
-distribution responses equipped with the 2-Wasserstein metric
+distributional responses equipped with the 2-Wasserstein metric
 (*2-Wasserstein space*). We present `fastfrechet`, an R package providing fast
 implementation of these Fréchet regression and variable selection methods in
 2-Wasserstein space, with resampling tools for automatic variable selection.
@@ -153,6 +153,7 @@ library(microbenchmark)
 X_df = as.data.frame(X)
 Y_adj = Y + matrix(seq(0, 0.01, len = m), n, m, byrow = TRUE)
 
+# Benchmark times (summaries in Figure 1)
 microbenchmark(WRI::wass_regress( ~ ., X_df, "quantile", Y_adj),
                frechet::GloDenReg(X, qin = Y, optns = list("lower" = 0)),
                frechetreg_univar2wass(X, Y, lower = 0),
@@ -161,24 +162,20 @@ microbenchmark(WRI::wass_regress( ~ ., X_df, "quantile", Y_adj),
 
 ### The Variable Selection Problem
 
-The R package `fastfrechet` solves the variable selection procedure proposed by
-@tucker_variable_2023 for Fréchet regression, specifically in 2-Wasserstein
-space. The implementation is a second-order geodesic gradient descent algorithm
-developed by @coulter_fast_2024, with two new modifications. First, the new
-implementation uses the custom dual active-set method discussed in the previous
-subsection, with warm starts. Second, the new implementation includes an option
-for the user to specify an impulse parameter for the gradient descent algorithm,
-which implements a momentum-based geodesic gradient descent.
+The R package `fastfrechet` implements variable selection for Fréchet regression, specifically in 2-Wasserstein space. Variable selection comprises finding an optimal weight vector $\widehat{\pmb{\lambda}}$ that satisfies a $\tau$-simplex constraint, for fixed hyperparameter $\tau > 0$; method exposition is provided by @tucker_variable_2023. `fastfrechet` implements the second-order geodesic gradient descent algorithm developed by
+@coulter_fast_2024, with two new modifications. First, the implementation uses
+the custom dual active-set method discussed in the previous subsection, with
+warm starts. Second, the implementation includes an option for the user to
+specify an impulse parameter, which implements momentum-based geodesic gradient
+descent.
 
 The algorithm implemented by `fastfrechet` provides a fast and accurate solution
-to the variable selection problem, illustrated by comparison to the algorithm
-available from @tucker_variable_2023 (Supplementary Material) in 
-\autoref{fig:friso_comparison}. We use the same $\epsilon = 0.0075$ error
-tolerance for the `fastfrechet` method as @coulter_fast_2024, chosen to provide
-similar optimization accuracy so computation time comparisons are on
-approximately equal footing. As existing code for the old method does not
-natively accept multiple $\tau$ inputs, we wrote a short wrapper function which
-loops over the $\tau$ values.
+to the variable selection problem, illustrated in \autoref{fig:friso_comparison}
+by optimization comparison to the algorithm available from @tucker_variable_2023 (Supplementary Material), over a sequence of $\tau$ hyperpamaters. As this previous algorithm does not natively accept multiple $\tau$ inputs, we wrote a short wrapper function
+that loops over $\tau$ and uses fitted $\widehat{\pmb{\lambda}}(\tau_i)$ as warm start for
+$\widehat{\pmb{\lambda}}(\tau_{i+1})$. We use $\epsilon = 0.0075$ error tolerance for the
+`fastfrechet` method to estimate each method's computation time to attain
+comparable optimization accuracy.
 ```
 # Centering and scaling X
 X0 = (scale(X) * sqrt(n / (n - 1)))[,]
@@ -186,6 +183,7 @@ X0 = (scale(X) * sqrt(n / (n - 1)))[,]
 # Defining tau range:
 tauseq = seq(0.5, 10, 0.5)
 
+# Benchmark times (summaries in Figure 2)
 microbenchmark(FRiSO_univar2wass(X, Y, lower = 0, tauseq = tauseq,
                                  eps = 0.0075, nudge = 0.01),
                FRiSO_tucker(X0, Y, tauseq = tauseq, lower = 0, upper = 1000),
@@ -196,16 +194,16 @@ microbenchmark(FRiSO_univar2wass(X, Y, lower = 0, tauseq = tauseq,
 
 ![Fréchet regression optimization accuracy and median solve time
 (of 5 iterations) on simulated zero-inflated negative binomial responses, zoomed
-in around zero. Departures $\widehat{\mathbf{q}}_i < 0$ are violations of lower
-bound.\label{fig:frechetreg_comparison}](figures/frechetreg_comparison.png){width="5.4in"}
+in around zero. Estimated quantile functions should be monotone non-decreasing,
+and non-negative for this distribution family. Only `frechet` and `fastfrechet`
+accept this lower bound constraint as an argument.\label{fig:frechetreg_comparison}](figures/frechetreg_comparison.png){width="5.4in"}
 
-![Variable selection comparison between old method and new method
-from `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. Each algorithm solves
-$\widehat{\pmb{\lambda}}(\tau)$ on increasing $\tau$, using warm starts.
-(*left*) Variable selection solution paths and computation times. (*right*)
-Optimization accuracy comparison; values below zero (grey dotted line)
-correspond to superior accuracy of `fastfrechet` method, and values
-above zero correspond to superior accuracy of old method.
+![Variable selection comparison between @tucker_variable_2023 algorithm and
+`fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. (*left*) Variable
+selection solution paths and computation times. (*right*) Optimization accuracy
+comparison; values below zero (grey dotted line) correspond to superior accuracy
+of `fastfrechet`, and values above zero correspond to superior accuracy
+of @tucker_variable_2023 algorithm.
 \label{fig:friso_comparison}](figures/friso_comparison.png){width="4.5in"}
 
 

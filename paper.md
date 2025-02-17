@@ -200,10 +200,9 @@ accept this lower bound constraint as an argument.\label{fig:frechetreg_comparis
 
 ![Variable selection comparison between @tucker_variable_2023 algorithm and
 `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. (*left*) Variable
-selection solution paths and computation times. (*right*) Optimization accuracy
-comparison; values below zero (grey dotted line) correspond to superior accuracy
-of `fastfrechet`, and values above zero correspond to superior accuracy
-of @tucker_variable_2023 algorithm.
+selection solution paths and computation times. (*right*) Relative objective
+function ratios at $\widehat{\pmb{\lambda}}(\tau)$ solutions; values below 1 (gray dashed
+line) indicate `fastfrechet` more effectively minimized the objective.
 \label{fig:friso_comparison}](figures/friso_comparison.png){width="4.5in"}
 
 

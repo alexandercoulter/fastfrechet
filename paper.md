@@ -16,16 +16,13 @@ output:
 authors:
 - name: Alexander Coulter
   orcid: "0009-0001-9116-6588"
-  equal-contrib: yes
   affiliation: 1
   corresponding: yes
 - name: Rebecca Lee
   orcid: "0000-0001-8162-6555"
-  equal-contrib: yes
   affiliation: 1
-- name: Dr. Irina Gaynanova
+- name: Irina Gaynanova
   orcid: "0000-0002-4116-0268"
-  equal-contrib: yes
   affiliation: 2
 bibliography: inst/REFERENCES.bib
 affiliations:
@@ -201,9 +198,9 @@ accept this lower bound constraint as an argument.\label{fig:frechetreg_comparis
 ![Variable selection comparison between @tucker_variable_2023 algorithm and
 `fastfrechet`, across $\tau = \{0.5, 1, \dots, 10\}$. (*left*) Variable
 selection solution paths and computation times. (*right*) Relative objective
-function ratios at $\widehat{\pmb{\lambda}}(\tau)$ solutions; values below 1 (gray dashed
-line) indicate `fastfrechet` more effectively minimized the objective.
-\label{fig:friso_comparison}](figures/friso_comparison.png){width="4.5in"}
+function ratios at $\widehat{\pmb{\lambda}}(\tau)$ solutions; values below 1
+(gray dashed line) indicate `fastfrechet` more effectively minimized the
+objective.\label{fig:friso_comparison}](figures/friso_comparison.png){width="4.5in"}
 
 
 # Acknowledgements

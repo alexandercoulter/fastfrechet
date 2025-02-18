@@ -26,6 +26,7 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     WRI,
-    frechet
+    frechet,
+    microbenchmark
 VignetteBuilder: knitr
 Config/testthat/edition: 3

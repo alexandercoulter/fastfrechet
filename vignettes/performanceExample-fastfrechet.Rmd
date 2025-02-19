@@ -24,6 +24,10 @@ library(frechet)
 library(microbenchmark)
 ```
 
+```{r, echo = FALSE}
+sapply(list.files(file.path("..", "inst", "private", "Tucker_Code"), full.names = TRUE), FUN = source)
+```
+
 # Purpose
 
 The purpose of this vignette is to provide step-by-step instructions for
@@ -43,7 +47,10 @@ The covariate-response objects we utilize for our comparisons are
 simulated covariate-dependent zero-inflated negative binomial distributions. The
 `fastfrechet` function `generate_zinbinom_qf` allows us to simulate $n$ such
 distributions, represented as quantile functions evaluated on a shared $m$-grid
-in $(0, 1)$, dependent on the first 4 of $p \geq 4$ covariates.
+in $(0, 1)$, dependent on the first 4 of $p \geq 4$ covariates. The example data
+set we generate for this vignette has sample size $n = 100$, covariate number
+$p = 10$, and quantile functions evaluated on an $m = 100$ equidistant grid in
+$(0, 1)$.
 ```{r}
 set.seed(31)
 n = 100          # number of quantile functions
@@ -59,28 +66,43 @@ mseq = seq(0.5 / m, 1 - 0.5 / m, length.out = m)
 matplot(mseq, t(Y), main = "Simulated ZINB Quantile Functions", type = "l")
 ```
 
-## The Fréchet Regression Problem
+# The Fréchet Regression Problem
 
-The (global) Fréchet mean problem in univariate 2-Wasserstein space is a
-weighted Fréchet mean problem, with solvers available in the `R` packages `WRI`
-(the `wass_regress` function) and `frechet` (the `GloDenReg` function). The
-resulting solutions are fitted distribution functions, with the most convenient
-representation being univariate quantile functions. The fitted quantile
-functions must be monotone non-decreasing, and should obey support constraints
-when those constraints are known. `fastfrechet` provides a solver which allows
-user-specified box constraints for support, and which very quickly obtains a
-numerically exact solution, based on the dual active-set methods of
+The (global) Fréchet regression problem in univariate 2-Wasserstein space is a
+weighted Fréchet mean problem, where inputs and outputs are discretized
+distribution functions. In this context, the most convenient distribution
+representation is the quantile function, which must be monotone non-decreasing
+and obey support constraints, when those are known. The R package `fastfrechet`
+implements a fast and numerically exact custom solver for Fréchet regression in
+2-Wasserstein space, inspired by the dual active-set method of
 @arnstrom_dual_2022 (see the accompanying `monotoneQP-fastfrechet` vignette).
+The function, `frechetreg_univar2wass`, permits user-specified box constraints,
+and is natively amenable to the weighting scheme used in the variable selection
+procedure described in the next section. It also solves the regression problem
+in the case the covariate matrix $\pmb{X}$ is low-rank.
 
-The implementation from the `WRI` package does not take user-specified support
-constraints as input, and requires the empirical distribution objects be
-strictly monotone increasing, which excludes the discretely supported
-distributions in our example. To include `WRI` in the comparisons, we add a
-small monotone adjustment to the simulated distributions. The implementation
-from `frechet` allows more flexible user inputs, but is a slower solver than both the `WRI`
-solver and the `fastfrechet` solver. We also observe the solution obtained from
-`fastfrechet` is the most accurate of the available methods. Computation time
-comparisons are made using the `microbenchmark` package.
+Fréchet regression implementations for 2-Wasserstein space are also available in
+the R packages `WRI` (the `wass_regress` function) and `frechet` (the
+`GloDenReg` function), as well as in the Supplementary Material of
+@tucker_variable_2023 (the `GloWassReg` function). The implementation from the
+`WRI` package can fit solutions in the low-rank setting, however it does not
+take user-specified support constraints as input. It also requires the empirical
+distribution objects be strictly monotone increasing, which excludes the
+discretely supported distributions in our example; to include `WRI` in our
+comparisons, we add a small monotone adjustment to the simulated distributions.
+The implementations from `frechet` and the Supplementary Material from
+@tucker_variable_2023 allow non-increasing distribution inputs and
+user-specified box constraints. However, neither method can solve the regression
+problem in the low-rank setting; the former is relatively slow, even for
+small $m$; and the latter is not currently available in an R package.
+
+## Computation Time Comparison
+
+We compare the four methods on time to solve the Fréchet regression problem for
+the example data set using the R package `microbenchmark`, iterating the
+solving procedure 5 times for each method. We can see the implementation from
+`fastfrechet` is the fastest of the four methods, up to $1000\times$ faster than
+methods currently available in R packages.
 
 ```{r}
 # WRI takes a data frame input:
@@ -92,6 +114,7 @@ Y_adj = Y + matrix(seq(0, 0.01, len = m), n, m, byrow = TRUE)
 # Benchmark times over 5 iterations:
 M = microbenchmark("WRI" = wass_regress( ~ ., X_df, "quantile", Y_adj),
                    "frechet" = GloDenReg(X, qin = Y, optns = list(lower = 0)),
+                   "Tucker" = GloWassReg(X, Y, X, lower = 0),
                    "fastfrechet" = frechetreg_univar2wass(X, Y, lower = 0),
                    times = 5,
                    unit = "ms")
@@ -100,9 +123,201 @@ M = microbenchmark("WRI" = wass_regress( ~ ., X_df, "quantile", Y_adj),
 cbind(summary(M)[ , 1], round(summary(M)[ , -1], 2))
 ```
 
+## Optimization Accuracy Comparison
 
+We compare the four methods on optimization accuracy for the Fréchet regression
+on the example data set. We can see the implementation from `WRI` does not obey
+known box constraints because the option to specify them is not available; the
+implementation from `frechet` violates the lower box constraint despite its
+explicit inclusion as an argument. The implementation from the Supplementary
+Material of @tucker_variable_2023 and the implementation from `fastfrechet` both
+solve the problem to numerical accuracy.
+```{r}
+# Fit quantile functions:
+WRI_Q = wass_regress( ~ ., X_df, "quantile", Y_adj)$Qfit
+frechet_Q = GloDenReg(X, qin = Y, optns = list(lower = 0))$qout
+Tucker_Q = GloWassReg(X, Y, X, lower = 0)
+fastfrechet_Q = frechetreg_univar2wass(X, Y, lower = 0)$Qhat
 
+# Plot quantile functions, focusing around zero:
+par(mfrow = c(2, 2), las = 1, mar = c(4.2, 4.5, 2, 0.7))
+matplot(mseq, t(WRI_Q), type = "l", col = 1, lty = 1,
+        ylim = c(-0.4, 0.4), xlab = "p", ylab = "Quantile", main = "WRI")
+abline(h = 0, lty = 2, col = "gray50")
+matplot(mseq, t(frechet_Q), type = "l", col = 1, lty = 1,
+        ylim = c(-0.4, 0.4), xlab = "p", ylab = "Quantile", main = "frechet")
+abline(h = 0, lty = 2, col = "gray50")
+matplot(mseq, t(Tucker_Q), type = "l", col = 1, lty = 1,
+        ylim = c(-0.4, 0.4), xlab = "p", ylab = "Quantile", main = "Tucker")
+abline(h = 0, lty = 2, col = "gray50")
+matplot(mseq, t(fastfrechet_Q), type = "l", col = 1, lty = 1,
+        ylim = c(-0.4, 0.4), xlab = "p", ylab = "Quantile", main = "fastfrechet")
+abline(h = 0, lty = 2, col = "gray50")
+```
 
+# The Variable Selection Problem
+
+The variable selection problem for Fréchet regression comprises finding an
+optimal weight vector $\widehat{\pmb{\lambda}} \in \mathbb{R}^p$ that satisfies
+a $\tau$-simplex constraint, for fixed hyperparameter $\tau > 0$. (See
+@tucker_variable_2023 for an exposition of the method.) Solving the variable
+selection problem involves iteratively solving a $\pmb{\lambda}$-weighted
+version of the associated Fréchet regression problem. The R package
+`fastfrechet` implements variable selection for Fréchet regression
+in 2-Wasserstein space, implementing the second-order geodesic gradient descent
+algorithm developed by @coulter_fast_2024. The function, `FRiSO_univar2wass`,
+includes two new modifications. First, `fastfrechet` utilizes the custom dual
+active-set method discussed in the previous subsection to solve the iterative
+$\pmb{\lambda}$-weighted Fréchet regression problem. For each step, as weight
+vector $\pmb{\lambda}^t \rightarrow \pmb{\lambda}^{t+1}$ is updated, the
+previously estimated Lagrangian for the Fréchet regression solution is used as a
+warm start for the subsequent iterate. Second, the implementation includes an
+option for the user to specify an impulse parameter, which implements
+momentum-based geodesic gradient descent.
+
+Existing implementation of variable selection for Fréchet regression is
+available in the Supplementary Material of @tucker_variable_2023 (the function
+`IndivRidgeGloWassReg`, which solves the $\pmb{\lambda}$-weighted Fréchet
+regression problem, and the function `lambdaGlobalcoordesc`, which performs the
+remaining variable selection algorithm steps). This implementation is a
+particular implementation of an algorithm which can be generally applied to
+Fréchet regression in other settings besides 2-Wasserstein space. However, it is
+slow and does not natively handle the low-rank setting, and is not currently
+available in an R package.
+
+## Computation Time Comparison
+
+We compare the two methods to solve the variable selection problem over a range
+of hyperparameter values $\tau \in \{0.5, 1.0, \cdots, 10.0\}$, iterating the
+solving procedure 5 times for each method. Since the implementation available
+from @tucker_variable_2023 does not natively take multiple $\tau$ values as
+input, we wrote a short wrapper function (given below) which loops over the
+$\tau$ values, and each step uses the previously fitted
+$\widehat{\pmb{\lambda}}$ vector as a warm start for the subsequent $\tau$
+iterate. We standardize the comparison to `fastfrechet` in two ways. First, as
+the implementation from `fastfrechet` centers and scales $\pmb{X}$ to remove the
+effect of unit choice on variable selection, we similarly center and scale
+$\pmb{X}$ prior to using the implementation from @tucker_variable_2023. Second,
+to ensure we compare methods on time to compute solutions of approximately equal
+accuracy, set the error tolerance parameter in the `fastfrechet` implementation
+to `varepsilon = 0.014` (chosen by trial and error for this example data set).
+
+We see the implementation from `fastfrechet` is upward of 20,000$\times$ faster
+than the implementation from @tucker_variable_2023.
+
+```{r}
+# Wrapper function for Tucker et al. (2023) code:
+FRiSO_Tucker = function(X, Y, lower, upper, tauseq){
+  
+  p = ncol(X)
+  Lambda = matrix(NA, nrow = p, ncol = length(tauseq))
+  L = rep(tauseq[1] / p, p)
+  for(t in 1:length(tauseq)){
+    
+    L = lambdaGlobalcoordesc(X, Y, tauseq[t], L, lower, upper)$lambda
+    Lambda[ , t] = L
+    
+  }
+  Lambda
+
+}
+
+# Centering and scaling X
+X0 = (scale(X) * sqrt(n / (n - 1)))[,]
+
+# Defining tau range:
+tauseq = seq(0.5, 10, by = 0.5)
+
+# Benchmark times over 5 iterations:
+M = microbenchmark("Tucker" = FRiSO_Tucker(X0, Y, 0, 1000, tauseq),
+                   "fastfrechet" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = 0.014),
+                   times = 5,
+                   unit = "ms")
+
+# Print times - milliseconds - rounding to 2 decimal places:
+cbind(summary(M)[ , 1], round(summary(M)[ , -1], 2))
+
+```
+
+## Optimization Accuracy Comparison
+
+We compare the two methods on optimization accuracy for the variable selection
+problem on the example data set, using relative objective function ratios. The
+optimal $\widehat{\pmb{\lambda}}$ minimizes an objective function (see the
+accompanying vignette `intro-fastfrechet`, and @tucker_variable_2023 and
+@coulter_fast_2024), so relative optimization accuracy can be measured by which
+solution attains a more minimal objective function. As stated in the previous
+subsection, the choice of $\varepsilon = 0.014$ gives comparable optimization
+accuracy to the "out of the box" implementation from @tucker_variable_2023 on
+this data set, so as to compare computation times in a more even way. We
+recommend setting smaller error tolerances in practice, and compare optimization
+accuracy across a range of `fastfrechet` error tolerances.
+```{r}
+# Set sequence of error tolerances:
+eps_seq = 0.014 / c(1, 2, 4, 8)
+
+# Calculate lambdas for fastfrechet implementation:
+L_fastfrechet = array(NA, dim = c(p, length(tauseq), 4))
+for(e in 1:4){
+  
+  L_fastfrechet[ , , e] = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eps_seq[e])
+  
+}
+
+# Calculate lambdas for Tucker et al. (2023) implementation:
+L_Tucker = FRiSO_Tucker(X0, Y, 0, 1000, tauseq)
+```
+
+Decreasing the error tolerance parameter results in increased computation time,
+however the comparative speed gains using the `fastfrechet` implementation
+continue to hold.
+```{r}
+# Benchmark times over 5 iterations:
+M = microbenchmark("fastfrechet" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eps_seq[4]),
+                   times = 5,
+                   unit = "ms")
+
+# Print times - milliseconds - rounding to 2 decimal places:
+cbind(summary(M)[ , 1], round(summary(M)[ , -1], 2))
+```
+
+Decreasing the error tolerance 
+```{r}
+# Calculate objective function values:
+f_fastfrechet = matrix(NA, length(tauseq), 4)
+f_Tucker = rep(NA, length(tauseq))
+
+for(t in 1:length(tauseq)){
+  
+  for(e in 1:4){
+    
+    # Fit quantile functions for fastfrechet lambdas:
+    Q = frechetreg_univar2wass(X, Y, lambda = L_fastfrechet[ , t, e], lower = 0)$Qhat
+    f_fastfrechet[t, e] = mean((Y - Q)^2)
+    
+  }
+  
+  # Fit quantile functions for Tucker et al. (2023) method:
+  Q = frechetreg_univar2wass(X, Y, lambda = L_Tucker[ , t], lower = 0)$Qhat
+  f_Tucker[t] = mean((Y - Q)^2)
+  
+}
+
+# Plot relative ratios:
+par(mar = c(4.5, 6, 0.7, 0.7), las = 1)
+plot(x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0.9999, 1.0001),
+     xlab = expression(tau), ylab = "")
+mtext(expression("f("*lambda*")"["fastfrechet"]*" / f("*lambda*")"[Tucker]), 2, 4.5, las = 0)
+abline(h = 1, col = "gray50", lty = 2)
+for(e in 1:4){
+  
+  points(tauseq, f_fastfrechet[ , e] / f_Tucker, type = "b",
+         pch = 14 + e, bg = e, col = e)
+  
+}
+legend("topleft", col = 1:4, pch = 15:18, lwd = 1, bty = "n",
+       legend = sapply(1:4, function(e) bquote(epsilon*" = "*.(eps_seq[e]))))
+```
 
 
 

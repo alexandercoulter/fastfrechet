@@ -10,3 +10,4 @@
 ^paper.html$
 ^scripts
 ^output
+^inst\private

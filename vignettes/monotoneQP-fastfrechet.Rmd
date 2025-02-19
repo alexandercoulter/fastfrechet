@@ -91,7 +91,7 @@ legend("topleft",
 
 ## Algorithm
 
-Solving for $\widehat{\mathbf{q}}$ is a quadratic programming (QP) problem, for which several approaches and solvers exist. We introduce a modification of the dual active-set method of Arnström et al. (2022, Algorithm 1) which utilizes the sparse structure of $\mathbf{A}$ to avoid costly matrix multiplication and $LDL^{\top}$ decomposition steps. This algorithm is implemented in *C++* as a sub-routine in `fastfrechet` functions solving Fréchet mean problems for 2-Wasserstein space, and is also made available as a standalone QP solver in the `monotoneQP` function.
+Solving for $\widehat{\mathbf{q}}$ is a quadratic programming (QP) problem, for which several approaches and solvers exist. We introduce a modification of the dual active-set method of @arnstrom_dual_2022 (Algorithm 1) which utilizes the sparse structure of $\mathbf{A}$ to avoid costly matrix multiplication and $LDL^{\top}$ decomposition steps. This algorithm is implemented in *C++* as a sub-routine in `fastfrechet` functions solving Fréchet mean problems for 2-Wasserstein space, and is also made available as a standalone QP solver in the `monotoneQP` function.
 
 ### Notation
 
@@ -143,7 +143,7 @@ and $\mathbf{exit} = \verb+false+$.
 
 ### Matrix Simplifications
 
-The implementation of the dual active-set method from @arnstrom_dual_2022  involves iterative updates of the $LDL^{\top}$ decomposition of the $\mathbf{A}_k^{\top}\mathbf{A}_k$ matrix. The form of $\mathbf{A}$ allows us to avoid these decompositions entirely, and represent the matrix operations $-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$ and $\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$ with a simpler set of subtraction operations. Further, in steps subsequent to 2(b) above, the result is invariant to any choice of $\mathbf{p}_k$ satisfying the two given equations. The upshot is the matrix $\mathbf{A}$ does not need to be stored, nor do expressions involving it or its sub-matrices need to be evaluated explicitly. We give a brief overview of each simplification, but omit the complete details.
+The implementation of the dual active-set method from @arnstrom_dual_2022 involves iterative updates of the $LDL^{\top}$ decomposition of the $\mathbf{A}_k^{\top}\mathbf{A}_k$ matrix. The form of $\mathbf{A}$ allows us to avoid these decompositions entirely, and represent the matrix operations $-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$ and $\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$ with a simpler set of subtraction operations. Further, in steps subsequent to 2(b) above, the result is invariant to any choice of $\mathbf{p}_k$ satisfying the two given equations. The upshot is the matrix $\mathbf{A}$ does not need to be stored, nor do expressions involving it or its sub-matrices need to be evaluated explicitly. We give a brief overview of each simplification, but omit the complete details.
 
 #### Evaluating $-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$
 

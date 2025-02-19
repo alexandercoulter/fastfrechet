@@ -1,0 +1,110 @@
+---
+title: "Performance Comparison Example to Accompany Manuscript"
+output: rmarkdown::html_vignette
+bibliography: '`r system.file("REFERENCES.bib", package="fastfrechet")`'
+vignette: >
+  %\VignetteIndexEntry{Performance Comparison Example to Accompany Manuscript}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r setup}
+library(fastfrechet)
+library(WRI)
+library(frechet)
+library(microbenchmark)
+```
+
+# Purpose
+
+The purpose of this vignette is to provide step-by-step instructions for
+replicating the performance comparisons in the manuscript introducing this
+package. We demonstrate superior computational speed and accuracy when compared
+to existing Fréchet regression algorithms (for 2-Wasserstein space) from the
+`WRI` package and the `frechet` package, and compared to existing variable
+selection functions provided in the supplementary material of
+@tucker_variable_2023, available for download at
+(`https://www.tandfonline.com/doi/abs/10.1080/01621459.2021.1969240`). (For a
+general illustration of what Fréchet regression and variable selection look like
+in 2-Wasserstein space, see the accompanying `intro-fastfrechet` vignette.)
+These latter functions are not available in package format; we assume the user
+has downloaded and sourced them into their active `R` session for use.
+
+The covariate-response objects we utilize for our comparisons are
+simulated covariate-dependent zero-inflated negative binomial distributions. The
+`fastfrechet` function `generate_zinbinom_qf` allows us to simulate $n$ such
+distributions, represented as quantile functions evaluated on a shared $m$-grid
+in $(0, 1)$, dependent on the first 4 of $p \geq 4$ covariates.
+```{r}
+set.seed(31)
+n = 100          # number of quantile functions
+p = 10           # number of covariates
+m = 100          # (0, 1) quantile functions grid density 
+
+gendata = generate_zinbinom_qf(n, p, m)
+X = gendata$X    # (n x p) covariate matrix
+Y = gendata$Y    # (n x m) quantile response matrix, stored row-wise
+
+# Illustrate distributions:
+mseq = seq(0.5 / m, 1 - 0.5 / m, length.out = m)
+matplot(mseq, t(Y), main = "Simulated ZINB Quantile Functions", type = "l")
+```
+
+## The Fréchet Regression Problem
+
+The (global) Fréchet mean problem in univariate 2-Wasserstein space is a
+weighted Fréchet mean problem, with solvers available in the `R` packages `WRI`
+(the `wass_regress` function) and `frechet` (the `GloDenReg` function). The
+resulting solutions are fitted distribution functions, with the most convenient
+representation being univariate quantile functions. The fitted quantile
+functions must be monotone non-decreasing, and should obey support constraints
+when those constraints are known. `fastfrechet` provides a solver which allows
+user-specified box constraints for support, and which very quickly obtains a
+numerically exact solution, based on the dual active-set methods of
+@arnstrom_dual_2022 (see the accompanying `monotoneQP-fastfrechet` vignette).
+
+The implementation from the `WRI` package does not take user-specified support
+constraints as input, and requires the empirical distribution objects be
+strictly monotone increasing, which excludes the discretely supported
+distributions in our example. To include `WRI` in the comparisons, we add a
+small monotone adjustment to the simulated distributions. The implementation
+from `frechet` allows more flexible user inputs, but is a slower solver than both the `WRI`
+solver and the `fastfrechet` solver. We also observe the solution obtained from
+`fastfrechet` is the most accurate of the available methods. Computation time
+comparisons are made using the `microbenchmark` package.
+
+```{r}
+# WRI takes a data frame input:
+X_df = as.data.frame(X)
+
+# Add small monotone adjustment to Y for WRI:
+Y_adj = Y + matrix(seq(0, 0.01, len = m), n, m, byrow = TRUE)
+
+# Benchmark times over 5 iterations:
+M = microbenchmark("WRI" = wass_regress( ~ ., X_df, "quantile", Y_adj),
+                   "frechet" = GloDenReg(X, qin = Y, optns = list(lower = 0)),
+                   "fastfrechet" = frechetreg_univar2wass(X, Y, lower = 0),
+                   times = 5,
+                   unit = "ms")
+
+# Print times - milliseconds - rounding to 2 decimal places:
+cbind(summary(M)[ , 1], round(summary(M)[ , -1], 2))
+```
+
+
+
+
+
+
+
+
+

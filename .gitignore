@@ -69,3 +69,6 @@ README_files/.DS_Store
 # scripts and output folder for Linux testing etc.
 /scripts/
 /output/
+
+# Code from Tucker et al. (2023):
+inst/private

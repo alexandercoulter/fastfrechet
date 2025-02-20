@@ -10,4 +10,4 @@
 ^paper.html$
 ^scripts
 ^output
-^inst\private
+^vignettes\private_code

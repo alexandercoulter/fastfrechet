@@ -114,10 +114,6 @@ mtext("Y(u)", 2, 1.5, cex = 1.2)
 mtext(expression("Response Quantile Functions "*bold("Y")), 3, 0, cex = 1.3)
 
 dev.off()
-
-file.copy("zinb_examples.png",
-          file.path(rprojroot::find_rstudio_root_file(), "inst", "private", "zinb_examples.png"),
-          overwrite = TRUE)
 ```
 
 ![](zinb_examples.png){width=100%}
@@ -310,10 +306,6 @@ text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
      pos = 2, xpd = TRUE, cex = 0.5)
 
 dev.off()
-
-file.copy("frechetreg_accuracy_comparison.png",
-          file.path(rprojroot::find_rstudio_root_file(), "inst", "private", "frechetreg_accuracy_comparison.png"),
-          overwrite = TRUE)
 ```
 
 ![](frechetreg_accuracy_comparison.png){width=100%}
@@ -561,10 +553,6 @@ legend("topleft", col = c("black", "#648FFF", "#FFB000", "#DC267F"),
        legend = sapply(1:4, function(e) bquote(epsilon*" = "*.(eseq[e])*" ("*.(round(median(M2$time[M2$expr == levels(M2$expr)[e + 1]])/1e6,1))*" ms)")))
 
 dev.off()
-
-file.copy("friso_accuracy_comparison.png",
-          file.path(rprojroot::find_rstudio_root_file(), "inst", "private", "friso_accuracy_comparison.png"),
-          overwrite = TRUE)
 ```
 
 ![](friso_accuracy_comparison.png){width=100%}

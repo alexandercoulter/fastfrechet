@@ -25,13 +25,13 @@ library(microbenchmark)
 ```
 
 ```{r load-code, include = FALSE}
-s = system.file("Tucker_code", "GlobalObj4h.R", package = "fastfrechet")
+s = system.file("private", "GlobalObj4h.R", package = "fastfrechet")
 if(file.exists(s)) source(s)
-s = system.file("Tucker_code", "GloWassReg.R", package = "fastfrechet")
+s = system.file("private", "GloWassReg.R", package = "fastfrechet")
 if(file.exists(s)) source(s)
-s = system.file("Tucker_code", "IndivRidgeGloWassReg.R", package = "fastfrechet")
+s = system.file("private", "IndivRidgeGloWassReg.R", package = "fastfrechet")
 if(file.exists(s)) source(s)
-s = system.file("Tucker_code", "lambdaGlobalcoordesc.R", package = "fastfrechet")
+s = system.file("private", "lambdaGlobalcoordesc.R", package = "fastfrechet")
 if(file.exists(s)) source(s)
 ```
 
@@ -181,7 +181,7 @@ M1
 
 ```{r, echo = FALSE}
 # Load times:
-s = system.file("doc", "microbenchmark_results.Rda", package = "fastfrechet")
+s = system.file("private", "microbenchmark_results.Rda", package = "fastfrechet")
 if(file.exists(s)) load(s)
 
 # Round frechetreg times:

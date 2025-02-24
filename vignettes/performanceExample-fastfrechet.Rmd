@@ -100,7 +100,7 @@ Y = gendata$Y  # (n x m) quantile response matrix, stored row-wise
 # Copy the image from vignettes/ (or wherever it's generated)
 png("zinb_examples.png", width = 6.5, height = 4, units = "in", res = 576)
 
-par(mai = c(0.55, 0.6, 0.08, 0.08))
+par(mai = c(0.55, 0.6, 0.3, 0.08))
 plot(x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(0, max(Y)), axes = FALSE,
      xlab = "", ylab = "")
 polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
@@ -109,8 +109,9 @@ abline(h = axTicks(2), v = axTicks(1), col = "white")
 matlines(mseq, t(Y), col = "black", lty = 1, lwd = 1.5)
 axis(1, NULL, TRUE, FALSE, -1.1, cex.axis = 0.9)
 axis(2, NULL, TRUE, FALSE, -0.9, las = 1, cex.axis = 0.9)
-mtext("p", 1, 1.4, cex = 1.2)
-mtext("Q(p)", 2, 1.5, cex = 1.2)
+mtext("u", 1, 1.4, cex = 1.2)
+mtext("Y(u)", 2, 1.5, cex = 1.2)
+mtext(expression("Response Quantile Functions "*bold("Y")), 3, 0, cex = 1.3)
 
 dev.off()
 
@@ -223,7 +224,7 @@ figs = cbind(c(0, 0.4 + a + 0.04, 0.4 + 2 * (a + 0.04), 0.4 + 3 * (a + 0.04)) / 
 
 png("frechetreg_accuracy_comparison.png", width = 6.5, height = 2.2, units = "in", res = 576)
 
-par(fig = figs[1, ], mai = mais[1, ])
+par(fig = figs[1, ], mai = mais[1, ], family = "Helvetica")
 plot(x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
      xlab = "", ylab = "")
 polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
@@ -233,13 +234,17 @@ abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(WRI_Q), col = "black", lty = 1, lwd = 1.5)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
 axis(2, NULL, TRUE, FALSE, -0.9, las = 1, cex.axis = 0.55)
-mtext("p", 1, 0.7, cex = 0.8)
-mtext("Q(p)", 2, 1.25, cex = 0.8)
-text(par("usr")[1] - 0.06, par("usr")[4] + 0.045,
+mtext("u", 1, 0.7, cex = 0.8)
+mtext(expression(widehat("Q")*"(u)"), 2, 1, cex = 0.8)
+text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
      "WRI", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[2] + 0.06, par("usr")[4] + 0.045,
+text(par("usr")[1] + 0.17, par("usr")[4] + 0.0235, col = 'gray40',
+     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
      sprintf("%.4f sec", median(M1$time[M1$expr == "WRI"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.6, font = 2)
+     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
+     pos = 2, xpd = TRUE, cex = 0.5)
 
 
 par(fig = figs[2, ], mai = mais[2, ], new = TRUE)
@@ -251,12 +256,16 @@ abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(frechet_Q), col = "black", lty = 1, lwd = 1.5)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
-mtext("p", 1, 0.7, cex = 0.8)
-text(par("usr")[1] - 0.06, par("usr")[4] + 0.045,
+mtext("u", 1, 0.7, cex = 0.8)
+text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
      "frechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[2] + 0.06, par("usr")[4] + 0.045,
+text(par("usr")[1] + 0.32, par("usr")[4] + 0.0235, col = 'gray40',
+     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
      sprintf("%.4f sec", median(M1$time[M1$expr == "frechet"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.6, font = 2)
+     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
+     pos = 2, xpd = TRUE, cex = 0.5)
 
 
 par(fig = figs[3, ], mai = mais[3, ], new = TRUE)
@@ -268,12 +277,16 @@ abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(Tucker_Q), col = "black", lty = 1, lwd = 1.5)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
-mtext("p", 1, 0.7, cex = 0.8)
-text(par("usr")[1] - 0.06, par("usr")[4] + 0.045,
+mtext("u", 1, 0.7, cex = 0.8)
+text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
      "Tucker", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[2] + 0.06, par("usr")[4] + 0.045,
+text(par("usr")[1] + 0.32, par("usr")[4] + 0.0235, col = 'gray40',
+     "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
      sprintf("%.4f sec", median(M1$time[M1$expr == "Tucker"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.6, font = 2)
+     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
+     pos = 2, xpd = TRUE, cex = 0.5)
 
 
 par(fig = figs[4, ], mai = mais[4, ], new = TRUE)
@@ -285,12 +298,16 @@ abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(fastfrechet_Q), col = "black", lty = 1, lwd = 1.5)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
-mtext("p", 1, 0.7, cex = 0.8)
-text(par("usr")[1] - 0.06, par("usr")[4] + 0.045,
+mtext("u", 1, 0.7, cex = 0.8)
+text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
      "fastfrechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[2] + 0.06, par("usr")[4] + 0.045,
+text(par("usr")[1] + 0.435, par("usr")[4] + 0.0235, col = 'gray40',
+     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
      sprintf("%.4f sec", median(M1$time[M1$expr == "fastfrechet"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.6, font = 2)
+     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
+     pos = 2, xpd = TRUE, cex = 0.5)
 
 dev.off()
 
@@ -424,10 +441,11 @@ problem on the example data set, using relative objective function ratios. The
 optimal $\widehat{\pmb{\lambda}}$ minimizes an objective function (see the
 accompanying vignette `intro-fastfrechet`, and @tucker_variable_2023 and
 @coulter_fast_2024), so relative optimization accuracy can be measured by which
-solution attains a more minimal objective function. For the `fastfrechet` error
+solution minimizes the objective function better. For the `fastfrechet` error
 tolerance of $\varepsilon = 0.014$, both methods attain comparably accurate
-solutions. As expected, the `fastfrechet` solutions are more accurate for
-smaller values of the error tolerance parameter.
+solutions. As expected, the `fastfrechet` solutions become more accurate as the
+error tolerance parameter decreases, with only modest increases in computation
+time.
 
 ```{r calculate-lambdas}
 # Set sequence of error tolerances:
@@ -463,25 +481,84 @@ f_Tucker = sapply(1:length(tauseq), function(t){
 
 })
 
+# 0.45 + 0.75 + 3a + 2(0.08) = 6.5
+a = (6.5 - 0.16 - 0.4 - 0.55) / 3
+mais = cbind(c(0.35, 0.35, 0.35),
+             c(0.4, 0.04, 0.55),
+             c(0.2, 0.2, 0.2),
+             c(0.04, 0, 0.08))
+figs = cbind(c(0, 0.4 + a + 0.04, 0.4 + a + 0.08 + a) / 6.5,
+             c(0.4 + a + 0.04, 0.4 + a + 0.08 + a, 6.5) / 6.5,
+             c(0, 0, 0),
+             c(1, 1, 1))
 # Save graph:
-png("friso_accuracy_comparison.png", width = 6.5, height = 4, units = "in", res = 576)
+png("friso_accuracy_comparison.png", width = 6.5, height = a + 0.35 + 0.2, units = "in", res = 576)
 
-par(mai = c(0.55, 0.75, 0.08, 0.08))
-plot(x = c(), y = c(), xlim = c(0, max(tauseq)), ylim = c(0.9999, 1.0001),
-     axes = FALSE, xlab = "", ylab = "")
+par(mai = mais[1, ], fig = figs[1, ], family = "Helvetica")
+plot(x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0, 4), axes = FALSE,
+     xlab = "", ylab = "")
+polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+        col = "gray93", border = NA)
+abline(h = axTicks(2), v = axTicks(1), col = "white")
+abline(h = 0, lty = 2, col = "gray50")
+matlines(tauseq, t(L_Tucker), col = "black", lty = 1)
+axis(1, NULL, TRUE, FALSE, -1.3, cex.axis = 0.55)
+axis(2, NULL, TRUE, FALSE, -0.9, las = 1, cex.axis = 0.55)
+mtext(expression(tau), 1, 0.7, cex = 0.8)
+mtext(expression(widehat(bold(lambda))*"("*tau*")"), 2, 0.65, cex = 0.8)
+text(par("usr")[1] - 0.6, par("usr")[4] + 0.15,
+     "Tucker", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
+text(par("usr")[1] + 2.3, par("usr")[4] + 0.1175, col = 'gray40',
+     "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+text(par("usr")[1] + 0.1, par("usr")[4] - 0.35, "median run time:",
+     pos = 4, xpd = TRUE, cex = 0.5)
+text(par("usr")[1] + 0.1, par("usr")[4] - 0.6,
+     sprintf("%.4f sec", median(M2$time[M2$expr == "Tucker"]) / 1e9),
+     pos = 4, xpd = TRUE, cex = 0.55, font = 2)
+
+
+
+par(mai = mais[2, ], fig = figs[2, ], new = TRUE)
+plot(x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0, 4), axes = FALSE,
+     xlab = "", ylab = "")
+polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+        col = "gray93", border = NA)
+abline(h = axTicks(2), v = axTicks(1), col = "white")
+abline(h = 0, lty = 2, col = "gray50")
+matlines(tauseq, t(L_fastfrechet[ , , 1]), col = "black", lty = 1)
+axis(1, NULL, TRUE, FALSE, -1.3, cex.axis = 0.55)
+mtext(expression(tau), 1, 0.7, cex = 0.8)
+text(par("usr")[1] - 0.6, par("usr")[4] + 0.15,
+     "fastfrechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
+text(par("usr")[1] + 3.7, par("usr")[4] + 0.1175, col = 'gray40',
+     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+text(par("usr")[1] + 0.1, par("usr")[4] - 0.35,
+     expression("median run time ("*epsilon*" = 0.014):"),
+     pos = 4, xpd = TRUE, cex = 0.5)
+text(par("usr")[1] + 0.1, par("usr")[4] - 0.6,
+     sprintf("%.4f sec", median(M2$time[M2$expr == "fastfrechet_e"]) / 1e9),
+     pos = 4, xpd = TRUE, cex = 0.55, font = 2)
+
+
+par(mai = mais[3, ], fig = figs[3, ], new = TRUE)
+plot(x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0.9999, 1.0001), axes = FALSE,
+     xlab = "", ylab = "")
 polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
         col = "gray93", border = NA)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 1, lty = 2, col = "gray50")
-matlines(tauseq, f_fastfrechet / f_Tucker, type = 'b', col = 1:4, lty = 1,
-         lwd = 1.5, pch = 15:18)
-axis(1, NULL, TRUE, FALSE, -1.1, cex.axis = 0.9)
+matlines(tauseq, f_fastfrechet / f_Tucker, type = 'o', lty = 1,
+         col = c("black", "#648FFF", "#FFB000", "#DC267F"),
+         lwd = 1, pch = 15:18, cex = c(0.5, 0.5, 0.5, 0.7))
+axis(1, NULL, TRUE, FALSE, -1.3, cex.axis = 0.55)
 axis(2, c(0.9999, 1, 1.0001),
-     c(expression("1 \U2013 10"^-4), expression("1.0"), expression("1 + 10"^-4)), FALSE, -0.9, las = 1, cex.axis = 0.9)
-mtext(expression(tau), 1, 1.4, cex = 1.2)
-mtext(expression("f("*bold(lambda)*")"["fastfrechet"]*" / f("*bold(lambda)*")"[Tucker]), 2, 2.4, las = 0)
-legend("topleft", col = 1:4, pch = 15:18, lwd = 1, bty = "n",
-       legend = sapply(1:4, function(e) bquote(epsilon*" = "*.(eseq[e]))))
+     c(expression("1 \U2013 10"^-4), expression("1.0"), expression("1 + 10"^-4)), FALSE, -0.9, las = 1, cex.axis = 0.55)
+mtext(expression(tau), 1, 0.7, cex = 0.8)
+mtext(expression("f("*bold(widehat(lambda))*")"["fastfrechet"]*" / f("*bold(widehat(lambda))*")"[Tucker]),
+      2, 1.3, las = 0, cex = 0.8)
+legend("topleft", col = c("black", "#648FFF", "#FFB000", "#DC267F"),
+       pch = 15:18, lwd = 1, bty = "n", cex = 0.52, pt.cex = c(0.5, 0.5, 0.5, 0.7),
+       legend = sapply(1:4, function(e) bquote(epsilon*" = "*.(eseq[e])*" ("*.(round(median(M2$time[M2$expr == levels(M2$expr)[e + 1]])/1e6,1))*" ms)")))
 
 dev.off()
 

@@ -200,8 +200,8 @@ accuracy with modest increases in computation time.
 # Figures
 
 ![Fitted Fréchet regression quantile functions (zoomed in around zero) and
-median solve times. Fitted quantile functions below zero violate known lower
-support constraints.\label{fig:frechetreg_comparison}](figures/frechetreg_accuracy_comparison.png){width=100%}
+median run times for `fastfrechet` and other implementations. Fitted quantile
+functions below zero violate known lower support constraints.\label{fig:frechetreg_comparison}](figures/frechetreg_accuracy_comparison.png){width=100%}
 
 ![(**left, center**) Variable selection solution paths
 $\widehat{\pmb{\lambda}}(\tau)$ across $\tau = \{0.5, 1, \dots, 10\}$ and median

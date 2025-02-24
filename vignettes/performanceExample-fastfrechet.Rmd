@@ -116,7 +116,7 @@ mtext(expression("Response Quantile Functions "*bold("Y")), 3, 0, cex = 1.3)
 dev.off()
 
 file.copy("zinb_examples.png",
-          file.path(rprojroot::find_rstudio_root_file(), "inst", "doc", "zinb_examples.png"),
+          file.path(rprojroot::find_rstudio_root_file(), "inst", "private", "zinb_examples.png"),
           overwrite = TRUE)
 ```
 
@@ -312,7 +312,7 @@ text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
 dev.off()
 
 file.copy("frechetreg_accuracy_comparison.png",
-          file.path(rprojroot::find_rstudio_root_file(), "inst", "doc", "frechetreg_accuracy_comparison.png"),
+          file.path(rprojroot::find_rstudio_root_file(), "inst", "private", "frechetreg_accuracy_comparison.png"),
           overwrite = TRUE)
 ```
 
@@ -563,7 +563,7 @@ legend("topleft", col = c("black", "#648FFF", "#FFB000", "#DC267F"),
 dev.off()
 
 file.copy("friso_accuracy_comparison.png",
-          file.path(rprojroot::find_rstudio_root_file(), "inst", "doc", "friso_accuracy_comparison.png"),
+          file.path(rprojroot::find_rstudio_root_file(), "inst", "private", "friso_accuracy_comparison.png"),
           overwrite = TRUE)
 ```
 

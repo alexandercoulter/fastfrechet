@@ -69,6 +69,3 @@ README_files/.DS_Store
 # scripts and output folder for Linux testing etc.
 /scripts/
 /output/
-
-# Private code files:
-inst/private

@@ -205,11 +205,11 @@ functions below zero violate known lower support constraints.\label{fig:frechetr
 
 ![(**left, center**) Variable selection solution paths
 $\widehat{\pmb{\lambda}}(\tau)$ across $\tau = \{0.5, 1, \dots, 10\}$ and median
-run times for `Tucker` materials and `fastfrechet`.
-(**right**) Relative optimization accuracy of `fastfrechet` and `Tucker`
-materials variable selection, and median `fastfrechet` run times, using
-different error tolerance values. Points below 1.0 indicate `fastfrechet`
-solutions minimize the objective function better.\label{fig:friso_comparison}](figures/friso_accuracy_comparison.png){width=100%}
+run times for `Tucker` materials and `fastfrechet`. (**right**) Relative
+optimization accuracy of `fastfrechet` and `Tucker` materials variable
+selection, and median `fastfrechet` run times, using different error tolerance
+values. Points below 1.0 indicate `fastfrechet` solutions minimize the objective
+function better.\label{fig:friso_comparison}](figures/friso_accuracy_comparison.png){width=100%}
 
 
 # Acknowledgements

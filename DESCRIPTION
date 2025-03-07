@@ -1,6 +1,6 @@
 Package: fastfrechet
 Title: Fast Implementation of Fréchet Regression and Related Functions
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: 
     c(person("Alexander", "Coulter", , "coultera@tamu.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0001-9116-6588")),

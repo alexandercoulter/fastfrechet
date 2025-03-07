@@ -43,7 +43,7 @@ implementations for solving these problems are available in other R package and
 non-package formats, but they are slow or provide inaccurate solutions in
 settings with common constraints. The purpose of this vignette is to provide
 performance comparisons (computation time, optimization accuracy) between
-`fastfrechet` and these othr implementations, using an example simulated data
+`fastfrechet` and these other implementations, using an example simulated data
 set. For a general illustration of what Fréchet regression and variable
 selection for distributional responses looks like, see the accompanying
 `intro-fastfrechet` vignette.

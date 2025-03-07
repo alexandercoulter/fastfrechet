@@ -135,7 +135,7 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
           
           if(Lw == 1){
             
-            if((w(0) == 0) || (w(0) == m)){
+            if((w(0) == 0) || (w(0) == static_cast<unsigned int>(m))){
               
               eta(w) = -d(w);
               
@@ -157,7 +157,7 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
                 
                 if(L == R){
                   
-                  if(w(L) == m){
+                  if(w(L) == static_cast<unsigned int>(m)){
                     
                     eta(w(L)) = -d(w(L));
                     
@@ -181,7 +181,7 @@ arma::mat monotoneQP_cpp(const arma::mat& Y,
                       
                     }
                     
-                  }else if(w(R) == m){
+                  }else if(w(R) == static_cast<unsigned int>(m)){
                     
                     x.set_size(LR + 1);
                     x.zeros();
@@ -437,7 +437,7 @@ arma::colvec projA0(const arma::colvec& v,
         ij = arma::regspace<arma::uvec>(i, j);
         x(w(ij)) = v(w(ij));
         
-      }else if(w(j) == m){
+      }else if(w(j) == static_cast<unsigned int>(m)){
         
         ij = arma::regspace<arma::uvec>(i, j);
         x(w(ij) - 1) = v(w(ij) - 1);

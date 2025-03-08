@@ -60,12 +60,11 @@ software package, available only through the Supplementary Material of
 @tucker_variable_2023 (hereafter "`Tucker` materials"). As discussed in
 @coulter_fast_2024, the implemented algorithm is prohibitively slow.
 Implementation of Fréchet regression in 2-Wasserstein space without variable
-selection is supported by the `Tucker` materials, and by two R packages: `WRI`
-and `frechet`. These packages face certain practical limitations. For instance,
-`WRI` requires continuous distributions, and does not allow user-specified
-constraints for the distribution support. `frechet` offers more flexibility in
-user specifications, but its solver for Fréchet regression is slow and may not
-accurately satisfy constraints.
+selection is supported by the `Tucker` materials, and by two R packages: `WRI` [@liu_wri_2022] and `frechet` [chen_frechet_2023]. These packages face certain
+practical limitations. For instance, `WRI` requires continuous distributions,
+and does not allow user-specified constraints for the distribution support.
+`frechet` offers more flexibility in user specifications, but its solver for
+Fréchet regression is slow and may not accurately satisfy constraints.
 
 The `fastfrechet` package addresses these limitations by providing a fast,
 scalable, and user-friendly implementation of both Fréchet regression and

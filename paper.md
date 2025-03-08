@@ -9,7 +9,7 @@ tags:
 - Metric space
 - R
 - C++
-date: 24 February 2025
+date: 07 March 2025
 output:
   html_document:
     df_print: paged

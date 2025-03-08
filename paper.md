@@ -87,11 +87,11 @@ function `generate_zinbinom_qf` simulates $n$ zero-inflated negative binomial
 (**zinbinom**) distributions (we choose $n = 100$), represented as quantile
 functions evaluated on a shared $m$-grid in $(0, 1)$ (we choose $m = 100$), and
 dependent on the first 4 of $p \geq 4$ covariates (we choose $p = 10$). We
-utilize the R package `microbenchmark` to calculate run times, and report median
-times for each method (Fréchet regression, variable selection) from 15
-iterations; all computations were performed on an Apple M1 Max chip. To
-replicate the specific simulation and comparison settings used in this
-manuscript, see the accompanying `performanceExample-fastfrechet` vignette.
+utilize the R package `microbenchmark` [@mersmann_microbenchmark_2024] to
+calculate run times, and report median times for each method (Fréchet
+regression, variable selection) from 15 iterations; all computations were
+performed on an Apple M1 Max chip. To replicate the specific simulation and
+comparison settings used in this manuscript, see the accompanying `performanceExample-fastfrechet` vignette.
 
 ### The Fréchet Regression Problem
 

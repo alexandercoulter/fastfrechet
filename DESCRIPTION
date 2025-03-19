@@ -28,5 +28,7 @@ Suggests:
     WRI,
     frechet,
     microbenchmark
+Depends:
+    R (>= 4.3.0),
 VignetteBuilder: knitr
 Config/testthat/edition: 3

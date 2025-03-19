@@ -8,7 +8,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r knitr-options, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -53,7 +53,7 @@ The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-depen
 
 `generate_zinbinom_qf` also optionally takes "baseline" parameters of the `zinbinom` distribution, namely, the zero-inflation factor, and the probability and size parameters of the `nbinom` component. As output, `generate_zinbinom_qf` returns a list containing the `n` $\times$ `p` covariate matrix `X`; and the `n` $\times$ `m` response matrix `Y`, which stores the quantile functions row-wise.
 
-```{r}
+```{r generate-data}
 n <- 200 # number of samples - nrow(X) and nrow(Y).
 p <- 20 # number of covariates - ncol(X).
 m <- 200 # quantile function grid density - ncol(Y).
@@ -75,7 +75,7 @@ Y <- mydata$Y # (n x m) matrix of quantile functions, stored row-wise
 
 We illustrate these quantile function responses with line plots. Note the true functions are piece-wise constant, where the line plots interpolate between points on the observed `m`-grid.
 
-```{r}
+```{r plot-EQFs}
 matplot(mseq, t(Y),
   xlim = c(0, 1), ylim = range(Y), type = "l", lty = 1, col = 1,
   main = "znbinom Quantile Functions", xlab = "p", ylab = "quantile"
@@ -104,7 +104,7 @@ The `frechetreg_univar2wass` function from `fastfrechet` takes as input
 
 Since the `zinbinom` distribution is bounded from below by zero, we set `lower = 0`, and use default settings for other parameters. As output, `frechetreg_univar2wass` returns a list containing the set of fitted quantile functions `Qhat`, stored row-wise as in `Y`; and the `n` $\times$ `m+1` matrix of Lagrange multipliers associated with the solution, also stored row-wise.
 
-```{r}
+```{r run-frechetreg}
 lower <- 0
 upper <- Inf
 # Estimate conditional quantile functions:
@@ -130,7 +130,7 @@ min(output$Qhat)
 
 The Fréchet means associated with the Fréchet regression problem $\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise, the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function constraints of monotonicity or box constraints, whereas the solution $\widehat{\mathbf{Q}}$ does. We recover the unconstrained matrix `Yhat` from the output of `frechetreg_univar2wass`, and illustrate it side-by-side the fitted $\widehat{\mathbf{Q}}$.
 
-```{r, fig.width = 8, fig.height = 5.5}
+```{r plot-unconstrained-constrained, fig.width = 8, fig.height = 5.5}
 # Plot the unconstrained estimators and the constrained conditional quantile functions:
 Yhat <- output$Qhat - output$Lagrange_Multiplier[, -(m + 1)] + output$Lagrange_Multiplier[, -1]
 par(mfrow = c(1, 2), las = 1)
@@ -169,7 +169,7 @@ The `FRiSO_univar2wass` function from `fastfrechet` takes as input
 
 In this illustrative example, we evaluate the variable selection problem on a dense grid `tauseq = seq(0.2, 20, 0.2)`, and set `eps = 0.001` and `nudge = 0.01`. Other optional parameters allow the user to control the gradient descent algorithm, including dampening, step size, momentum, and maximum number of iterations; the help page has more details. `FRiSO_univar2wass` returns a matrix of fitted $\widehat{\pmb{\lambda}}$ values, stored column-wise, one column for each value in `tauseq`.
 
-```{r}
+```{r run-friso}
 # Dense grid of "allowance" totals:
 tauseq <- seq(0.2, 20, 0.2)
 
@@ -192,7 +192,7 @@ L <- FRiSO_univar2wass(
 
 As functions of $\tau$, the fitted $\widehat{\pmb{\lambda}}$ values trace out "solution paths" that we illustrate with line plots. Each line path corresponds to a covariate: if the line is above zero, that covariate is selected, and if it is equal to zero, that covariate is not selected. We illustrate the solution paths of the first four covariates, on which the simulated quantile functions depend, with red lines. The other covariates are illustrated with black lines.
 
-```{r}                             
+```{r plot-friso}                             
 # Plot FRiSO "allowance vector" solution paths:
 matplot(tauseq, t(L),
   type = "l", col = c(rep("red", 4), rep("black", p - 4)),
@@ -233,7 +233,7 @@ The `FRiSO_CV_univar2wass` function from `fastfrechet` takes as input
 
 In this example, we use 10-fold CV, and set a selection threshold of `thresh = 0.0001`.
 
-```{r}
+```{r run-cv}
 # Set cross-validation parameters
 K <- 10
 thresh <- 0.0001
@@ -256,7 +256,7 @@ cv <- FRiSO_CV_univar2wass(
 
 We plot the CV errors in each fold, along with the average CV error across `tauseq`. This lets us see for which $\tau$ value the minimum CV error occurs. We also can print the indices of the variables selected by the model fit with this optimal $\tau$.
 
-```{r}
+```{r plot-cv}
 # Plot errors per fold and average fold error:
 matplot(tauseq, cv$errors, type = "l", lty = 1, main = "Cross-Validation Fold Errors")
 lines(tauseq, cv$error_sum / K, lwd = 3)
@@ -291,7 +291,7 @@ The `FRiSO_CPSS_univar2wass` function from `fastfrechet` is used analogously as 
 
 In this example, we use `B = 50`  data half-splits, and evaluate CPSS on a coarser $\tau$ grid, `tauseq = 1:10`.
 
-```{r}
+```{r run-cpss}
 # Set complementary pairs stability selection parameters
 B <- 50
 thresh <- 0.0001
@@ -315,7 +315,7 @@ cpss <- FRiSO_CPSS_univar2wass(
 
 We plot the CPSS "stability path" for each variable, which is the empirical proportion of split halves ($2B=100$ total) the variable is selected by FRiSO. This lets us see which variables are most frequently selected.
 
-```{r}
+```{r plot-cpss}
 # Plot stability paths:
 matplot(cpss$tau, cpss$stability_paths,
   type = "l", lty = 1, lwd = 2,
@@ -345,7 +345,7 @@ As output, `Shah_Samworth_thresholds` returns a list containing
 
 As the threshold is a function of model size, and hence a function of $\tau$, a final variable set could be selected from those variables whose "stability paths" exceed the "threshold path". We set the error control at `E_thr = 1`, that is, pointwise the expected number of LSP variables is bounded above by 1.
 
-```{r}
+```{r run-shah_samworth}
 # Calculate thresholds using Shah and Samworth (2013) method:
 shahsam <- Shah_Samworth_thresholds(
   p = p,
@@ -365,6 +365,6 @@ lines(cpss$tau, shahsam$pointwise_thresholds, type = "o", pch = 16)
 ```
 
 The "stability path" of each of the four true model variables exceeds the "threshold path" at some point. If we select variables on that basis, the final model contains each of the true variables, and no incorrect variable. For reference, the range of relative model sizes over `tauseq` is approximately 0.15 to 0.45.
-```{r}
+```{r show-model-size}
 range(cpss$model_size_est / p)
 ```

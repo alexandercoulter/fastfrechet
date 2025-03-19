@@ -197,12 +197,18 @@ implementation from `frechet` violates the lower box constraint despite its
 explicit inclusion as an argument. The implementation from the Supplementary
 Material of @tucker_variable_2023 and the implementation from `fastfrechet` both
 solve the problem to numerical accuracy.
-```{r fit-QFs}
+```{r fit-QFs, eval = FALSE}
 # Fit quantile functions:
 WRI_Q = wass_regress( ~ ., X_df, "quantile", Y_adj)$Qfit
 frechet_Q = GloDenReg(X, qin = Y, optns = list(lower = 0))$qout
 Tucker_Q = GloWassReg(X, Y, X, lower = 0)
 fastfrechet_Q = frechetreg_univar2wass(X, Y, lower = 0)$Qhat
+```
+
+```{r load-QFs, include = FALSE}
+# Load quantile functions:
+s = system.file("private", "Q_results.Rda", package = "fastfrechet")
+if(file.exists(s)) load(s)
 ```
 
 ```{r figure2, include = FALSE}
@@ -439,7 +445,7 @@ solutions. As expected, the `fastfrechet` solutions become more accurate as the
 error tolerance parameter decreases, with only modest increases in computation
 time.
 
-```{r obtain-FRiSO-lambdas}
+```{r obtain-FRiSO-lambdas, eval = FALSE}
 # Set sequence of error tolerances:
 eseq = 0.014 / c(1, 2, 4, 8)
 
@@ -452,6 +458,12 @@ L_fastfrechet = sapply(eseq, function(e){
 
 # Calculate lambdas with Tucker et al. (2023) implementation:
 L_Tucker = FRiSO_Tucker(X0, Y, 0, 1000, tauseq)
+```
+
+```{r load-FRiSO-lambdas, include = FALSE}
+# Load lambda path results:
+s = system.file("private", "L_results.Rda", package = "fastfrechet")
+if(file.exists(s)) load(s)
 ```
 
 ```{r figure3, include = FALSE}

@@ -33,7 +33,7 @@ algorithm developed in
 
 To use `fastfrechet`, you need to install
 [`R`](https://cran.r-project.org/). To enhance your user experience, you
-may use some IDE for it (e.g. [`RStudio`](https://www.rstudio.com/)).
+may use some IDE for it (e.g. [`RStudio`](https://www.rstudio.com/)).
 
 The development version of
 [`fastfrechet`](https://github.com/alexandercoulter/fastfrechet) is
@@ -44,3 +44,14 @@ package in `R` as follow:
 install.packages("devtools")
 devtools::install_github("https://github.com/alexandercoulter/fastfrechet", build_vignettes = TRUE)
 ```
+
+## Community Guidelines
+
+1.  Contributions and suggestions to the software are always welcome.
+    Please consult our [contribution
+    guidelines](.github/CONTRIBUTING.md) prior to submitting a pull
+    request.
+2.  Report issues or problems with the software using github’s [issue
+    tracker](https://github.com/alexandercoulter/fastfrechet/issues).
+3.  Contributors must adhere to the [Code of
+    Conduct](CODE_OF_CONDUCT.md).

@@ -169,7 +169,7 @@ The `FRiSO_univar2wass` function from `fastfrechet` takes as input
 
 In this illustrative example, we evaluate the variable selection problem on a dense grid `tauseq = seq(0.2, 20, 0.2)`, and set `eps = 0.001` and `nudge = 0.01`. Other optional parameters allow the user to control the gradient descent algorithm, including dampening, step size, momentum, and maximum number of iterations; the help page has more details. `FRiSO_univar2wass` returns a matrix of fitted $\widehat{\pmb{\lambda}}$ values, stored column-wise, one column for each value in `tauseq`.
 
-```{r run-friso}
+```{r run-FRiSO, eval = FALSE}
 # Dense grid of "allowance" totals:
 tauseq <- seq(0.2, 20, 0.2)
 
@@ -184,6 +184,12 @@ L <- FRiSO_univar2wass(
   eps = 0.001,
   nudge = 0.01
 )
+```
+
+```{r load-FRiSO, include = FALSE}
+tauseq <- seq(0.2, 20, 0.2)
+s = system.file("private", "L_intro.Rda", package = "fastfrechet")
+if(file.exists(s)) load(s)
 ```
 
 
@@ -233,7 +239,7 @@ The `FRiSO_CV_univar2wass` function from `fastfrechet` takes as input
 
 In this example, we use 10-fold CV, and set a selection threshold of `thresh = 0.0001`.
 
-```{r run-cv}
+```{r run-cv, eval = FALSE}
 # Set cross-validation parameters
 K <- 10
 thresh <- 0.0001
@@ -250,6 +256,14 @@ cv <- FRiSO_CV_univar2wass(
   tauseq = tauseq,
   eps = eps
 )
+```
+
+```{r load-cv, include = FALSE}
+K <- 10
+thresh = 0.0001
+eps = 0.001
+s = system.file("private", "cv_intro.Rda", package = "fastfrechet")
+if(file.exists(s)) load(s)
 ```
 
 ### Plotting, interpreting CV errors and optimal solution
@@ -291,7 +305,7 @@ The `FRiSO_CPSS_univar2wass` function from `fastfrechet` is used analogously as 
 
 In this example, we use `B = 50`  data half-splits, and evaluate CPSS on a coarser $\tau$ grid, `tauseq = 1:10`.
 
-```{r run-cpss}
+```{r run-cpss, eval = FALSE}
 # Set complementary pairs stability selection parameters
 B <- 50
 thresh <- 0.0001
@@ -309,6 +323,15 @@ cpss <- FRiSO_CPSS_univar2wass(
   tauseq = tauseq,
   eps = eps
 )
+```
+
+```{r load-cpss, include = FALSE}
+B <- 50
+thresh <- 0.0001
+tauseq <- 1:10
+eps <- 0.001
+s = system.file("private", "cpss_intro.Rda", package = "fastfrechet")
+if(file.exists(s)) load(s)
 ```
 
 ### Plotting, interpreting stability paths

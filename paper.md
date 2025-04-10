@@ -125,7 +125,7 @@ $\widehat{\pmb{Q}}(\widehat{\pmb{\lambda}})$ and the raw data $\pmb{Y}$. (See
 the accompanying `intro-fastfrechet` vignette for a detailed exposition.)
 `fastfrechet` implements the second-order geodesic descent algorithm developed
 by @coulter_fast_2024, with two modifications. First, the implementation uses
-the custom dual active-set method discussed in the previous subsection. The
+the custom dual active-set method mentioned in the previous subsection. The
 active set defining the weighted Fréchet regression solution
 $\widehat{\pmb{Q}}(\pmb{\lambda}^t)$ for iterate $\pmb{\lambda}^t$ serves as a
 warm start for iterate $\pmb{\lambda}^{t + 1}$, reducing computation time.

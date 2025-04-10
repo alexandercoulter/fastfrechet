@@ -295,7 +295,7 @@ The `FRiSO_CPSS_univar2wass` function from `fastfrechet` is used analogously as 
 * `B`, the number of data half-splits to perform (default 50), and
 * `thresh`, the same selection threshold parameter as in `FRiSO_CV_univar2wass`.
 
-`FRiSO_CPSS_univar2wass` also calls `FRiSO_univar2wass` internally, and additionally takes any parameter which can be fed into that function. As output, `FRiSO_CV_univar2wass` returns a list containing
+`FRiSO_CPSS_univar2wass` also calls `FRiSO_univar2wass` internally, and additionally takes any parameter which can be fed into that function. As output, `FRiSO_CPSS_univar2wass` returns a list containing
 
 * `tauseq`, the sequence of $\tau$ values as provided to the function,
 * `selected_variables`, a `B` $\times$ `2` $\times$ `length(tauseq)` $\times$ `p` array indicating which variables were selected in the $2B$ split halves, across `tauseq`,

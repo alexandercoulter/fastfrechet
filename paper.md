@@ -55,16 +55,23 @@ to large data sets, such as the UK Biobank [@doherty_large_2017].
 
 # Statement of Need
 
+
+
 Fréchet regression with variable selection is currently not implemented by any
 software package, available only through the Supplementary Material of
-@tucker_variable_2023 (hereafter "`Tucker` materials"). As discussed in
-@coulter_fast_2024, the implemented algorithm is prohibitively slow.
-Implementation of Fréchet regression in 2-Wasserstein space without variable
-selection is supported by the `Tucker` materials, and by two R packages: `WRI` [@liu_wri_2022] and `frechet` [@chen_frechet_2023]. These packages face certain
+@tucker_variable_2023 (hereafter "`Tucker` materials"). The `Tucker` algorithm
+is prohibitively slow, for example taking 1.5 hours to run on a modest 207
+patient, 34 covariate data set size from the HYPNOS CGM cohort
+[@coulter_fast_2024], even prior to resampling methods. Implementation of
+Fréchet regression in 2-Wasserstein space without variable selection is
+supported by the `Tucker` materials, and by two R packages: `WRI`
+[@liu_wri_2022] and `frechet` [@chen_frechet_2023]. These packages face certain
 practical limitations. For instance, `WRI` requires continuous distributions,
 and does not allow user-specified constraints for the distribution support.
 `frechet` offers more flexibility in user specifications, but its solver for
-Fréchet regression is slow and may not accurately satisfy constraints.
+Fréchet regression may not accurately satisfy constraints and is comparatively
+slow (i.e. takes upward of 10,000$\times$ longer than `fastfrechet`), as we show
+in the next section.
 
 The `fastfrechet` package addresses these limitations by providing a fast,
 scalable, and user-friendly implementation of both Fréchet regression and
@@ -91,7 +98,8 @@ utilize the R package `microbenchmark` [@mersmann_microbenchmark_2024] to
 calculate run times, and report median times for each method (Fréchet
 regression, variable selection) from 15 iterations; all computations were
 performed on an Apple M1 Max chip. To replicate the specific simulation and
-comparison settings used in this manuscript, see the accompanying `performanceExample-fastfrechet` vignette.
+comparison settings used in this manuscript, see the accompanying
+`performanceExample-fastfrechet` vignette.
 
 ### The Fréchet Regression Problem
 

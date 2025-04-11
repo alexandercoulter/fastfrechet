@@ -55,8 +55,6 @@ to large data sets, such as the UK Biobank [@doherty_large_2017].
 
 # Statement of Need
 
-
-
 Fréchet regression with variable selection is currently not implemented by any
 software package, available only through the Supplementary Material of
 @tucker_variable_2023 (hereafter "`Tucker` materials"). The `Tucker` algorithm

@@ -117,7 +117,10 @@ and `Tucker` materials implementations. `WRI` does not accept known support
 bounds as input, and fitted responses correspondingly violate the zero lower
 bound; `frechet` solutions only approximately satisfy the lower bound. The
 `Tucker` materials implementation finds numerically accurate solutions, but
-`fastfrechet` accomplishes this in a fraction the time.
+`fastfrechet` accomplishes this in a fraction the time. Applying support
+constraints *post hoc*, the solutions from `WRI` and `frechet` solutions remain
+sub-optimal minimizers of the Fréchet regression objective function. (See the
+accompanying `performanceExample-fastfrechet` vignette.)
 
 ### The Variable Selection Problem
 

@@ -229,7 +229,6 @@ figs = cbind(c(0, 0.4 + a + 0.04, 0.4 + 2 * (a + 0.04), 0.4 + 3 * (a + 0.04)) / 
              c(0, 0, 0, 0),
              c(1, 1, 1, 1))
 
-# Plot quantile functions, focusing around zero:
 png("frechetreg_accuracy_comparison.png", width = 6.5, height = 2.2, units = "in", res = 576)
 
 par(fig = figs[1, ], mai = mais[1, ], family = "Helvetica")
@@ -311,9 +310,9 @@ matlines(mseq, t(fastfrechet_Q), col = "black", lty = 1, lwd = 1.5)
 matlines(mseq, t(fastfrechet_Q[pick, ]), col = plotcols[c(1, 3)], lty = 1, lwd = 2)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
 mtext("u", 1, 0.7, cex = 0.8)
-text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
+text(par("usr")[1] - 0.05, par("usr")[4] + 0.03,
      "fastfrechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 0.435, par("usr")[4] + 0.0235, col = 'gray40',
+text(par("usr")[1] + 0.46, par("usr")[4] + 0.0235, col = 'gray40',
      "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
      sprintf("%.4f sec", median(M1$time[M1$expr == "fastfrechet"]) / 1e9),
@@ -322,9 +321,102 @@ text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
      pos = 2, xpd = TRUE, cex = 0.5)
 
 dev.off()
+
+new_width = 3 * a + 0.52 + 0.04 + 0.52 + 0.08 + 0.52 + 0.08
+# Figure margin and size specifications:
+mais = cbind(c(0.35, 0.35, 0.35),
+             c(0.52, 0.52, 0.52),
+             c(0.2, 0.2, 0.2),
+             c(0.04, 0.08, 0.08))
+figs = cbind(c(0, 0.52 + a + 0.04, 0.52 + a + 0.04 + 0.52 + a + 0.08) / new_width,
+             c(0.52 + a + 0.04, 0.52 + a + 0.04 + 0.52 + a + 0.08, new_width) / new_width,
+             c(0, 0, 0),
+             c(1, 1, 1))
+
+# Calculate Yhat:
+Xs = cbind(1, scale(X))
+Yhat = Xs %*% solve(crossprod(Xs), crossprod(Xs, Y))
+
+png("frechetreg_accuracy_comparison2.png", width = new_width, height = 2.2, units = "in", res = 576)
+
+par(fig = figs[1, ], mai = mais[1, ], family = "Helvetica")
+plot(x = c(), y = c(), xlim = c(-1, 101), ylim = c(-1e-14, 0.02), axes = FALSE,
+     xlab = "", ylab = "")
+polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+        col = "gray93", border = NA)
+abline(h = axTicks(2), v = axTicks(1), col = "white")
+abline(h = 0, lty = 2, col = "gray50")
+lines(rowSums((pmax(WRI_Q, 0) - Yhat)^2) - rowSums((fastfrechet_Q - Yhat)^2),
+      col = "black", lty = 1, lwd = 1)
+axis(1, c(1, 100), c(1, 100), FALSE, -1.3, cex.axis = 0.55)
+axis(2, axTicks(2), c("0", "0.005", "0.010", "0.015", "0.020"), FALSE, -0.9, las = 1, cex.axis = 0.55)
+mtext("Sample (i)", 1, 0.7, cex = 0.8)
+mtext(expression(f(widehat(Q))[WRI] - f(widehat(Q))[fastfrechet]),
+      2, 1.5, cex = 0.8)
+text(par("usr")[1] - 6, par("usr")[4] + 0.03 / 0.8 * 0.02,
+     "WRI", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
+text(par("usr")[1] + 17, par("usr")[4] + 0.0235 / 0.8 * 0.02, col = 'gray40',
+     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+
+par(fig = figs[2, ], mai = mais[2, ], new = TRUE)
+plot(x = c(), y = c(), xlim = c(-1, 101), ylim = c(-1e-14, 0.02), axes = FALSE,
+     xlab = "", ylab = "")
+polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+        col = "gray93", border = NA)
+abline(h = axTicks(2), v = axTicks(1), col = "white")
+abline(h = 0, lty = 2, col = "gray50")
+lines(rowSums((pmax(frechet_Q, 0) - Yhat)^2) - rowSums((fastfrechet_Q - Yhat)^2),
+      col = "black", lty = 1, lwd = 1)
+axis(1, c(1, 100), c(1, 100), FALSE, -1.3, cex.axis = 0.55)
+axis(2, axTicks(2), c("0", "0.005", "0.010", "0.015", "0.020"), FALSE, -0.9, las = 1, cex.axis = 0.55)
+mtext("Sample (i)", 1, 0.7, cex = 0.8)
+mtext(expression(f(widehat(Q))[frechet] - f(widehat(Q))[fastfrechet]),
+      2, 1.5, cex = 0.8)
+text(par("usr")[1] - 6, par("usr")[4] + 0.03 / 0.8 * 0.02,
+     "frechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
+text(par("usr")[1] + 32, par("usr")[4] + 0.0235 / 0.8 * 0.02, col = 'gray40',
+     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+
+par(fig = figs[3, ], mai = mais[3, ], new = TRUE)
+plot(x = c(), y = c(), xlim = c(-1, 101), ylim = c(0, 2e-13), axes = FALSE,
+     xlab = "", ylab = "")
+polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+        col = "gray93", border = NA)
+abline(h = axTicks(2), v = axTicks(1), col = "white")
+abline(h = 0, lty = 2, col = "gray50")
+lines(rowSums((Tucker_Q - Yhat)^2) - rowSums((fastfrechet_Q - Yhat)^2),
+      col = "black", lty = 1, lwd = 1)
+axis(1, c(1, 100), c(1, 100), FALSE, -1.3, cex.axis = 0.55)
+axis(2, axTicks(2), c("0",
+                      expression("0.5"*scriptstyle("E")*-"13"),
+                      expression("1.0"*scriptstyle("E")*-"13"),
+                      expression("1.5"*scriptstyle("E")*-"13"),
+                      expression("2.0"*scriptstyle("E")*-"13")), FALSE, -0.9, las = 1, cex.axis = 0.5)
+mtext("Sample (i)", 1, 0.7, cex = 0.8)
+mtext(expression(f(widehat(Q))[Tucker] - f(widehat(Q))[fastfrechet]),
+      2, 1.75, cex = 0.8)
+text(par("usr")[1] - 6, par("usr")[4] + 0.03 / 0.8 * 2e-13,
+     "Tucker", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
+text(par("usr")[1] + 32, par("usr")[4] + 0.0235 / 0.8 * 2e-13, col = 'gray40',
+     "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+
+dev.off()
 ```
 
 ![](frechetreg_accuracy_comparison.png){width=100%}
+
+Depsite `WRI` and `frechet` not adequately handling box constraints natively,
+constraints like $\widehat{Q} \geq \texttt{lower} = 0$ can possibly be applied
+*post hoc*. Nonetheless, even doing so, the resulting solutions do not minimize
+the Fréchet regression objective function as well as the solutions from the
+`Tucker` materials and, `fastfrechet`.
+```{r manually_box_solutions, eval = FALSE}
+# Fit quantile functions:
+WRI_Q = pmax(WRI_Q, 0)
+frechet_Q = pmax(frechet_Q, 0)
+```
+
+![](frechetreg_accuracy_comparison2.png){width=100%}
 
 
 # The Variable Selection Problem

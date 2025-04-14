@@ -58,10 +58,11 @@ to large data sets, such as the UK Biobank [@doherty_large_2017].
 Fréchet regression with variable selection is currently not implemented by any
 software package, available only through the Supplementary Material of
 @tucker_variable_2023 (hereafter "`Tucker` materials"). The `Tucker` algorithm
-is prohibitively slow, for example taking 1.5 hours to run on a modest 207
-patient, 34 covariate data set size from the HYPNOS CGM cohort
-[@coulter_fast_2024], even prior to resampling methods. Implementation of
-Fréchet regression in 2-Wasserstein space without variable selection is
+can be prohibitively slow in many contexts, for example taking 1.5 hours to run
+on a modest 207 patient, 34 covariate data set size from the HYPNOS CGM cohort;
+applying resampling methods like complementary pairs stability selection would
+take several CPU-days [@coulter_fast_2024]. Implementation of the Fréchet
+regression problem in 2-Wasserstein space (i.e. without variable selection) is
 supported by the `Tucker` materials, and by two R packages: `WRI`
 [@liu_wri_2022] and `frechet` [@chen_frechet_2023]. These packages face certain
 practical limitations. For instance, `WRI` requires continuous distributions,

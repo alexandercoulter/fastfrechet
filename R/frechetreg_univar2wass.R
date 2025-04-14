@@ -11,8 +11,7 @@
 #' \insertCite{tucker_variable_2023}{fastfrechet}.
 #'
 #' @param X A (`n` \eqn{\times} `p`) "input" covariate matrix with no missing, all finite entries.
-#' @param Y A (`n` \eqn{\times} `m`) matrix of observed quantile functions, row-wise monotone non-decreasing.
-#'  Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
+#' @param Y A (`n` \eqn{\times} `m`) matrix of observed quantile functions evaluated on a shared uniform `m`-grid in \eqn{(0, 1)} - e.g. `seq(0.5/m, 1 - 0.5/m, len = m)` - row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
 #' @param Z An optional (`z` \eqn{\times} `p`) "output" covariate matrix (default `NULL`) with no missing, all finite entries.
 #' @param C_init An optional (`n` \eqn{\times} `m + 1`) matrix (or `z` \eqn{\times} `m + 1` if `Z` is provided) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.
 #' @param lambda An optional (`p` \eqn{\times} `1`) vector with non-negative entries whose sum is strictly positive.
@@ -45,7 +44,7 @@
 #'
 #' @return A list object with components:
 #' \tabular{ll}{
-#'   `Qhat` \tab returns a (`n` \eqn{\times} `m`) matrix - or (`z` \eqn{\times} `m`) matrix if `Z` was provided - row-wise containing the solutions to the Fréchet regression problem, i.e. best-fitting quantile functions bounded between `lower` and `upper`. \cr
+#'   `Qhat` \tab returns a (`n` \eqn{\times} `m`) matrix - or (`z` \eqn{\times} `m`) matrix if `Z` was provided - row-wise containing the solutions to the Fréchet regression problem, i.e. best-fitting quantile functions bounded between `lower` and `upper`. These quantile functions are treated as evaluated on a shared `m`-grid in \eqn{(0, 1)}, e.g. `seq(0.5/m, 1 - 0.5/m, len = m)`.\cr
 #'   `Lagrange_Multiplier` \tab returns a (`n` \eqn{\times} (`m + 1`)) matrix - or (`z` \eqn{\times} (`m + 1`)) matrix if `Z` was provided - row-wise containing the Lagrange multipliers associated with the underlying QP problems. \cr
 #' }
 #'
@@ -393,6 +392,7 @@ frechetreg_univar2wass <- function(X,
 
     # Calculate Qhat from stability optimality condition:
     Qhat <- Yhat + (Eta[, -ncol(Eta)] - Eta[, -1])
+    
   }
 
   # Return Qhat value:

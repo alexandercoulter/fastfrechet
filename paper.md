@@ -96,9 +96,9 @@ dependent on the first 4 of $p \geq 4$ covariates (we choose $p = 10$). We
 utilize the R package `microbenchmark` [@mersmann_microbenchmark_2024] to
 calculate run times, and report median times for each method (Fréchet
 regression, variable selection) from 15 iterations; all computations were
-performed on an Apple M1 Max chip. To replicate the specific simulation and
-comparison settings used in this manuscript, see the accompanying
-`performanceExample-fastfrechet` vignette.
+performed on an Apple M1 Max chip. For a more detailed description and to
+replicate the specific simulation settings used in this manuscript, see the
+accompanying `performanceExample-fastfrechet` vignette.
 
 ### The Fréchet Regression Problem
 

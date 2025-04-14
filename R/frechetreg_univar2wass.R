@@ -43,9 +43,11 @@
 #' \insertCite{tucker_variable_2023}{fastfrechet} through the parameter `lambda`.
 #' By default, the function will perform non-regularized regression.
 #'
-#' @return A (`n` \eqn{\times} `m`) matrix that is the unique solution to the Fréchet
-#' Regression problem for univariate distribution responses. The solution has rows
-#' that are monotone non-decreasing and bounded between the `lower` and `upper` arguments.
+#' @return A list object with components:
+#' \tabular{ll}{
+#'   `Qhat` \tab returns a (`n` \eqn{\times} `m`) matrix - or (`z` \eqn{\times} `m`) matrix if `Z` was provided - row-wise containing the solutions to the Fréchet regression problem, i.e. best-fitting quantile functions bounded between `lower` and `upper`. \cr
+#'   `Lagrange_Multiplier` \tab returns a (`n` \eqn{\times} (`m + 1`)) matrix - or (`z` \eqn{\times} (`m + 1`)) matrix if `Z` was provided - row-wise containing the Lagrange multipliers associated with the underlying QP problems. \cr
+#' }
 #'
 #' @references
 #' \insertRef{arnstrom_dual_2022}{fastfrechet}

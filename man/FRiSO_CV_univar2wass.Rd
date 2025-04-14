@@ -9,8 +9,7 @@ FRiSO_CV_univar2wass(X, Y, K = NULL, thresh = 1e-04, ...)
 \arguments{
 \item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions, row-wise monotone non-decreasing.
-Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
+\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions evaluated on a shared uniform \code{m}-grid in \eqn{(0, 1)} - e.g. \code{seq(0.5/m, 1 - 0.5/m, len = m)} - row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
 \item{K}{Numeric whole number no bigger than \code{nrow(X)}.}
 

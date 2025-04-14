@@ -18,8 +18,7 @@ frechetreg_univar2wass(
 \arguments{
 \item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions, row-wise monotone non-decreasing.
-Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
+\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions evaluated on a shared uniform \code{m}-grid in \eqn{(0, 1)} - e.g. \code{seq(0.5/m, 1 - 0.5/m, len = m)} - row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
 \item{Z}{An optional (\code{z} \eqn{\times} \code{p}) "output" covariate matrix (default \code{NULL}) with no missing, all finite entries.}
 
@@ -35,9 +34,11 @@ If \code{NULL} a non-regularized regression is performed (the default).}
 \item{eps}{An optional numeric scalar (default \code{1e-10}) error tolerance; must be strictly positive.}
 }
 \value{
-A (\code{n} \eqn{\times} \code{m}) matrix that is the unique solution to the Fréchet
-Regression problem for univariate distribution responses. The solution has rows
-that are monotone non-decreasing and bounded between the \code{lower} and \code{upper} arguments.
+A list object with components:
+\tabular{ll}{
+\code{Qhat} \tab returns a (\code{n} \eqn{\times} \code{m}) matrix - or (\code{z} \eqn{\times} \code{m}) matrix if \code{Z} was provided - row-wise containing the solutions to the Fréchet regression problem, i.e. best-fitting quantile functions bounded between \code{lower} and \code{upper}. These quantile functions are treated as evaluated on a shared \code{m}-grid in \eqn{(0, 1)}, e.g. \code{seq(0.5/m, 1 - 0.5/m, len = m)}.\cr
+\code{Lagrange_Multiplier} \tab returns a (\code{n} \eqn{\times} (\code{m + 1})) matrix - or (\code{z} \eqn{\times} (\code{m + 1})) matrix if \code{Z} was provided - row-wise containing the Lagrange multipliers associated with the underlying QP problems. \cr
+}
 }
 \description{
 Calculate global Fréchet regression mean objects \insertCite{petersen_frechet_2019}{fastfrechet},

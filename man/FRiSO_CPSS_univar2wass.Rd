@@ -9,8 +9,7 @@ FRiSO_CPSS_univar2wass(X, Y, B = 50, thresh = 1e-04, ...)
 \arguments{
 \item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
 
-\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions, row-wise monotone non-decreasing.
-Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
+\item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions evaluated on a shared uniform \code{m}-grid in \eqn{(0, 1)} - e.g. \code{seq(0.5/m, 1 - 0.5/m, len = m)} - row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
 \item{B}{A positive integer number of complementary pair sub-samples to generate from the original data set (default \code{50}).}
 

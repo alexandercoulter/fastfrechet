@@ -77,8 +77,7 @@ scalable, and user-friendly implementation of both Fréchet regression and
 variable selection for 2-Wasserstein space, based on the work of
 @coulter_fast_2024. The Fréchet regression solver features a customized dual active-set algorithm, inspired by @arnstrom_dual_2022, which ensures both
 computational efficiency and accuracy while accommodating user-specified support
-constraints. To support variable selection, it is also the first Fréchet regression solver to
-incorporate an auxiliary weighting scheme. In this scheme, the covariate-dependent weights
+constraints. To support variable selection, it is also the first Fréchet regression solver to incorporate an auxiliary weighting scheme. In this scheme, the covariate-dependent weights
 that determine each observation's influence can be modified using a user-supplied vector
 $\lambda$ [@tucker_variable_2023], which specifies which covariates are excluded from the
 weight construction. The package incorporates resampling tools to enhance

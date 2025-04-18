@@ -271,14 +271,8 @@ output <- tryCatch(
 )
 output$message # This is NULL, reflecting there is no error message
 ```
-```{r low-rank-X-Z-graph, echo = FALSE}
-matplot(t(output$Qhat),
-  type = "l", lty = 1, col = "black", las = 1,
-  xlab = "u", ylab = "", main = "Affine Z : n = 5, p = 10, z = 10"
-)
-mtext(expression(widehat(Q)(u)), 2, 2.25)
-```
-Keep in mind that arbitrary linear combinations generally will not suffice.
+The `NULL` "message" indicates no error was encountered.  Arbitrary linear
+combinations will generally not suffice, however.
 ```{r low-rank-X-Z-linear}
 A <- matrix(rnorm(10 * 5), 10, 5)
 # A <- A / rowSums(A)

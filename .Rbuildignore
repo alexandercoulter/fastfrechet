@@ -1,7 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
-^doc$
+^\doc$
 ^Meta$
 ^\.github$
 ^figures$

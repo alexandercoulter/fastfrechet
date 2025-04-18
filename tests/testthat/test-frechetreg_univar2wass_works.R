@@ -194,7 +194,7 @@ test_that("works with Z", {
 })
 
 
-test_that("works with Z, and large p", {
+test_that("fails with large p and improper Z", {
   # Parameters
   lower <- 0 # Lower bound
   upper <- 40 # Upper bound
@@ -214,6 +214,41 @@ test_that("works with Z, and large p", {
   # Generate Z matrix
   nz <- 10
   Z <- matrix(rnorm(nz * p), nz, p)
+
+  expect_error(frechetreg_univar2wass(
+    X = X,
+    Y = Y,
+    Z = Z,
+    C_init = NULL,
+    lambda = NULL,
+    lower = lower,
+    upper = upper
+  ), "The rows of matrix (1 Z) are not all in the row-space of (1 X).", fixed = TRUE)
+})
+
+
+test_that("works with large p and Z passing row-space condition", {
+  # Parameters
+  lower <- 0 # Lower bound
+  upper <- 40 # Upper bound
+
+  # Generate data
+  n <- 50
+  p <- 70
+  m <- 30
+  set.seed(31)
+  mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
+
+  X <- mydata$X
+  Y <- mydata$Y
+
+  Y[Y > upper] <- upper
+
+  # Generate Z matrix
+  nz <- 10
+  A <- matrix(rnorm(nz * n), nz, n)
+  A <- A / rowSums(A)
+  Z <- A %*% X
 
   # Estimate conditional QFs
   output <- frechetreg_univar2wass(
@@ -246,7 +281,7 @@ test_that("works with Z, and large p", {
 })
 
 
-test_that("works with Z, and large n but non full column rank X", {
+test_that("fails with arbitrary Z, and large n but non full column rank X", {
   # Parameters
   lower <- 0 # Lower bound
   upper <- 40 # Upper bound
@@ -266,6 +301,41 @@ test_that("works with Z, and large n but non full column rank X", {
   # Generate Z matrix
   nz <- 10
   Z <- matrix(rnorm(nz * p * 2), nz, p * 2)
+
+  expect_error(frechetreg_univar2wass(
+    X = X,
+    Y = Y,
+    Z = Z,
+    C_init = NULL,
+    lambda = NULL,
+    lower = lower,
+    upper = upper
+  ), "The rows of matrix (1 Z) are not all in the row-space of (1 X).", fixed = TRUE)
+})
+
+
+test_that("works with Z satisfying row-space condition, and large n but non full column rank X", {
+  # Parameters
+  lower <- 0 # Lower bound
+  upper <- 40 # Upper bound
+
+  # Generate data
+  n <- 100
+  p <- 10
+  m <- 100
+  set.seed(31)
+  mydata <- generate_zinbinom_qf(n = n, p = p, m = m)
+
+  X <- cbind(mydata$X, mydata$X)
+  Y <- mydata$Y
+
+  Y[Y > upper] <- upper
+
+  # Generate Z matrix
+  nz <- 10
+  A <- matrix(rnorm(nz * n), nz, n)
+  A <- A / rowSums(A)
+  Z <- A %*% X
 
   # Estimate conditional QFs
   output <- frechetreg_univar2wass(

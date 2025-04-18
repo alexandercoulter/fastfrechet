@@ -26,32 +26,74 @@ library(fastfrechet)
 
 # Introduction
 
-`fastfrechet` is an R package providing fast and robust solutions to several computational problems associated with Fréchet regression [@petersen_frechet_2019] and an associated variable selection method [@tucker_variable_2023], focusing on a specific metric space setting. Fréchet regression generalizes regression with Euclidean covariates and Euclidean responses, to settings where responses exist in a general metric space (i.e. non-vector space). The space of univariate distribution response objects is one such example, recently gaining popularity in biomedical applications where technological advances have made rich patient-level data sets commonplace in a variety of settings. These larger data sets and complex response constraints require newer, faster algorithms for feasibility and scalability [@coulter_fast_2024], which `fastfrechet` provides.\
+`fastfrechet` is an R package providing fast and robust solutions to several
+computational problems associated with Fréchet regression
+[@petersen_frechet_2019] and an associated variable selection method
+[@tucker_variable_2023], focusing on a specific metric space setting. Fréchet
+regression generalizes regression with Euclidean covariates and Euclidean
+responses, to settings where responses exist in a general metric space (i.e.
+non-vector space). The space of univariate distribution response objects is one
+such example, recently gaining popularity in biomedical applications where
+technological advances have made rich patient-level data sets commonplace in a
+variety of settings. These larger data sets and complex response constraints
+require newer, faster algorithms for feasibility and scalability
+[@coulter_fast_2024], which `fastfrechet` provides.\
 
-This vignette walks through an example use case of all of the available functions in `fastfrechet`. This includes simulating example covariate-dependent distribution responses, implementing Fréchet regression, performing variable selection, and utilizing resampling tools to supplement automatic variable selection. Where appropriate, the mathematical problems being solved by each function are briefly described. A second vignette, `monotoneQP-fastfrechet`, provides a more detailed algorithmic exposition of the function `monotoneQP` specifically.
+This vignette walks through example use cases of all of the available functions
+in `fastfrechet`. This includes simulating example covariate-dependent
+distribution responses, implementing Fréchet regression, performing variable
+selection, and utilizing resampling tools to supplement automatic variable
+selection. Where appropriate, the mathematical problems being solved by each
+function are briefly described. A second vignette, `monotoneQP-fastfrechet`,
+provides a more detailed algorithmic exposition of the function `monotoneQP`
+specifically.
 
 
 # Running Through Examples
 
-Since `fastfrechet` performs regression tasks on distribution responses, we illustrate its functionality with simulated distributions. In this section we generate covariate-dependent, zero-inflated negative binomial distributions. We then perform Fréchet regression, and the basic variable selection task with the Fréchet Ridge Selection Operator (FRiSO). Detailed mathematical treatment of these topics can be found in @petersen_frechet_2019, @tucker_variable_2023, and @coulter_fast_2024.
+Since `fastfrechet` performs regression tasks on distribution responses, we
+illustrate its functionality with simulated distributions. In this section we
+generate covariate-dependent, zero-inflated negative binomial distributions. We
+then perform Fréchet regression, and the basic variable selection task with the
+Fréchet Ridge Selection Operator (FRiSO). Detailed mathematical treatment of
+these topics can be found in @petersen_frechet_2019, @tucker_variable_2023, and
+@coulter_fast_2024.
 
 ## Generating quantile functions
 
-The zero-inflated negative binomial (`zinbinom`) distribution is a mixture distribution. It can be described as the marginal distribution of random variable $Y$ utilizing variable $\Psi \sim \mathrm{Bernoulli}(z)$ which turns "on" or "off" the zero inflation: $(Y|\Psi=1) \sim \delta_{\{0\}}$, and $(Y|\Psi=0) \sim \mathrm{nbinom}(r, p)$. As stated, there are three parameters to $Y$'s distribution: the zero-inflation parameter $z \in (0, 1)$, the size parameter of the negative binomial part $r > 0$, and the probability parameter of the negative binomial part $p > 0$. We represent the distribution of $Y$ with its quantile function, given by
+The zero-inflated negative binomial (`zinbinom`) distribution is a mixture
+distribution. It can be described as the marginal distribution of random
+variable $Y$ utilizing variable $\Psi \sim \mathrm{Bernoulli}(z)$ which turns
+"on" or "off" the zero inflation: $(Y|\Psi=1) \sim \delta_{\{0\}}$, and
+$(Y|\Psi=0) \sim \mathrm{nbinom}(r, p)$. As stated, there are three parameters
+to $Y$'s distribution: the zero-inflation parameter $z \in (0, 1)$, the size
+parameter of the negative binomial part $r > 0$, and the probability parameter
+of the negative binomial part $p > 0$. We represent the distribution of $Y$ with
+its quantile function, given by
 $$
-F_Y^{-1}(p) = F_{Y|\Psi=0}^{-1}\left( \frac{p-z}{1-z} \right),
+F_Y^{-1}(u) = F_{Y|\Psi=0}^{-1}\left( \frac{u-z}{1-z} \right),
 $$
-where $F_{Y|\Psi=0}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$ and $F_{Y|\Psi=0}^{-1}(p) = 0$ for $p < 0$.
+where $F_{Y|\Psi=0}^{-1}$ is the quantile function of $\mathrm{nbinom}(r, p)$
+and $F_{Y|\Psi=0}^{-1}(u) = 0$ for $u < 0$.
 
 ### Using `fastfrechet::generate_zinbinom_qf`
 
-The `generate_zinbinom_qf` function from `fastfrechet` generates covariate-dependent quantile functions from the `zinbinom` distribution, in line with the Experiment B setting from @coulter_fast_2024. The function takes as inputs
+The `generate_zinbinom_qf` function from `fastfrechet` generates
+covariate-dependent quantile functions from the `zinbinom` distribution, in line
+with the Experiment B setting from @coulter_fast_2024. The function takes as
+inputs
 
 * `n`, the number of response-covariate pairs,
 * `p`, the number of covariates, and
-* `m`, the grid density to evaluate the quantile functions in the $(0, 1)$ interval.
+* `m`, the grid density to evaluate the quantile functions in the $(0, 1)$
+interval.
 
-`generate_zinbinom_qf` also optionally takes "baseline" parameters of the `zinbinom` distribution, namely, the zero-inflation factor, and the probability and size parameters of the `nbinom` component. As output, `generate_zinbinom_qf` returns a list containing the `n` $\times$ `p` covariate matrix `X`; and the `n` $\times$ `m` response matrix `Y`, which stores the quantile functions row-wise.
+`generate_zinbinom_qf` also optionally takes "baseline" parameters of the
+`zinbinom` distribution, namely, the zero-inflation factor, and the probability
+and size parameters of the `nbinom` component. As output, `generate_zinbinom_qf`
+returns a list containing the `n` $\times$ `p` covariate matrix `X`; and the
+`n` $\times$ `m` response matrix `Y`, which stores the quantile functions
+row-wise.
 
 ```{r generate-data}
 n <- 200 # number of samples - nrow(X) and nrow(Y).
@@ -73,23 +115,37 @@ Y <- mydata$Y # (n x m) matrix of quantile functions, stored row-wise
 
 ### Plotting
 
-We illustrate these quantile function responses with line plots. Note the true functions are piece-wise constant, where the line plots interpolate between points on the observed `m`-grid.
+We illustrate these quantile function responses with line plots. Note the true
+functions are piece-wise constant, where the line plots interpolate between
+points on the observed `m`-grid.
 
 ```{r plot-EQFs}
 matplot(mseq, t(Y),
   xlim = c(0, 1), ylim = range(Y), type = "l", lty = 1, col = 1,
-  main = "znbinom Quantile Functions", xlab = "p", ylab = "quantile"
+  main = "znbinom Quantile Functions", xlab = "u", ylab = "quantile"
 )
 ```
 
 
 ## Fréchet regression
 
-Fréchet regression generalizes Euclidean regression to the general metric space setting. In the sample setting, we observe covariate-response pairs $\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega$, where $\Omega$ is the space of univariate quantile functions equipped with the 2-Wasserstein metric $d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}$. (Generally we also only observe the distributions over a discrete grid, not as full functions.) We treat the covariate vectors $\mathbf{x}_i$ as rows of matrix $\mathbf{X}$, which is column-centered and scaled so that $\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}$. The conditional Fréchet mean is estimated by
+Fréchet regression generalizes Euclidean regression to the general metric space
+setting. In the sample setting, we observe covariate-response pairs
+$\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega$, where
+$\Omega$ is the space of univariate quantile functions equipped with the
+2-Wasserstein metric
+$d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}$.
+(Generally we also only observe the distributions over a discrete grid, not as
+full functions.) We treat the covariate vectors $\mathbf{x}_i$ as rows of matrix
+$\mathbf{X}$, which is column-centered and scaled so that
+$\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}$. The conditional Fréchet
+mean at $X = \mathbf{x}_*$ is estimated by
 $$
-\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) := \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left\{ \frac{1}{n} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).
+\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_*) := \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{i=1}^n \left\{ \frac{1}{n} + \mathbf{x}_*^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_i\right\} d_W^2(\mathbf{y}_i, \mathbf{q}).
 $$
-This is the Fréchet regression problem, a weighted Fréchet mean problem which can be solved by quadratic programming. This is implemented by `frechetreg_univar2wass`, using a dual active-set method inspired from @arnstrom_dual_2022.
+This is the Fréchet regression problem, a weighted Fréchet mean problem solvable
+by quadratic programming. This is implemented by `frechetreg_univar2wass`, using
+a dual active-set method inspired from @arnstrom_dual_2022.
 
 ### Using `fastfrechet::frechetreg_univar2wass`
 
@@ -97,12 +153,19 @@ The `frechetreg_univar2wass` function from `fastfrechet` takes as input
 
 * `X`, the covariate matrix,
 * `Y`, the quantile function response matrix,
-* `Z`, an optional "output" covariate matrix for which to evaluate the conditional Fréchet means, if not `X`,
-* `C_init`, an optional warm-start estimate of the constraint active sets (see the `monotoneQP-fastfrechet` vignette for more details),
-* `lambda`, an optional sparsity vector from the variable selection method (see the next section), and
+* `Z`, an optional "output" covariate matrix for which to evaluate the
+conditional Fréchet means, if not `X`,
+* `C_init`, an optional warm-start estimate of the constraint active sets (see
+the `monotoneQP-fastfrechet` vignette for more details),
+* `lambda`, an optional sparsity vector from the variable selection method (see
+the next section), and
 * `lower` and `upper`, support constraints on the distributions.
 
-Since the `zinbinom` distribution is bounded from below by zero, we set `lower = 0`, and use default settings for other parameters. As output, `frechetreg_univar2wass` returns a list containing the set of fitted quantile functions `Qhat`, stored row-wise as in `Y`; and the `n` $\times$ `m+1` matrix of Lagrange multipliers associated with the solution, also stored row-wise.
+Since the `zinbinom` distribution is bounded from below by zero, we set
+`lower = 0`, and use default settings for other parameters. As output,
+`frechetreg_univar2wass` returns a list containing the set of fitted quantile
+functions `Qhat`, stored row-wise as in `Y`; and the `n` $\times$ `m+1` matrix
+of Lagrange multipliers associated with the solution, also stored row-wise.
 
 ```{r run-frechetreg}
 lower <- 0
@@ -128,7 +191,14 @@ min(output$Qhat)
 
 ### Plotting $\widehat{\mathbf{Y}}$ and $\widehat{\mathbf{Q}}$
 
-The Fréchet means associated with the Fréchet regression problem $\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise, the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function constraints of monotonicity or box constraints, whereas the solution $\widehat{\mathbf{Q}}$ does. We recover the unconstrained matrix `Yhat` from the output of `frechetreg_univar2wass`, and illustrate it side-by-side the fitted $\widehat{\mathbf{Q}}$.
+The Fréchet means associated with the Fréchet regression problem
+$\widehat{\mathbf{Q}}$ are projections of the unconstrained Euclidean response
+object $\widehat{\mathbf{Y}}$ onto the space of quantile functions. Row-wise,
+the matrix $\widehat{\mathbf{Y}}$ generally does not obey quantile function
+constraints of monotonicity or box constraints, whereas the solution
+$\widehat{\mathbf{Q}}$ does. We recover the unconstrained matrix `Yhat` from the
+output of `frechetreg_univar2wass`, and illustrate it side-by-side the fitted
+$\widehat{\mathbf{Q}}$.
 
 ```{r plot-unconstrained-constrained, fig.width = 8, fig.height = 5.5}
 # Plot the unconstrained estimators and the constrained conditional quantile functions:
@@ -146,10 +216,81 @@ matplot(mseq, t(output$Qhat),
 
 ## Low-Rank Settings
 
-The Fréchet regression problem has unique solution even when the model matrix $\mathbf{X}$ is not full rank.  The weight matrix $\mathbf{Z}(\mathbf{X}^{\top}\mathbf{X})^-\mathbf{X}^{\top}$ is invariant to choice of generalized inverse $(\mathbf{X}^{\top}\mathbf{X})^-$
-$$
+When $\mathbf{X}$ is not full column rank, and optional parameter `lambda` is
+not specified, there are restrictions on what form the output covariate matrix
+$\mathbf{X}$ may take.  Specifically, given the internal centering and scaling
+performed on $\mathbf{X}$ and $\mathbf{Z}$ in order to insert an isolated
+intercept column [@petersen_frechet_2019], so that in effect the Fréchet
+regression is performed on matrices
+$(\begin{matrix} \pmb{1} & \mathbf{X} \end{matrix})$ and
+$(\begin{matrix} \pmb{1} & \mathbf{Z} \end{matrix})$, the requirement for the
+Fréchet regression solution on $\mathbf{Z}$ to be unique is that each row in
+$(\begin{matrix} \pmb{1} & \mathbf{Z} \end{matrix})$ has to belong to the
+row-space of $(\begin{matrix} \pmb{1} & \mathbf{X} \end{matrix})$. When
+$\mathbf{X}$ is full column rank, this condition always holds; when it is not,
+this condition holds if each row of $\mathbf{Z}$ is an *affine combination* of
+the rows of $\mathbf{X}$.
 
-$$`fastfrechet` implements Fréchet regression even when the model matrix $\mathbf{X}$ is not full rank.  
+We can illustrate what happens when we remove rows from the example data set to
+make it low-rank.
+```{r low-rank-X}
+output <- frechetreg_univar2wass(X = X[1:5, ], Y = Y[1:5, ], Z = NULL, lower = 0)
+```
+```{r low-rank-X-graph, echo = FALSE}
+matplot(t(output$Qhat),
+  type = "l", lty = 1, col = "black", las = 1,
+  xlab = "u", ylab = "", main = "Low Rank X : n = 5, p = 10"
+)
+mtext(expression(widehat(Q)(u)), 2, 2.25)
+```
+Arbitrary `Z` inputs can throw an error in the low rank setting.
+```{r low-rank-X-Z-arbitrary}
+Z <- matrix(rnorm(10 * p), 10, p)
+output <- tryCatch(
+  expr = frechetreg_univar2wass(X = X[1:5, ], Y = Y[1:5, ], Z = Z, lower = 0),
+  error = function(e) {
+    return(e)
+  }
+)
+output$message
+```
+On the other hand, if $\mathbf{X}$ is not full column rank, but there exists a
+matrix $\mathbf{A} \in \mathbb{R}^{z \times n}$ such that
+$\mathbf{Z} = \mathbf{A}\mathbf{X}$, and each row $\mathbf{A}$ sums to 1, then
+$\mathbf{Z}$ obeys the requisite row-space constraint to obtain a unique
+Fréchet regression solution.
+```{r low-rank-X-Z-affine}
+A <- matrix(rnorm(10 * 5), 10, 5)
+A <- A / rowSums(A)
+Z <- A %*% X[1:5, ]
+output <- tryCatch(
+  expr = frechetreg_univar2wass(X = X[1:5, ], Y = Y[1:5, ], Z = Z, lower = 0),
+  error = function(e) {
+    return(e)
+  }
+)
+output$message # This is NULL, reflecting there is no error message
+```
+```{r low-rank-X-Z-graph, echo = FALSE}
+matplot(t(output$Qhat),
+  type = "l", lty = 1, col = "black", las = 1,
+  xlab = "u", ylab = "", main = "Affine Z : n = 5, p = 10, z = 10"
+)
+mtext(expression(widehat(Q)(u)), 2, 2.25)
+```
+Keep in mind that arbitrary linear combinations generally will not suffice.
+```{r low-rank-X-Z-linear}
+A <- matrix(rnorm(10 * 5), 10, 5)
+# A <- A / rowSums(A)
+Z <- A %*% X[1:5, ]
+output <- tryCatch(
+  expr = frechetreg_univar2wass(X = X[1:5, ], Y = Y[1:5, ], Z = Z, lower = 0),
+  error = function(e) {
+    return(e)
+  }
+)
+output$message
+```
 
 
 ## Variable selection with Fréchet ridge selection operator

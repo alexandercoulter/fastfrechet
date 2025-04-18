@@ -316,5 +316,5 @@ frechetreg_univar2wass <- function(X,
   }
 
   # Return Qhat value:
-  return(list("Qhat" = Qhat, "Lagrange_Multiplier" = Eta, "Yhat" = Yhat))
+  return(list("Qhat" = Qhat, "Lagrange_Multiplier" = Eta))
 }

@@ -25,3 +25,11 @@ FRiSO_GSD <- function(X, Y, gamma_init, tauseq, nudge, lower = 0, upper = 1, alp
     .Call(`_fastfrechet_FRiSO_GSD`, X, Y, gamma_init, tauseq, nudge, lower, upper, alpha, eps, max_theta, impulse, max_iter)
 }
 
+qr_econ_getQR <- function(X) {
+    .Call(`_fastfrechet_qr_econ_getQR`, X)
+}
+
+qr_proj <- function(X, Y, Z, tol = 1e-9) {
+    .Call(`_fastfrechet_qr_proj`, X, Y, Z, tol)
+}
+

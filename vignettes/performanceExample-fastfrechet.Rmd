@@ -25,14 +25,14 @@ library(microbenchmark)
 ```
 
 ```{r load-code, include = FALSE}
-s = system.file("private", "GlobalObj4h.R", package = "fastfrechet")
-if(file.exists(s)) source(s)
-s = system.file("private", "GloWassReg.R", package = "fastfrechet")
-if(file.exists(s)) source(s)
-s = system.file("private", "IndivRidgeGloWassReg.R", package = "fastfrechet")
-if(file.exists(s)) source(s)
-s = system.file("private", "lambdaGlobalcoordesc.R", package = "fastfrechet")
-if(file.exists(s)) source(s)
+s <- system.file("private", "GlobalObj4h.R", package = "fastfrechet")
+if (file.exists(s)) source(s)
+s <- system.file("private", "GloWassReg.R", package = "fastfrechet")
+if (file.exists(s)) source(s)
+s <- system.file("private", "IndivRidgeGloWassReg.R", package = "fastfrechet")
+if (file.exists(s)) source(s)
+s <- system.file("private", "lambdaGlobalcoordesc.R", package = "fastfrechet")
+if (file.exists(s)) source(s)
 ```
 
 # Purpose of Vignette
@@ -109,22 +109,22 @@ $$
 \mathbf{q}_{\mathbf{x}_i}( u \mid z_i, r_i, \rho_i) = F^{-1}_{\mathrm{nbinom}} \left( \frac{ u - z_i}{1 - z_i} \mid r_i, \rho_i  \right), \qquad u \in \left\{ \begin{matrix} \frac{1}{2m} & \frac{3}{2m} & \cdots & \frac{2m-1}{2m} \end{matrix} \right\},
 $$
 where $F^{-1}_{\mathrm{nbinom}}$ is effectuated by calling the `qnbinom`
-function in `R`. The example data set we generate for this vignette has sample
+function in R. The example data set we generate for this vignette has sample
 size $n = 100$, covariate number $p = 10$, and quantile functions evaluated on
 an equidistant $m = 100$ grid.
 
 ```{r generate-ZINB}
 set.seed(31)
-n = 100        # number of quantile functions
-p = 10         # number of covariates
-m = 100        # (0, 1) quantile functions grid density 
+n <- 100 # number of quantile functions
+p <- 10 # number of covariates
+m <- 100 # (0, 1) quantile functions grid density
 
 # Equidistant m-grid in (0, 1)
-mseq = seq(0.5 / m, 1 - 0.5 / m, length.out = m)
+mseq <- seq(0.5 / m, 1 - 0.5 / m, length.out = m)
 
-gendata = generate_zinbinom_qf(n, p, m)
-X = gendata$X  # (n x p) covariate matrix
-Y = gendata$Y  # (n x m) quantile response matrix, stored row-wise
+gendata <- generate_zinbinom_qf(n, p, m)
+X <- gendata$X # (n x p) covariate matrix
+Y <- gendata$Y # (n x m) quantile response matrix, stored row-wise
 ```
 
 ```{r figure1, include = FALSE}
@@ -132,17 +132,21 @@ Y = gendata$Y  # (n x m) quantile response matrix, stored row-wise
 png("zinb_examples.png", width = 6.5, height = 4, units = "in", res = 576)
 
 par(mai = c(0.55, 0.6, 0.3, 0.08))
-plot(x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(0, max(Y)), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(0, max(Y)), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 matlines(mseq, t(Y), col = "black", lty = 1, lwd = 1.5)
 axis(1, NULL, TRUE, FALSE, -1.1, cex.axis = 0.9)
 axis(2, NULL, TRUE, FALSE, -0.9, las = 1, cex.axis = 0.9)
 mtext("u", 1, 1.4, cex = 1.2)
 mtext("Y(u)", 2, 1.5, cex = 1.2)
-mtext(expression("Response Quantile Functions "*bold("Y")), 3, 0, cex = 1.3)
+mtext(expression("Response Quantile Functions " * bold("Y")), 3, 0, cex = 1.3)
 
 dev.off()
 ```
@@ -178,10 +182,10 @@ in an R package.
 
 ```{r frechet-times}
 # WRI takes a data frame input:
-X_df = as.data.frame(X)
+X_df <- as.data.frame(X)
 
 # Add small monotone adjustment to Y for WRI:
-Y_adj = Y + matrix(seq(0, 0.01, len = m), n, m, byrow = TRUE)
+Y_adj <- Y + matrix(seq(0, 0.01, len = m), n, m, byrow = TRUE)
 ```
 
 ## Computation Time Comparison
@@ -194,26 +198,28 @@ than methods currently available in R packages.
 
 ```{r microbenchmark-frechetreg, eval = FALSE}
 # Benchmark times over 5 iterations:
-M1 = microbenchmark("WRI" = wass_regress( ~ ., X_df, "quantile", Y_adj),
-                    "frechet" = GloDenReg(X, qin = Y, optns = list(lower = 0)),
-                    "Tucker" = GloWassReg(X, Y, X, lower = 0),
-                    "fastfrechet" = frechetreg_univar2wass(X, Y, lower = 0),
-                    times = 5,
-                    unit = "ms")
+M1 <- microbenchmark(
+  "WRI" = wass_regress(~., X_df, "quantile", Y_adj),
+  "frechet" = GloDenReg(X, qin = Y, optns = list(lower = 0)),
+  "Tucker" = GloWassReg(X, Y, X, lower = 0),
+  "fastfrechet" = frechetreg_univar2wass(X, Y, lower = 0),
+  times = 5,
+  unit = "ms"
+)
 
 # Display times (milliseconds) rounded to 1 decimal:
-M1$time = round(M1$time / 1e6, 1) * 1e6
+M1$time <- round(M1$time / 1e6, 1) * 1e6
 M1
 ```
 
 ```{r show-frechetreg-times, echo = FALSE}
 # Load times:
-s = system.file("private", "microbenchmark_results.Rda", package = "fastfrechet")
-if(file.exists(s)) load(s)
+s <- system.file("private", "microbenchmark_results.Rda", package = "fastfrechet")
+if (file.exists(s)) load(s)
 
 # Round frechetreg times:
-M1_temp = M1
-M1_temp$time = round(M1_temp$time / 1e6, 1) * 1e6
+M1_temp <- M1
+M1_temp$time <- round(M1_temp$time / 1e6, 1) * 1e6
 
 # Display rounded time summary:
 M1_temp
@@ -231,42 +237,50 @@ argument. The implementation from the Supplementary Material of
 problem to numerical accuracy.
 ```{r fit-QFs, eval = FALSE}
 # Fit quantile functions:
-WRI_Q = wass_regress( ~ ., X_df, "quantile", Y_adj)$Qfit
-frechet_Q = GloDenReg(X, qin = Y, optns = list(lower = 0))$qout
-Tucker_Q = GloWassReg(X, Y, X, lower = 0)
-fastfrechet_Q = frechetreg_univar2wass(X, Y, lower = 0)$Qhat
+WRI_Q <- wass_regress(~., X_df, "quantile", Y_adj)$Qfit
+frechet_Q <- GloDenReg(X, qin = Y, optns = list(lower = 0))$qout
+Tucker_Q <- GloWassReg(X, Y, X, lower = 0)
+fastfrechet_Q <- frechetreg_univar2wass(X, Y, lower = 0)$Qhat
 ```
 
 ```{r load-QFs, include = FALSE}
 # Load quantile functions:
-s = system.file("private", "Q_results.Rda", package = "fastfrechet")
-if(file.exists(s)) load(s)
+s <- system.file("private", "Q_results.Rda", package = "fastfrechet")
+if (file.exists(s)) load(s)
 ```
 
 ```{r figure2, include = FALSE}
 # Pick specific lines to plot:
-pick = c(54, 69)
-plotcols = c('#648FFF', '#785EF0', '#DC267F', '#FFB000', 'black')
+pick <- c(54, 69)
+plotcols <- c("#648FFF", "#785EF0", "#DC267F", "#FFB000", "black")
 
 # Figure margin and size specifications:
 # 0.4 + 4a + 4(0.06) = 6.5
-a = (6.5 - 0.32 - 0.45) / 4
-mais = cbind(c(0.35, 0.35, 0.35, 0.35),
-             c(0.45, 0.04, 0.04, 0.04),
-             c(0.2, 0.2, 0.2, 0.2),
-             c(0.04, 0.04, 0.04, 0.08))
-figs = cbind(c(0, 0.4 + a + 0.04, 0.4 + 2 * (a + 0.04), 0.4 + 3 * (a + 0.04)) / 6.5,
-             c(0.4 + a + 0.04, 0.4 + 2 * (a + 0.04), 0.4 + 3 * (a + 0.04), 6.5) / 6.5,
-             c(0, 0, 0, 0),
-             c(1, 1, 1, 1))
+a <- (6.5 - 0.32 - 0.45) / 4
+mais <- cbind(
+  c(0.35, 0.35, 0.35, 0.35),
+  c(0.45, 0.04, 0.04, 0.04),
+  c(0.2, 0.2, 0.2, 0.2),
+  c(0.04, 0.04, 0.04, 0.08)
+)
+figs <- cbind(
+  c(0, 0.4 + a + 0.04, 0.4 + 2 * (a + 0.04), 0.4 + 3 * (a + 0.04)) / 6.5,
+  c(0.4 + a + 0.04, 0.4 + 2 * (a + 0.04), 0.4 + 3 * (a + 0.04), 6.5) / 6.5,
+  c(0, 0, 0, 0),
+  c(1, 1, 1, 1)
+)
 
 png("frechetreg_accuracy_comparison.png", width = 6.5, height = 2.2, units = "in", res = 576)
 
 par(fig = figs[1, ], mai = mais[1, ], family = "Helvetica")
-plot(x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(WRI_Q), col = "black", lty = 1, lwd = 1.5)
@@ -274,23 +288,33 @@ matlines(mseq, t(WRI_Q[pick, ]), col = plotcols[c(1, 3)], lty = 1, lwd = 2)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
 axis(2, NULL, TRUE, FALSE, -0.9, las = 1, cex.axis = 0.55)
 mtext("u", 1, 0.7, cex = 0.8)
-mtext(expression(widehat("Q")*"(u)"), 2, 1, cex = 0.8)
+mtext(expression(widehat("Q") * "(u)"), 2, 1, cex = 0.8)
 text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
-     "WRI", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 0.17, par("usr")[4] + 0.0235, col = 'gray40',
-     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "WRI",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 0.17, par("usr")[4] + 0.0235,
+  col = "gray40",
+  "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
-     sprintf("%.4f sec", median(M1$time[M1$expr == "WRI"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+  sprintf("%.4f sec", median(M1$time[M1$expr == "WRI"]) / 1e9),
+  pos = 2, xpd = TRUE, cex = 0.55, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
-     pos = 2, xpd = TRUE, cex = 0.5)
+  pos = 2, xpd = TRUE, cex = 0.5
+)
 
 
 par(fig = figs[2, ], mai = mais[2, ], new = TRUE)
-plot(x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(frechet_Q), col = "black", lty = 1, lwd = 1.5)
@@ -298,21 +322,31 @@ matlines(mseq, t(frechet_Q[pick, ]), col = plotcols[c(1, 3)], lty = 1, lwd = 2)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
 mtext("u", 1, 0.7, cex = 0.8)
 text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
-     "frechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 0.32, par("usr")[4] + 0.0235, col = 'gray40',
-     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "frechet",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 0.32, par("usr")[4] + 0.0235,
+  col = "gray40",
+  "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
-     sprintf("%.4f sec", median(M1$time[M1$expr == "frechet"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+  sprintf("%.4f sec", median(M1$time[M1$expr == "frechet"]) / 1e9),
+  pos = 2, xpd = TRUE, cex = 0.55, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
-     pos = 2, xpd = TRUE, cex = 0.5)
+  pos = 2, xpd = TRUE, cex = 0.5
+)
 
 
 par(fig = figs[3, ], mai = mais[3, ], new = TRUE)
-plot(x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(Tucker_Q), col = "black", lty = 1, lwd = 1.5)
@@ -320,21 +354,31 @@ matlines(mseq, t(Tucker_Q[pick, ]), col = plotcols[c(1, 3)], lty = 1, lwd = 2)
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
 mtext("u", 1, 0.7, cex = 0.8)
 text(par("usr")[1] - 0.06, par("usr")[4] + 0.03,
-     "Tucker", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 0.32, par("usr")[4] + 0.0235, col = 'gray40',
-     "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "Tucker",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 0.32, par("usr")[4] + 0.0235,
+  col = "gray40",
+  "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
-     sprintf("%.4f sec", median(M1$time[M1$expr == "Tucker"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+  sprintf("%.4f sec", median(M1$time[M1$expr == "Tucker"]) / 1e9),
+  pos = 2, xpd = TRUE, cex = 0.55, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
-     pos = 2, xpd = TRUE, cex = 0.5)
+  pos = 2, xpd = TRUE, cex = 0.5
+)
 
 
 par(fig = figs[4, ], mai = mais[4, ], new = TRUE)
-plot(x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.01, 1.01), ylim = c(-0.4, 0.4), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(mseq, t(fastfrechet_Q), col = "black", lty = 1, lwd = 1.5)
@@ -342,94 +386,139 @@ matlines(mseq, t(fastfrechet_Q[pick, ]), col = plotcols[c(1, 3)], lty = 1, lwd =
 axis(1, axTicks(1), c("0", "0.2", "0.4", "0.6", "0.8", 1), FALSE, -1.3, cex.axis = 0.55)
 mtext("u", 1, 0.7, cex = 0.8)
 text(par("usr")[1] - 0.05, par("usr")[4] + 0.03,
-     "fastfrechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 0.46, par("usr")[4] + 0.0235, col = 'gray40',
-     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "fastfrechet",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 0.46, par("usr")[4] + 0.0235,
+  col = "gray40",
+  "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.06,
-     sprintf("%.4f sec", median(M1$time[M1$expr == "fastfrechet"]) / 1e9),
-     pos = 2, xpd = TRUE, cex = 0.55, font = 2)
+  sprintf("%.4f sec", median(M1$time[M1$expr == "fastfrechet"]) / 1e9),
+  pos = 2, xpd = TRUE, cex = 0.55, font = 2
+)
 text(par("usr")[2] + 0.01, par("usr")[3] + 0.12, "median run time:",
-     pos = 2, xpd = TRUE, cex = 0.5)
+  pos = 2, xpd = TRUE, cex = 0.5
+)
 
 dev.off()
 
-new_width = 3 * a + 0.52 + 0.04 + 0.52 + 0.08 + 0.52 + 0.08
+new_width <- 3 * a + 0.52 + 0.04 + 0.52 + 0.08 + 0.52 + 0.08
 # Figure margin and size specifications:
-mais = cbind(c(0.35, 0.35, 0.35),
-             c(0.52, 0.52, 0.52),
-             c(0.2, 0.2, 0.2),
-             c(0.04, 0.08, 0.08))
-figs = cbind(c(0, 0.52 + a + 0.04, 0.52 + a + 0.04 + 0.52 + a + 0.08) / new_width,
-             c(0.52 + a + 0.04, 0.52 + a + 0.04 + 0.52 + a + 0.08, new_width) / new_width,
-             c(0, 0, 0),
-             c(1, 1, 1))
+mais <- cbind(
+  c(0.35, 0.35, 0.35),
+  c(0.52, 0.52, 0.52),
+  c(0.2, 0.2, 0.2),
+  c(0.04, 0.08, 0.08)
+)
+figs <- cbind(
+  c(0, 0.52 + a + 0.04, 0.52 + a + 0.04 + 0.52 + a + 0.08) / new_width,
+  c(0.52 + a + 0.04, 0.52 + a + 0.04 + 0.52 + a + 0.08, new_width) / new_width,
+  c(0, 0, 0),
+  c(1, 1, 1)
+)
 
 # Calculate Yhat:
-Xs = cbind(1, scale(X))
-Yhat = Xs %*% solve(crossprod(Xs), crossprod(Xs, Y))
+Xs <- cbind(1, scale(X))
+Yhat <- Xs %*% solve(crossprod(Xs), crossprod(Xs, Y))
 
 png("frechetreg_accuracy_comparison2.png", width = new_width, height = 2.2, units = "in", res = 576)
 
 par(fig = figs[1, ], mai = mais[1, ], family = "Helvetica")
-plot(x = c(), y = c(), xlim = c(-1, 101), ylim = c(-1e-14, 0.02), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-1, 101), ylim = c(-1e-14, 0.02), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 lines(rowSums((pmax(WRI_Q, 0) - Yhat)^2) - rowSums((fastfrechet_Q - Yhat)^2),
-      col = "black", lty = 1, lwd = 1)
+  col = "black", lty = 1, lwd = 1
+)
 axis(1, c(1, 100), c(1, 100), FALSE, -1.3, cex.axis = 0.55)
 axis(2, axTicks(2), c("0", "0.005", "0.010", "0.015", "0.020"), FALSE, -0.9, las = 1, cex.axis = 0.55)
 mtext("Sample (i)", 1, 0.7, cex = 0.8)
 mtext(expression(f(widehat(Q))[WRI] - f(widehat(Q))[fastfrechet]),
-      2, 1.5, cex = 0.8)
+  2, 1.5,
+  cex = 0.8
+)
 text(par("usr")[1] - 6, par("usr")[4] + 0.03 / 0.8 * 0.02,
-     "WRI", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 17, par("usr")[4] + 0.0235 / 0.8 * 0.02, col = 'gray40',
-     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "WRI",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 17, par("usr")[4] + 0.0235 / 0.8 * 0.02,
+  col = "gray40",
+  "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 
 par(fig = figs[2, ], mai = mais[2, ], new = TRUE)
-plot(x = c(), y = c(), xlim = c(-1, 101), ylim = c(-1e-14, 0.02), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-1, 101), ylim = c(-1e-14, 0.02), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 lines(rowSums((pmax(frechet_Q, 0) - Yhat)^2) - rowSums((fastfrechet_Q - Yhat)^2),
-      col = "black", lty = 1, lwd = 1)
+  col = "black", lty = 1, lwd = 1
+)
 axis(1, c(1, 100), c(1, 100), FALSE, -1.3, cex.axis = 0.55)
 axis(2, axTicks(2), c("0", "0.005", "0.010", "0.015", "0.020"), FALSE, -0.9, las = 1, cex.axis = 0.55)
 mtext("Sample (i)", 1, 0.7, cex = 0.8)
 mtext(expression(f(widehat(Q))[frechet] - f(widehat(Q))[fastfrechet]),
-      2, 1.5, cex = 0.8)
+  2, 1.5,
+  cex = 0.8
+)
 text(par("usr")[1] - 6, par("usr")[4] + 0.03 / 0.8 * 0.02,
-     "frechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 32, par("usr")[4] + 0.0235 / 0.8 * 0.02, col = 'gray40',
-     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "frechet",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 32, par("usr")[4] + 0.0235 / 0.8 * 0.02,
+  col = "gray40",
+  "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 
 par(fig = figs[3, ], mai = mais[3, ], new = TRUE)
-plot(x = c(), y = c(), xlim = c(-1, 101), ylim = c(0, 2e-13), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-1, 101), ylim = c(0, 2e-13), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 lines(rowSums((Tucker_Q - Yhat)^2) - rowSums((fastfrechet_Q - Yhat)^2),
-      col = "black", lty = 1, lwd = 1)
+  col = "black", lty = 1, lwd = 1
+)
 axis(1, c(1, 100), c(1, 100), FALSE, -1.3, cex.axis = 0.55)
-axis(2, axTicks(2), c("0",
-                      expression("0.5"*scriptstyle("E")*-"13"),
-                      expression("1.0"*scriptstyle("E")*-"13"),
-                      expression("1.5"*scriptstyle("E")*-"13"),
-                      expression("2.0"*scriptstyle("E")*-"13")), FALSE, -0.9, las = 1, cex.axis = 0.5)
+axis(2, axTicks(2), c(
+  "0",
+  expression("0.5" * scriptstyle("E") * -"13"),
+  expression("1.0" * scriptstyle("E") * -"13"),
+  expression("1.5" * scriptstyle("E") * -"13"),
+  expression("2.0" * scriptstyle("E") * -"13")
+), FALSE, -0.9, las = 1, cex.axis = 0.5)
 mtext("Sample (i)", 1, 0.7, cex = 0.8)
 mtext(expression(f(widehat(Q))[Tucker] - f(widehat(Q))[fastfrechet]),
-      2, 1.75, cex = 0.8)
+  2, 1.75,
+  cex = 0.8
+)
 text(par("usr")[1] - 6, par("usr")[4] + 0.03 / 0.8 * 2e-13,
-     "Tucker", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 32, par("usr")[4] + 0.0235 / 0.8 * 2e-13, col = 'gray40',
-     "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "Tucker",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 32, par("usr")[4] + 0.0235 / 0.8 * 2e-13,
+  col = "gray40",
+  "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 
 dev.off()
 ```
@@ -443,8 +532,8 @@ the Fréchet regression objective function as well as the solutions from the
 `Tucker` materials and, `fastfrechet`.
 ```{r manually_box_solutions, eval = FALSE}
 # Fit quantile functions:
-WRI_Q = pmax(WRI_Q, 0)
-frechet_Q = pmax(frechet_Q, 0)
+WRI_Q <- pmax(WRI_Q, 0)
+frechet_Q <- pmax(frechet_Q, 0)
 ```
 
 ![](frechetreg_accuracy_comparison2.png){width=100%}
@@ -496,19 +585,15 @@ iterate.
 
 ```{r Tucker-function}
 # Wrapper function for Tucker et al. (2023) code:
-FRiSO_Tucker = function(X, Y, lower, upper, tauseq){
-
-  p = ncol(X)
-  Lambda = matrix(NA, nrow = p, ncol = length(tauseq))
-  L = rep(tauseq[1] / p, p)
-  for(t in 1:length(tauseq)){
-
-    L = lambdaGlobalcoordesc(X, Y, tauseq[t], L, lower, upper)$lambda
-    Lambda[ , t] = L
-
+FRiSO_Tucker <- function(X, Y, lower, upper, tauseq) {
+  p <- ncol(X)
+  Lambda <- matrix(NA, nrow = p, ncol = length(tauseq))
+  L <- rep(tauseq[1] / p, p)
+  for (t in 1:length(tauseq)) {
+    L <- lambdaGlobalcoordesc(X, Y, tauseq[t], L, lower, upper)$lambda
+    Lambda[, t] <- L
   }
   Lambda
-
 }
 ```
 
@@ -528,11 +613,11 @@ parameter.
 
 ```{r scale-tauseq-eseq}
 # Centering and scaling X
-X0 = (scale(X) * sqrt(n / (n - 1)))[,]
+X0 <- (scale(X) * sqrt(n / (n - 1)))[, ]
 
 # Defining tau range, and error tolerances:
-tauseq = seq(0.5, 10, by = 0.5)
-eseq = 0.014 / c(1, 2, 4, 8)
+tauseq <- seq(0.5, 10, by = 0.5)
+eseq <- 0.014 / c(1, 2, 4, 8)
 ```
 
 The implementation from `fastfrechet` is upward of 20,000$\times$ faster than
@@ -543,23 +628,25 @@ benefits.
 
 ```{r FRiSO-times, eval = FALSE}
 # Benchmark times over 5 iterations:
-M2 = microbenchmark("Tucker" = FRiSO_Tucker(X0, Y, 0, 1e6, tauseq),
-                    "fastfrechet_e" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[1]),
-                    "fastfrechet_e/2" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[2]),
-                    "fastfrechet_e/4" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[3]),
-                    "fastfrechet_e/8" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[4]),
-                    times = 5,
-                    unit = "ms")
+M2 <- microbenchmark(
+  "Tucker" = FRiSO_Tucker(X0, Y, 0, 1e6, tauseq),
+  "fastfrechet_e" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[1]),
+  "fastfrechet_e/2" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[2]),
+  "fastfrechet_e/4" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[3]),
+  "fastfrechet_e/8" = FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = eseq[4]),
+  times = 5,
+  unit = "ms"
+)
 
 # Display times (milliseconds) rounded to 1 decimal:
-M2$time = round(M2$time / 1e6, 1) * 1e6
+M2$time <- round(M2$time / 1e6, 1) * 1e6
 M2
 ```
 
 ```{r show-FRiSO-times, echo = FALSE}
 # Round FRiSO times:
-M2_temp = M2
-M2_temp$time = round(M2_temp$time / 1e6, 1) * 1e6
+M2_temp <- M2
+M2_temp$time <- round(M2_temp$time / 1e6, 1) * 1e6
 
 # Display rounded time summary:
 M2_temp
@@ -580,122 +667,152 @@ time.
 
 ```{r obtain-FRiSO-lambdas, eval = FALSE}
 # Set sequence of error tolerances:
-eseq = 0.014 / c(1, 2, 4, 8)
+eseq <- 0.014 / c(1, 2, 4, 8)
 
 # Calculate lambdas with fastfrechet implementation:
-L_fastfrechet = sapply(eseq, function(e){
-
+L_fastfrechet <- sapply(eseq, function(e) {
   FRiSO_univar2wass(X, Y, 0, Inf, tauseq, eps = e)
-
 }, simplify = "array")
 
 # Calculate lambdas with Tucker et al. (2023) implementation:
-L_Tucker = FRiSO_Tucker(X0, Y, 0, 1000, tauseq)
+L_Tucker <- FRiSO_Tucker(X0, Y, 0, 1000, tauseq)
 ```
 
 ```{r load-FRiSO-lambdas, include = FALSE}
 # Load lambda path results:
-s = system.file("private", "L_results.Rda", package = "fastfrechet")
-if(file.exists(s)) load(s)
+s <- system.file("private", "L_results.Rda", package = "fastfrechet")
+if (file.exists(s)) load(s)
 ```
 
 ```{r figure3, include = FALSE}
 # Calculate objective function values for fastfrechet implementation:
-f_fastfrechet = matrix(apply(expand.grid(tauseq, eseq), 1, function(x){
-
-  t = which(tauseq == x[1])
-  e = which(eseq == x[2])
-  Q = frechetreg_univar2wass(X, Y, lambda = L_fastfrechet[ , t, e], lower = 0)$Qhat
+f_fastfrechet <- matrix(apply(expand.grid(tauseq, eseq), 1, function(x) {
+  t <- which(tauseq == x[1])
+  e <- which(eseq == x[2])
+  Q <- frechetreg_univar2wass(X, Y, lambda = L_fastfrechet[, t, e], lower = 0)$Qhat
   mean((Y - Q)^2)
-
 }), ncol = 4)
 
 # Calculate objective function values for Tucker et al. (2023) implementation:
-f_Tucker = sapply(1:length(tauseq), function(t){
-
-  Q = frechetreg_univar2wass(X, Y, lambda = L_Tucker[ , t], lower = 0)$Qhat
+f_Tucker <- sapply(1:length(tauseq), function(t) {
+  Q <- frechetreg_univar2wass(X, Y, lambda = L_Tucker[, t], lower = 0)$Qhat
   mean((Y - Q)^2)
-
 })
 
 # 0.45 + 0.75 + 3a + 2(0.08) = 6.5
-a = (6.5 - 0.16 - 0.4 - 0.55) / 3
-mais = cbind(c(0.35, 0.35, 0.35),
-             c(0.4, 0.04, 0.55),
-             c(0.2, 0.2, 0.2),
-             c(0.04, 0, 0.08))
-figs = cbind(c(0, 0.4 + a + 0.04, 0.4 + a + 0.08 + a) / 6.5,
-             c(0.4 + a + 0.04, 0.4 + a + 0.08 + a, 6.5) / 6.5,
-             c(0, 0, 0),
-             c(1, 1, 1))
+a <- (6.5 - 0.16 - 0.4 - 0.55) / 3
+mais <- cbind(
+  c(0.35, 0.35, 0.35),
+  c(0.4, 0.04, 0.55),
+  c(0.2, 0.2, 0.2),
+  c(0.04, 0, 0.08)
+)
+figs <- cbind(
+  c(0, 0.4 + a + 0.04, 0.4 + a + 0.08 + a) / 6.5,
+  c(0.4 + a + 0.04, 0.4 + a + 0.08 + a, 6.5) / 6.5,
+  c(0, 0, 0),
+  c(1, 1, 1)
+)
 # Save graph:
 png("friso_accuracy_comparison.png", width = 6.5, height = a + 0.35 + 0.2, units = "in", res = 576)
 
 par(mai = mais[1, ], fig = figs[1, ], family = "Helvetica")
-plot(x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0, 4), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0, 4), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
 matlines(tauseq, t(L_Tucker), col = "black", lty = 1)
 axis(1, NULL, TRUE, FALSE, -1.3, cex.axis = 0.55)
 axis(2, NULL, TRUE, FALSE, -0.9, las = 1, cex.axis = 0.55)
 mtext(expression(tau), 1, 0.7, cex = 0.8)
-mtext(expression(widehat(bold(lambda))*"("*tau*")"), 2, 0.65, cex = 0.8)
+mtext(expression(widehat(bold(lambda)) * "(" * tau * ")"), 2, 0.65, cex = 0.8)
 text(par("usr")[1] - 0.6, par("usr")[4] + 0.15,
-     "Tucker", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 2.3, par("usr")[4] + 0.1175, col = 'gray40',
-     "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "Tucker",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 2.3, par("usr")[4] + 0.1175,
+  col = "gray40",
+  "PAPER SUPPLEMENT", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 text(par("usr")[1] + 0.1, par("usr")[4] - 0.35, "median run time:",
-     pos = 4, xpd = TRUE, cex = 0.5)
+  pos = 4, xpd = TRUE, cex = 0.5
+)
 text(par("usr")[1] + 0.1, par("usr")[4] - 0.6,
-     sprintf("%.4f sec", median(M2$time[M2$expr == "Tucker"]) / 1e9),
-     pos = 4, xpd = TRUE, cex = 0.55, font = 2)
+  sprintf("%.4f sec", median(M2$time[M2$expr == "Tucker"]) / 1e9),
+  pos = 4, xpd = TRUE, cex = 0.55, font = 2
+)
 
 
 
 par(mai = mais[2, ], fig = figs[2, ], new = TRUE)
-plot(x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0, 4), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0, 4), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 0, lty = 2, col = "gray50")
-matlines(tauseq, t(L_fastfrechet[ , , 1]), col = "black", lty = 1)
+matlines(tauseq, t(L_fastfrechet[, , 1]), col = "black", lty = 1)
 axis(1, NULL, TRUE, FALSE, -1.3, cex.axis = 0.55)
 mtext(expression(tau), 1, 0.7, cex = 0.8)
 text(par("usr")[1] - 0.6, par("usr")[4] + 0.15,
-     "fastfrechet", pos = 4, xpd = TRUE, cex = 0.75, font = 2)
-text(par("usr")[1] + 3.7, par("usr")[4] + 0.1175, col = 'gray40',
-     "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2)
+  "fastfrechet",
+  pos = 4, xpd = TRUE, cex = 0.75, font = 2
+)
+text(par("usr")[1] + 3.7, par("usr")[4] + 0.1175,
+  col = "gray40",
+  "R PACKAGE", pos = 4, xpd = TRUE, cex = 0.45, font = 2
+)
 text(par("usr")[1] + 0.1, par("usr")[4] - 0.35,
-     expression("median run time ("*epsilon*" = 0.014):"),
-     pos = 4, xpd = TRUE, cex = 0.5)
+  expression("median run time (" * epsilon * " = 0.014):"),
+  pos = 4, xpd = TRUE, cex = 0.5
+)
 text(par("usr")[1] + 0.1, par("usr")[4] - 0.6,
-     sprintf("%.4f sec", median(M2$time[M2$expr == "fastfrechet_e"]) / 1e9),
-     pos = 4, xpd = TRUE, cex = 0.55, font = 2)
+  sprintf("%.4f sec", median(M2$time[M2$expr == "fastfrechet_e"]) / 1e9),
+  pos = 4, xpd = TRUE, cex = 0.55, font = 2
+)
 
 
 par(mai = mais[3, ], fig = figs[3, ], new = TRUE)
-plot(x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0.9999, 1.0001), axes = FALSE,
-     xlab = "", ylab = "")
-polygon(x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
-        col = "gray93", border = NA)
+plot(
+  x = c(), y = c(), xlim = c(-0.1, 10.1), ylim = c(0.9999, 1.0001), axes = FALSE,
+  xlab = "", ylab = ""
+)
+polygon(
+  x = par("usr")[c(1, 2, 2, 1)], y = par("usr")[c(3, 3, 4, 4)],
+  col = "gray93", border = NA
+)
 abline(h = axTicks(2), v = axTicks(1), col = "white")
 abline(h = 1, lty = 2, col = "gray50")
-matlines(tauseq, f_fastfrechet / f_Tucker, type = 'o', lty = 1,
-         col = c("black", "#648FFF", "#FFB000", "#DC267F"),
-         lwd = 1, pch = 15:18, cex = c(0.5, 0.5, 0.5, 0.7))
+matlines(tauseq, f_fastfrechet / f_Tucker,
+  type = "o", lty = 1,
+  col = c("black", "#648FFF", "#FFB000", "#DC267F"),
+  lwd = 1, pch = 15:18, cex = c(0.5, 0.5, 0.5, 0.7)
+)
 axis(1, NULL, TRUE, FALSE, -1.3, cex.axis = 0.55)
 axis(2, c(0.9999, 1, 1.0001),
-     c(expression("1 \U2013 10"^-4), expression("1.0"), expression("1 + 10"^-4)), FALSE, -0.9, las = 1, cex.axis = 0.55)
+  c(expression("1 \U2013 10"^-4), expression("1.0"), expression("1 + 10"^-4)), FALSE, -0.9,
+  las = 1, cex.axis = 0.55
+)
 mtext(expression(tau), 1, 0.7, cex = 0.8)
-mtext(expression("f("*bold(widehat(lambda))*")"["fastfrechet"]*" / f("*bold(widehat(lambda))*")"[Tucker]),
-      2, 1.3, las = 0, cex = 0.8)
-legend("topleft", col = c("black", "#648FFF", "#FFB000", "#DC267F"),
-       pch = 15:18, lwd = 1, bty = "n", cex = 0.52, pt.cex = c(0.5, 0.5, 0.5, 0.7),
-       legend = sapply(1:4, function(e) bquote(epsilon*" = "*.(eseq[e])*" ("*.(round(median(M2$time[M2$expr == levels(M2$expr)[e + 1]])/1e6,1))*" ms)")))
+mtext(expression("f(" * bold(widehat(lambda)) * ")"["fastfrechet"] * " / f(" * bold(widehat(lambda)) * ")"[Tucker]),
+  2, 1.3,
+  las = 0, cex = 0.8
+)
+legend("topleft",
+  col = c("black", "#648FFF", "#FFB000", "#DC267F"),
+  pch = 15:18, lwd = 1, bty = "n", cex = 0.52, pt.cex = c(0.5, 0.5, 0.5, 0.7),
+  legend = sapply(1:4, function(e) bquote(epsilon * " = " * .(eseq[e]) * " (" * .(round(median(M2$time[M2$expr == levels(M2$expr)[e + 1]]) / 1e6, 1)) * " ms)"))
+)
 
 dev.off()
 ```

@@ -10,37 +10,58 @@
 #' set of covariate vectors. Accommodates the regularization scheme from
 #' \insertCite{tucker_variable_2023}{fastfrechet}.
 #'
-#' @param X A (`n` \eqn{\times} `p`) "input" covariate matrix with no missing, all finite entries.
+#' @param X A (`n` \eqn{\times} `p`) "input" covariate matrix with no missing, all finite entries. We recommend you **do not** include an intercept column (i.e. all `1`'s vector).
 #' @param Y A (`n` \eqn{\times} `m`) matrix of observed quantile functions evaluated on a shared uniform `m`-grid in \eqn{(0, 1)} - e.g. `seq(0.5/m, 1 - 0.5/m, len = m)` - row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by `lower` and `upper` parameters.
-#' @param Z An optional (`z` \eqn{\times} `p`) "output" covariate matrix (default `NULL`) with no missing, all finite entries.
+#' @param Z An optional (`z` \eqn{\times} `p`) "output" covariate matrix (default `NULL`) with no missing, all finite entries. If the rows of \eqn{(\begin{matrix} 1 & \mathbf{Z} \end{matrix})} do not belong to the column space of \eqn{(\begin{matrix} 1 & \mathbf{X} \end{matrix})^{\top}}, then there is no unique Fréchet regression solution.
 #' @param C_init An optional (`n` \eqn{\times} `m + 1`) matrix (or `z` \eqn{\times} `m + 1` if `Z` is provided) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.
 #' @param lambda An optional (`p` \eqn{\times} `1`) vector with non-negative entries whose sum is strictly positive.
 #'  If `NULL` a non-regularized regression is performed (the default).
 #' @param lower An optional numeric scalar (default `-Inf`) lower box constraint; must be strictly less than `upper`.
 #' @param upper An optional numeric scalar (default `Inf`) upper box constraint; must be strictly greater than `lower`.
 #' @param eps An optional numeric scalar (default `1e-10`) error tolerance; must be strictly positive.
+#' @param Ztol An optional numeric scalar (default `1e-10`) error tolerance for the row-space condition on `Z`; must be strictly positive. See Details.
 #'
 #' @details
-#' Fréchet regression generalizes Euclidean regression to the general metric space setting.
-#' In the sample setting, we observe covariate-response pairs \eqn{\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega},
-#' where \eqn{\mathbf{x}_i}'s are rows of matrix \eqn{\mathbf{X}} column-centered
-#' and scaled such that \eqn{\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}},
-#' and \eqn{\Omega} is the space of univariate quantile functions equipped with
-#' the 2-Wasserstein metric \eqn{d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}}.
-#' (Generally we also only observe the distributions over a discrete grid, not as
-#' full functions.) The conditional Fréchet mean is estimated by
-#' \deqn{\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) = \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left\{ n^{-1} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).}
-#' This is the Fréchet regression problem, a weighted-mean and quadratic programming
-#' problem which this function solves with a customized dual active-set method
-#' inspired by \insertCite{arnstrom_dual_2022}{fastfrechet}.
+#' Fréchet regression generalizes Euclidean regression to the general metric
+#' space setting. In the sample setting, we observe covariate-response pairs
+#' \eqn{\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega},
+#' where \eqn{\mathbf{x}_i}'s are rows of matrix \eqn{\mathbf{X}}
+#' column-centered and scaled such that
+#' \eqn{\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}}, and \eqn{\Omega}
+#' is the space of univariate quantile functions equipped with the 2-Wasserstein
+#' metric \eqn{d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L^2[0,1]}}.
+#' (Generally we also only observe the distributions over a discrete grid, not
+#' as full functions.) The conditional Fréchet mean is estimated by
+#' \deqn{\widehat{\mathbf{q}}_{\oplus}(\mathbf{z}) = \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left\{ n^{-1} + \mathbf{z}^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).}
+#' This is the Fréchet regression problem, a weighted-mean and quadratic
+#' programming problem which this function solves with a customized dual
+#' active-set method inspired by \insertCite{arnstrom_dual_2022}{fastfrechet}.
 #'
 #' Options include box constraints on distribution support, an option to evaluate
 #' quantile function estimates on a different set of covariate vectors than the
 #' "input" vectors, and an option to include an initial estimate of the active
-#' constraint sets. The function accommodates non-full rank covariate matrices,
-#' as well as the regularization used in the variable selection method of
-#' \insertCite{tucker_variable_2023}{fastfrechet} through the parameter `lambda`.
-#' By default, the function will perform non-regularized regression.
+#' constraint sets. The function accommodates non-full column rank covariate
+#' matrix `X`, as well as the regularization used in the variable selection
+#' method of \insertCite{tucker_variable_2023}{fastfrechet} through the
+#' parameter `lambda`. By default, the function will perform non-regularized
+#' regression.
+#'
+#' In case `X` is not full column rank, and `lambda` is not provided, the
+#' Fréchet mean is unique only if the rows of `(1 Z)` are in the row-space of
+#' `(1 X)`. This is because the solution would otherwise depend on the choice of
+#' generalized inverse of the covariance object `X'X`. Specifically, the rows of
+#' `Z` have to be *affine combinations* of the rows of `X`, i.e. linear
+#' combinations where the weights sum to 1. This is more restrictive than a
+#' simple linear combination due to the inclusion of an explicit intercept
+#' column under the hood, which is why we ask you do not include an intercept
+#' column in either `X` or `Z`. The affine combination property of `X` preserves
+#' the intercept column. When either `X` is full column rank or an appropriate
+#' `lambda` is specified, the covariance object is either full rank or is
+#' regularized, so it has an exact and unique inverse.
+#'
+#' This function checks the row-space condition on `Z` if it is included and if
+#' `lambda` is not included. If `Z` does not meet the row-space condition, the
+#' function terminates with an error.
 #'
 #' @return A list object with components:
 #' \tabular{ll}{
@@ -100,7 +121,8 @@ frechetreg_univar2wass <- function(X,
                                    lambda = NULL,
                                    lower = -Inf,
                                    upper = Inf,
-                                   eps = 1e-10) {
+                                   eps = 1e-10,
+                                   Ztol = 1e-6) {
   # Compatibility and dimension checks:
 
   # Numeric matrix checks for X and Y, Z if provided:
@@ -122,9 +144,11 @@ frechetreg_univar2wass <- function(X,
   check_numeric(upper, "scalar", finite = FALSE)
   if (lower >= upper) stop("'lower' must be strictly less than 'upper'.")
 
-  # Numeric scalar and constraint checks for eps:
+  # Numeric scalar and constraint checks for eps and Ztol:
   check_numeric(eps, "scalar", finite = TRUE)
   if (eps <= 0) stop("'eps' must be strictly positive.")
+  check_numeric(Ztol, "scalar", finite = TRUE)
+  if (Ztol <= 0) stop("'Ztol' must be strictly positive.")
 
   # Check for column matching between X and Z, if provided:
   if (!is.null(Z)) if (ncol(X) != ncol(Z)) stop("'X' and 'Z' must have the same number of columns.")
@@ -173,69 +197,10 @@ frechetreg_univar2wass <- function(X,
 
       # If lambda is not present (i.e. non-regularized regression)...
       if (is.null(lambda)) {
-        # For simplicity in comments, let X = Xc. The following  evaluates
-        #
-        # ( 1/n J + Z( X'X )^{+}X' )Y
-        #
-        # which requires either inverting X'X (if possible) or finding the
-        # right singular vectors of X. In case X'X is not invertible, the
-        # SVD of X or the SVD of X'X (both through which the right singular
-        # vectors can be found) should be selected by comparing n vs. p.
-        #
-        # We re-write the expression of interest as
-        #
-        # ( 1/n J + ZM )Y,
-        #
-        # and try first to invert X'X. If it fails, we take an SVD route.
-        if (p > (0.9 * n)) {
-          # In case p out-scales n, SVD on X is faster than SVD on X'X:
-          M <- tryCatch(solve(crossprod(Xc), crossprod(Xc, Y)),
-            error = function(e) {
-              S <- svd(Xc)
-              g <- which(S$d > 1e-10)
+        output <- qr_proj(cbind(1, Xc), Y, cbind(1, Zc), tol = Ztol)
+        if (!output$Converged) stop("The rows of matrix (1 Z) are not all in the row-space of (1 X).")
 
-              # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-              if (length(g) == 0) {
-                return(list(matrix(0, p, 1), matrix(0, 1, m)))
-              }
-
-              return(list(S$v[, g, drop = FALSE], crossprod(S$v[, g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g]^2)))
-            }
-          )
-
-          if (!is.list(M)) {
-            # Calculate Yhat:
-            Yhat <- rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% M
-          } else {
-            # Calculate Yhat, preferring to first multiply Z by the right
-            # singular vector matrix V[ , g] under the assumption n ~ nz:
-            Yhat <- rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + (Zc %*% M[[1]]) %*% M[[2]]
-          }
-        } else {
-          # In case n out-scales p, SVD on X'X is faster than SVD on X:
-          M <- tryCatch(solve(crossprod(Xc), crossprod(Xc, Y)),
-            error = function(e) {
-              S <- svd(crossprod(Xc))
-              g <- which(S$d > 1e-10)
-
-              # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-              if (length(g) == 0) {
-                return(matrix(0, p, m))
-              }
-
-              return(list(S$v[, g, drop = FALSE], crossprod(S$v[, g, drop = FALSE], crossprod(Xc, Y)) / (S$d[g])))
-            }
-          )
-
-          if (!is.list(M)) {
-            # Calculate Yhat:
-            Yhat <- rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% M
-          } else {
-            # Calculate Yhat, preferring to first multiply the matrices from
-            # M's output under the assumption n ~ nz:
-            Yhat <- rep(1, nz) %*% crossprod(rep(1 / n, n), Y) + Zc %*% (M[[1]] %*% M[[2]])
-          }
-        }
+        Yhat <- output$Solution
       } else {
         # Scale Xc and Zc by sqrt(n) to simplify algebra with ridge penalty:
         Xcn <- Xc / sqrt(n)
@@ -289,57 +254,13 @@ frechetreg_univar2wass <- function(X,
 
       # If lambda is not present (i.e. non-regularized regression)...
       if (is.null(lambda)) {
-        # For simplicity in comments, let X = Xc. The following  evaluates
+        # Evaluate the economical QR decomposition of (1 X) in order to perform
+        # fast projection, since
         #
-        # ( 1/n J + X( X'X )^{+}X' )Y
-        #
-        # i.e. the projection of Y onto ColSpace(1, X). This requires either
-        # inverting X'X (if possible) or finding the right singular vectors of
-        # X.
-        #
-        # We re-write the expression of interest as
-        #
-        # ( 1/n J + ZM )Y,
-        #
-        # and compare p vs. n. If p is at least as large as n, we immediately
-        # skip to the SVD method. If it is less than n, we try to invert X'X,
-        # and if that fails then we do the SVD method.
-        if (p >= n) {
-          # Immediately calculate SVD of Xc = USV':
-          S <- svd(Xc)
-          g <- which(S$d > 1e-10)
+        # Yhat = QQ'Y
+        QR <- qr_econ_getQR(cbind(1, Xc))
 
-          # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-          if (length(g) == 0) {
-            M <- 0
-          } else {
-            # Evaluate UU'Y, ordering the multiplication based on n > m:
-            M <- if (n > m) S$u[, g, drop = FALSE] %*% crossprod(S$u[, g, drop = FALSE], Y) else tcrossprod(S$u[, g, drop = FALSE]) %*% Y
-          }
-
-          # Calculate Yhat:
-          Yhat <- rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
-        } else {
-          # Try to solve X(X'X)^{-1}X'Y through inversion method:
-          M <- tryCatch(Xc %*% solve(crossprod(Xc), crossprod(Xc, Y)),
-            error = function(e) {
-              # If inversion fails, calculate SVD of Xc = USV':
-              S <- svd(Xc)
-              g <- which(S$d > 1e-10)
-
-              # If length(g) == 0, then X is essentially all-zeros, meaning should evaluate to all zeros:
-              if (length(g) == 0) {
-                return(0)
-              }
-
-              # Evaluate UU'Y, ordering the multiplication based on n > m:
-              if (n > m) S$u[, g, drop = FALSE] %*% crossprod(S$u[, g, drop = FALSE], Y) else tcrossprod(S$u[, g, drop = FALSE]) %*% Y
-            }
-          )
-
-          # Calculate Yhat:
-          Yhat <- rep(1, n) %*% crossprod(rep(1 / n, n), Y) + M
-        }
+        Yhat <- QR$Q %*% crossprod(QR$Q, Y)
       } else {
         # Scale Xc sqrt(n) to simplify algebra with ridge penalty:
         Xcn <- Xc / sqrt(n)
@@ -393,8 +314,10 @@ frechetreg_univar2wass <- function(X,
     # Calculate Qhat from stability optimality condition:
     Qhat <- Yhat + (Eta[, -ncol(Eta)] - Eta[, -1])
     
+    # Apply lower and upper constraints as in monotoneQP function:
+    
   }
 
   # Return Qhat value:
-  return(list("Qhat" = Qhat, "Lagrange_Multiplier" = Eta))
+  return(list("Qhat" = Qhat, "Lagrange_Multiplier" = Eta, "Yhat" = Yhat))
 }

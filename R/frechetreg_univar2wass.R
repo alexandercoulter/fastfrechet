@@ -313,9 +313,6 @@ frechetreg_univar2wass <- function(X,
 
     # Calculate Qhat from stability optimality condition:
     Qhat <- Yhat + (Eta[, -ncol(Eta)] - Eta[, -1])
-    
-    # Apply lower and upper constraints as in monotoneQP function:
-    
   }
 
   # Return Qhat value:

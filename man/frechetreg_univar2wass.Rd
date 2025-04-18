@@ -12,15 +12,16 @@ frechetreg_univar2wass(
   lambda = NULL,
   lower = -Inf,
   upper = Inf,
-  eps = 1e-10
+  eps = 1e-10,
+  Ztol = 1e-06
 )
 }
 \arguments{
-\item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
+\item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries. We recommend you \strong{do not} include an intercept column (i.e. all \code{1}'s vector).}
 
 \item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions evaluated on a shared uniform \code{m}-grid in \eqn{(0, 1)} - e.g. \code{seq(0.5/m, 1 - 0.5/m, len = m)} - row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 
-\item{Z}{An optional (\code{z} \eqn{\times} \code{p}) "output" covariate matrix (default \code{NULL}) with no missing, all finite entries.}
+\item{Z}{An optional (\code{z} \eqn{\times} \code{p}) "output" covariate matrix (default \code{NULL}) with no missing, all finite entries. If the rows of \eqn{(\begin{matrix} 1 & \mathbf{Z} \end{matrix})} do not belong to the column space of \eqn{(\begin{matrix} 1 & \mathbf{X} \end{matrix})^{\top}}, then there is no unique Fréchet regression solution.}
 
 \item{C_init}{An optional (\code{n} \eqn{\times} \code{m + 1}) matrix (or \code{z} \eqn{\times} \code{m + 1} if \code{Z} is provided) of non-negative entries, specifying initial active set(s) for optimization. Active sets are identified by positive entries, row-wise if a matrix.}
 
@@ -32,6 +33,8 @@ If \code{NULL} a non-regularized regression is performed (the default).}
 \item{upper}{An optional numeric scalar (default \code{Inf}) upper box constraint; must be strictly greater than \code{lower}.}
 
 \item{eps}{An optional numeric scalar (default \code{1e-10}) error tolerance; must be strictly positive.}
+
+\item{Ztol}{An optional numeric scalar (default \code{1e-10}) error tolerance for the row-space condition on \code{Z}; must be strictly positive. See Details.}
 }
 \value{
 A list object with components:
@@ -51,26 +54,46 @@ set of covariate vectors. Accommodates the regularization scheme from
 \insertCite{tucker_variable_2023}{fastfrechet}.
 }
 \details{
-Fréchet regression generalizes Euclidean regression to the general metric space setting.
-In the sample setting, we observe covariate-response pairs \eqn{\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega},
-where \eqn{\mathbf{x}_i}'s are rows of matrix \eqn{\mathbf{X}} column-centered
-and scaled such that \eqn{\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}},
-and \eqn{\Omega} is the space of univariate quantile functions equipped with
-the 2-Wasserstein metric \eqn{d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L_2[0,1]}}.
-(Generally we also only observe the distributions over a discrete grid, not as
-full functions.) The conditional Fréchet mean is estimated by
-\deqn{\widehat{\mathbf{q}}_{\oplus}(\mathbf{x}_i) = \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left\{ n^{-1} + \mathbf{x}_i^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).}
-This is the Fréchet regression problem, a weighted-mean and quadratic programming
-problem which this function solves with a customized dual active-set method
-inspired by \insertCite{arnstrom_dual_2022}{fastfrechet}.
+Fréchet regression generalizes Euclidean regression to the general metric
+space setting. In the sample setting, we observe covariate-response pairs
+\eqn{\{(\mathbf{x}_i, \mathbf{y}_i)\} \subset \mathbb{R}^p \times \Omega},
+where \eqn{\mathbf{x}_i}'s are rows of matrix \eqn{\mathbf{X}}
+column-centered and scaled such that
+\eqn{\mathrm{diag}(\mathbf{X}^{\top}\mathbf{X}) = \pmb{1}}, and \eqn{\Omega}
+is the space of univariate quantile functions equipped with the 2-Wasserstein
+metric \eqn{d_W(\mathbf{q}, \mathbf{p}) = \lVert\mathbf{q} - \mathbf{p}\rVert_{L^2[0,1]}}.
+(Generally we also only observe the distributions over a discrete grid, not
+as full functions.) The conditional Fréchet mean is estimated by
+\deqn{\widehat{\mathbf{q}}_{\oplus}(\mathbf{z}) = \underset{\mathbf{q}\in\Omega}{\mathrm{argmin}} \sum_{j=1}^n \left\{ n^{-1} + \mathbf{z}^{\top}(\mathbf{X}^{\top}\mathbf{X})^+\mathbf{x}_j\right\} d_W^2(\mathbf{y}_j, \mathbf{q}).}
+This is the Fréchet regression problem, a weighted-mean and quadratic
+programming problem which this function solves with a customized dual
+active-set method inspired by \insertCite{arnstrom_dual_2022}{fastfrechet}.
 
 Options include box constraints on distribution support, an option to evaluate
 quantile function estimates on a different set of covariate vectors than the
 "input" vectors, and an option to include an initial estimate of the active
-constraint sets. The function accommodates non-full rank covariate matrices,
-as well as the regularization used in the variable selection method of
-\insertCite{tucker_variable_2023}{fastfrechet} through the parameter \code{lambda}.
-By default, the function will perform non-regularized regression.
+constraint sets. The function accommodates non-full column rank covariate
+matrix \code{X}, as well as the regularization used in the variable selection
+method of \insertCite{tucker_variable_2023}{fastfrechet} through the
+parameter \code{lambda}. By default, the function will perform non-regularized
+regression.
+
+In case \code{X} is not full column rank, and \code{lambda} is not provided, the
+Fréchet mean is unique only if the rows of \verb{(1 Z)} are in the row-space of
+\verb{(1 X)}. This is because the solution would otherwise depend on the choice of
+generalized inverse of the covariance object \verb{X'X}. Specifically, the rows of
+\code{Z} have to be \emph{affine combinations} of the rows of \code{X}, i.e. linear
+combinations where the weights sum to 1. This is more restrictive than a
+simple linear combination due to the inclusion of an explicit intercept
+column under the hood, which is why we ask you do not include an intercept
+column in either \code{X} or \code{Z}. The affine combination property of \code{X} preserves
+the intercept column. When either \code{X} is full column rank or an appropriate
+\code{lambda} is specified, the covariance object is either full rank or is
+regularized, so it has an exact and unique inverse.
+
+This function checks the row-space condition on \code{Z} if it is included and if
+\code{lambda} is not included. If \code{Z} does not meet the row-space condition, the
+function terminates with an error.
 }
 \examples{
 # Generate data for X and Y inputs by using the output of `generate_zinbinom_qf`

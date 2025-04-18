@@ -7,7 +7,7 @@
 FRiSO_CPSS_univar2wass(X, Y, B = 50, thresh = 1e-04, ...)
 }
 \arguments{
-\item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries.}
+\item{X}{A (\code{n} \eqn{\times} \code{p}) "input" covariate matrix with no missing, all finite entries. We recommend you \strong{do not} include an intercept column (i.e. all \code{1}'s vector).}
 
 \item{Y}{A (\code{n} \eqn{\times} \code{m}) matrix of observed quantile functions evaluated on a shared uniform \code{m}-grid in \eqn{(0, 1)} - e.g. \code{seq(0.5/m, 1 - 0.5/m, len = m)} - row-wise monotone non-decreasing. Entries must obey user-specified box constraints given by \code{lower} and \code{upper} parameters.}
 

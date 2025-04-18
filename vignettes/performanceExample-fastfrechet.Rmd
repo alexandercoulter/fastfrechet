@@ -129,7 +129,7 @@ Y <- gendata$Y # (n x m) quantile response matrix, stored row-wise
 
 ```{r figure1, include = FALSE}
 # Copy the image from vignettes/ (or wherever it's generated)
-png("zinb_examples.png", width = 6.5, height = 4, units = "in", res = 576)
+png("zinb_examples.png", width = 6.5, height = 4, units = "in", res = 432)
 
 par(mai = c(0.55, 0.6, 0.3, 0.08))
 plot(
@@ -169,16 +169,19 @@ $\pmb{X}$ is low-rank.
 Fréchet regression implementations are also available in the R packages `WRI`
 (the `wass_regress` function) and `frechet` (the `GloDenReg` function), as well
 as in the Tucker materials (the `GloWassReg` function). The implementation from
-the `WRI` package can fit solutions in the low-rank setting, however it does not
-take user-specified support constraints as input. It also requires the empirical
+the `WRI` package can fit solutions when $\mathbf{X}$ is not full column rank,
+however it does not take user-specified support constraints as input and does
+not permit predictions on a separate set of covariate vectors (typically denoted
+$\mathbf{Z} \in \mathbb{R}^{z \times p}$). It also requires the empirical
 distribution objects be strictly monotone increasing, which excludes the
 discretely supported distributions in our example; to include `WRI` in our
 comparisons, we add a small monotone adjustment to the simulated distributions.
-The implementations from `frechet` and the Tucker materials allow non-increasing
-distribution inputs and user-specified box constraints. However, neither method
-can solve the regression problem in the low-rank setting; the former is
-relatively slow, even for small $m$; and the latter is not currently available
-in an R package.
+The implementations from `frechet` and the Tucker materials allow distribution
+inputs that are not strictly increasing, specification of a separate prediction
+matrix $\mathbf{Z}$, and user-specified box constraints. However, neither method
+can solve the regression problem when $\mathbf{X}$ is not full column rank; the
+former is relatively slow, even for small $m$; and the latter is not currently
+available in an R package.
 
 ```{r frechet-times}
 # WRI takes a data frame input:
@@ -270,7 +273,7 @@ figs <- cbind(
   c(1, 1, 1, 1)
 )
 
-png("frechetreg_accuracy_comparison.png", width = 6.5, height = 2.2, units = "in", res = 576)
+png("frechetreg_accuracy_comparison.png", width = 6.5, height = 2.2, units = "in", res = 432)
 
 par(fig = figs[1, ], mai = mais[1, ], family = "Helvetica")
 plot(
@@ -422,7 +425,7 @@ figs <- cbind(
 Xs <- cbind(1, scale(X))
 Yhat <- Xs %*% solve(crossprod(Xs), crossprod(Xs, Y))
 
-png("frechetreg_accuracy_comparison2.png", width = new_width, height = 2.2, units = "in", res = 576)
+png("frechetreg_accuracy_comparison2.png", width = new_width, height = 2.2, units = "in", res = 432)
 
 par(fig = figs[1, ], mai = mais[1, ], family = "Helvetica")
 plot(
@@ -537,7 +540,6 @@ frechet_Q <- pmax(frechet_Q, 0)
 ```
 
 ![](frechetreg_accuracy_comparison2.png){width=100%}
-
 
 # The Variable Selection Problem
 
@@ -714,7 +716,7 @@ figs <- cbind(
   c(1, 1, 1)
 )
 # Save graph:
-png("friso_accuracy_comparison.png", width = 6.5, height = a + 0.35 + 0.2, units = "in", res = 576)
+png("friso_accuracy_comparison.png", width = 6.5, height = a + 0.35 + 0.2, units = "in", res = 432)
 
 par(mai = mais[1, ], fig = figs[1, ], family = "Helvetica")
 plot(

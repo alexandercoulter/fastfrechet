@@ -31,7 +31,7 @@ library(fastfrechet)
 This vignette walks through an example use case of all of the available functions in `fastfrechet`. This includes simulating example covariate-dependent distribution responses, implementing Fréchet regression, performing variable selection, and utilizing resampling tools to supplement automatic variable selection. Where appropriate, the mathematical problems being solved by each function are briefly described. A second vignette, `monotoneQP-fastfrechet`, provides a more detailed algorithmic exposition of the function `monotoneQP` specifically.
 
 
-# Running Through an Example
+# Running Through Examples
 
 Since `fastfrechet` performs regression tasks on distribution responses, we illustrate its functionality with simulated distributions. In this section we generate covariate-dependent, zero-inflated negative binomial distributions. We then perform Fréchet regression, and the basic variable selection task with the Fréchet Ridge Selection Operator (FRiSO). Detailed mathematical treatment of these topics can be found in @petersen_frechet_2019, @tucker_variable_2023, and @coulter_fast_2024.
 
@@ -144,6 +144,13 @@ matplot(mseq, t(output$Qhat),
 )
 ```
 
+## Low-Rank Settings
+
+The Fréchet regression problem has unique solution even when the model matrix $\mathbf{X}$ is not full rank.  The weight matrix $\mathbf{Z}(\mathbf{X}^{\top}\mathbf{X})^-\mathbf{X}^{\top}$ is invariant to choice of generalized inverse $(\mathbf{X}^{\top}\mathbf{X})^-$
+$$
+
+$$`fastfrechet` implements Fréchet regression even when the model matrix $\mathbf{X}$ is not full rank.  
+
 
 ## Variable selection with Fréchet ridge selection operator
 
@@ -188,8 +195,8 @@ L <- FRiSO_univar2wass(
 
 ```{r load-FRiSO, include = FALSE}
 tauseq <- seq(0.2, 20, 0.2)
-s = system.file("private", "L_intro.Rda", package = "fastfrechet")
-if(file.exists(s)) load(s)
+s <- system.file("private", "L_intro.Rda", package = "fastfrechet")
+if (file.exists(s)) load(s)
 ```
 
 
@@ -210,7 +217,6 @@ legend("topleft",
   legend = c("Model variable", "Unimportant variable")
 )
 ```
-
 # Resampling for Variable Selection
 
 The variable selection procedure depends on a hyperparameter $\tau$ which is loosely related to the final model size. Two ways of choosing a final model free of $\tau$ are cross-validation (CV) and complementary pairs stability selection (CPSS). In CV, detailed in @tucker_variable_2023, final model selection occurs by finding $\tau_{\mathrm{opt}}$ which minimizes out-of-sample error, and selecting those variables indicated by $\widehat{\pmb{\lambda}}(\tau_{\mathrm{opt}})$. In CPSS, detailed in @shah_variable_2013 and @coulter_fast_2024, variable selection stability is measured across repeated half-splits of the data, with the most consistently selected variables being chosen in a way to guarantee pointwise error control.
@@ -260,10 +266,10 @@ cv <- FRiSO_CV_univar2wass(
 
 ```{r load-cv, include = FALSE}
 K <- 10
-thresh = 0.0001
-eps = 0.001
-s = system.file("private", "cv_intro.Rda", package = "fastfrechet")
-if(file.exists(s)) load(s)
+thresh <- 0.0001
+eps <- 0.001
+s <- system.file("private", "cv_intro.Rda", package = "fastfrechet")
+if (file.exists(s)) load(s)
 ```
 
 ### Plotting, interpreting CV errors and optimal solution
@@ -330,8 +336,8 @@ B <- 50
 thresh <- 0.0001
 tauseq <- 1:10
 eps <- 0.001
-s = system.file("private", "cpss_intro.Rda", package = "fastfrechet")
-if(file.exists(s)) load(s)
+s <- system.file("private", "cpss_intro.Rda", package = "fastfrechet")
+if (file.exists(s)) load(s)
 ```
 
 ### Plotting, interpreting stability paths

@@ -97,6 +97,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// qr_econ_getQR
+Rcpp::List qr_econ_getQR(const arma::mat& X);
+RcppExport SEXP _fastfrechet_qr_econ_getQR(SEXP XSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    rcpp_result_gen = Rcpp::wrap(qr_econ_getQR(X));
+    return rcpp_result_gen;
+END_RCPP
+}
+// qr_proj
+Rcpp::List qr_proj(const arma::mat& X, const arma::mat& Y, const arma::mat& Z, const double& tol);
+RcppExport SEXP _fastfrechet_qr_proj(SEXP XSEXP, SEXP YSEXP, SEXP ZSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(qr_proj(X, Y, Z, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_fastfrechet_scaleX_cpp", (DL_FUNC) &_fastfrechet_scaleX_cpp, 2},
@@ -105,6 +130,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fastfrechet_XDXt", (DL_FUNC) &_fastfrechet_XDXt, 2},
     {"_fastfrechet_projA0", (DL_FUNC) &_fastfrechet_projA0, 2},
     {"_fastfrechet_FRiSO_GSD", (DL_FUNC) &_fastfrechet_FRiSO_GSD, 12},
+    {"_fastfrechet_qr_econ_getQR", (DL_FUNC) &_fastfrechet_qr_econ_getQR, 1},
+    {"_fastfrechet_qr_proj", (DL_FUNC) &_fastfrechet_qr_proj, 4},
     {NULL, NULL, 0}
 };
 

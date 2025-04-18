@@ -161,27 +161,30 @@ distribution functions. The R package `fastfrechet` implements a fast and
 numerically exact custom solver for Fréchet regression in this setting, inspired
 by the dual active-set method of @arnstrom_dual_2022 (see the accompanying
 `monotoneQP-fastfrechet` vignette). The function, `frechetreg_univar2wass`,
-permits user-specified box constraints, and is natively amenable to the
+permits user-specified box constraints; it permits predictions on a different
+set of covariates than $\mathbf{X}$, typically a matrix denoted
+$\mathbf{Z} \in \mathbb{R}^{z \times p}$; and it is natively amenable to the
 weighting scheme used in the variable selection procedure described in the next
-section. It also solves the regression problem in the case the covariate matrix
-$\pmb{X}$ is low-rank.
+section. It also solves the regression problem, when possible, in the case the
+covariate matrix $\pmb{X}$ is not full column rank. The $\mathbf{Z}$ and
+low-rank settings are illustrated in more detail in the accompanying
+`intro-fastfrechet` vignette.
 
 Fréchet regression implementations are also available in the R packages `WRI`
 (the `wass_regress` function) and `frechet` (the `GloDenReg` function), as well
 as in the Tucker materials (the `GloWassReg` function). The implementation from
 the `WRI` package can fit solutions when $\mathbf{X}$ is not full column rank,
 however it does not take user-specified support constraints as input and does
-not permit predictions on a separate set of covariate vectors (typically denoted
-$\mathbf{Z} \in \mathbb{R}^{z \times p}$). It also requires the empirical
-distribution objects be strictly monotone increasing, which excludes the
-discretely supported distributions in our example; to include `WRI` in our
-comparisons, we add a small monotone adjustment to the simulated distributions.
-The implementations from `frechet` and the Tucker materials allow distribution
-inputs that are not strictly increasing, specification of a separate prediction
-matrix $\mathbf{Z}$, and user-specified box constraints. However, neither method
-can solve the regression problem when $\mathbf{X}$ is not full column rank; the
-former is relatively slow, even for small $m$; and the latter is not currently
-available in an R package.
+not permit predictions on a separate set of covariate vectors $\mathbf{Z}$). It
+also requires the empirical distribution objects be strictly monotone
+increasing, which excludes the discretely supported distributions in our
+example; to include `WRI` in our comparisons, we add a small monotone adjustment
+to the simulated distributions. The implementations from `frechet` and the
+Tucker materials allow distribution inputs that are not strictly increasing,
+specification of a separate prediction matrix $\mathbf{Z}$, and user-specified
+box constraints. However, neither method can solve the regression problem when
+$\mathbf{X}$ is not full column rank; the former is relatively slow, even for
+small $m$; and the latter is not currently available in an R package.
 
 ```{r frechet-times}
 # WRI takes a data frame input:

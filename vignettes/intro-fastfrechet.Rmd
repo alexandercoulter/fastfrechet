@@ -214,6 +214,93 @@ matplot(mseq, t(output$Qhat),
 )
 ```
 
+### An Example with $\widehat{\mathbf{Z}}$
+
+To illustrate how the "output" covariate matrix `Z` works—i.e. predicting
+distribution responses on non-training data—we specify an example matrix which
+is zero everywhere, except for the first column. The first covariate, which is
+known to be associated with the distribution responses, ranges over an
+increasing sequence of values.
+
+```{r frechetreg-with-Z}
+# Create a Z matrix
+nz <- 20
+Z <- matrix(data = 0, nrow = nz, ncol = p)
+Z[, 1] <- seq(from = -5, to = 5, length.out = nz)
+
+# Run frechetreg_univar2wass
+outputZ <- fastfrechet::frechetreg_univar2wass(
+  X = X,
+  Y = Y,
+  Z = Z,
+  C_init = NULL,
+  lambda = NULL,
+  lower = 0,
+  upper = Inf
+)
+
+# Note: to numerical precision, these quantile functions are non-decreasing...
+min(apply(outputZ$Qhat, 1, diff))
+
+# ...and bounded from below by the lower bound, zero:
+min(outputZ$Qhat)
+```
+The plot of unconstrained estimators and fitted quantile functions shows how
+increasing the first covariate leads to changes in the distribution responses.
+
+```{r plot-Z, fig.width = 8, fig.height = 5.5}
+# Plot the unconstrained estimators and the constrained conditional quantile functions:
+Yhat <- outputZ$Qhat - outputZ$Lagrange_Multiplier[, -(m + 1)] + outputZ$Lagrange_Multiplier[, -1]
+par(mfrow = c(1, 2), las = 1)
+matplot(mseq, t(Yhat),
+  type = "l", lty = 1, col = hcl.colors(nz, palette = "Spectral"), xlab = "p", ylab = "Yhat",
+  main = "Unconstrained Solution"
+)
+matplot(mseq, t(outputZ$Qhat),
+  type = "l", lty = 1, col = hcl.colors(nz, palette = "Spectral"), xlab = "p", ylab = "Qhat",
+  main = "Fitted Quantile Functions"
+)
+```
+
+In the example above, we knew the first covariate is associated with the
+distributional responses. Below, we change the values of a covariate known to
+not associate with the distributional response; correspondingly, the fitted
+distributions are more "constant".
+
+```{r frechetreg-with-Z-2, fig.width = 8, fig.height = 5.5}
+# Create a Z matrix
+nz <- 20
+Z <- matrix(data = 0, nrow = nz, ncol = p)
+Z[, 5] <- seq(from = -5, to = 5, length.out = nz)
+
+# Run frechetreg_univar2wass
+outputZ <- fastfrechet::frechetreg_univar2wass(
+  X = X,
+  Y = Y,
+  Z = Z,
+  C_init = NULL,
+  lambda = NULL,
+  lower = 0,
+  upper = Inf
+)
+
+# Plot the unconstrained estimators and the constrained conditional quantile functions:
+Yhat <- outputZ$Qhat - outputZ$Lagrange_Multiplier[, -(m + 1)] + outputZ$Lagrange_Multiplier[, -1]
+par(mfrow = c(1, 2), las = 1)
+matplot(mseq, t(Yhat),
+  type = "l", lty = 1, col = hcl.colors(nz, palette = "Spectral"), xlab = "p", ylab = "Yhat",
+  main = "Unconstrained Solution"
+)
+matplot(mseq, t(outputZ$Qhat),
+  type = "l", lty = 1, col = hcl.colors(nz, palette = "Spectral"), xlab = "p", ylab = "Qhat",
+  main = "Fitted Quantile Functions"
+)
+```
+
+
+
+
+
 ## Low-Rank Settings
 
 When $\mathbf{X}$ is not full column rank, and optional parameter `lambda` is

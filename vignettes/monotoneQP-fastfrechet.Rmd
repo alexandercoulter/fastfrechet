@@ -51,14 +51,15 @@ $$
 \widehat{\mathbf{y}}^{\top} = (n^{-1}\pmb{1}^{\top} + \mathbf{x}_*^{\top}(\mathbf{X}^{\top}\mathbf{X})^-\mathbf{X}^{\top})\mathbf{Y}.
 $$
 so long as $\mathbf{x}_*$ obeys a suitable row-space condition. (See the
-accompanying `intro-fastfrechet` vignette for details.) This is a quadratic
-programming (QP) problem, where the final projected vector
-$\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e. $q_i \leq q_j$ for
-$i \leq j$) and obeys the same box constraints as the $\mathbf{y}$'s. While the
-`fastfrechet` package solves the Fréchet regression problem via the
-`frechetreg_univar2wass` function, it also implements a solver for the more
-general QP problem of finding the closest "monotone and bounded" vector(s) via
-the `monotoneQP` function.
+accompanying `intro-fastfrechet` vignette for details.)
+
+Solving for $\widehat{\mathbf{q}}$ is a quadratic programming (QP) problem,
+where the final projected vector $\widehat{\mathbf{q}}$ is monotone
+non-decreasing (i.e. $q_i \leq q_j$ for $i \leq j$) and obeys the same box
+constraints as the $\mathbf{y}$'s. While the `fastfrechet` package solves the
+Fréchet regression problem via the `frechetreg_univar2wass` function, it also
+implements a solver for the more general QP problem of finding the closest
+"monotone and bounded" vector(s) via the `monotoneQP` function.
 
 ## Example Utilization
 

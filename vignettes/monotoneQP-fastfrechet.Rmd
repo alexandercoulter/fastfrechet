@@ -17,13 +17,21 @@ knitr::opts_chunk$set(
 
 ## Background
 
-This vignette details the mathematical foundation of the algorithm we implement to solve the non-convex Fréchet mean problem for univariate distribution responses equipped with the 2-Wasserstein metric. In the "population setting", this is an orthogonal projection problem. In the "sample setting" where distribution responses are represented by quantile functions $\mathbf{y} \in \mathbb{R}^m$ evaluated on a discrete uniform $m$-grid in $(0, 1)$ and obeying box constraints $y_j \in [b_L, b_U] \subseteq \mathbb{R}$, the Fréchet mean problem can be written
+This vignette details the mathematical foundation of the algorithm we implement
+to solve the non-convex Fréchet mean problem for univariate distribution
+responses equipped with the 2-Wasserstein metric. In the "population setting",
+this is an orthogonal projection problem. In the "sample setting" where
+distribution responses are represented by quantile functions
+$\mathbf{y} \in \mathbb{R}^m$ evaluated on a discrete uniform $m$-grid in
+$(0, 1)$ and obeying box constraints $y_j \in [b_L, b_U] \subseteq \mathbb{R}$,
+the Fréchet mean problem can be written
 
 $$
 \widehat{\mathbf{q}} := \mathrm{arg\:min}_{\mathbf{q} \in \mathbb{R}^m} \lVert{\mathbf{q} - \widehat{\mathbf{y}}} \rVert_2^2, \qquad \mathbf{b} - \mathbf{A}^{\top}\mathbf{q} \leq \pmb{0}_{m+1},
 $$
 where $\mathbf{b}^{\top} = \begin{pmatrix} b_L & \pmb{0}_{m-1}^{\top} & -b_U\end{pmatrix} \in \mathbb{R}^{m+1}$,
-$\mathbf{A} \in \mathbb{R}^{m\times(m+1)}$ is a first-difference matrix of the form
+$\mathbf{A} \in \mathbb{R}^{m\times(m+1)}$ is a first-difference matrix of the
+form
 
 $$
 \mathbf{A} = \begin{pmatrix}
@@ -36,12 +44,27 @@ $$
    0 &  0 &  0 &  0 & \cdots &  0 & +1 & -1
 \end{pmatrix},
 $$
-and finally $\widehat{\mathbf{y}}$ is a non-convex sum of the $\mathbf{y}$'s
-which does not necessarily sit in the target space. The final projected vector $\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e. $q_i \leq q_j$ for $i \leq j$) and obeys the same box constraints as the $\mathbf{y}$'s. The `fastfrechet` package implements a solver for this problem via the `monotoneQP` function.
+Finally, in Fréchet regression, $\widehat{\mathbf{y}}$ is a non-convex sum of
+the observed response $\mathbf{y}$'s which does not necessarily sit in the
+target space, defined for some $\mathbf{x}_* \in \mathbb{R}^p$
+$$
+\widehat{\mathbf{y}}^{\top} = (n^{-1}\pmb{1}^{\top} + \mathbf{x}_*^{\top}(\mathbf{X}^{\top}\mathbf{X})^-\mathbf{X}^{\top})\mathbf{Y}.
+$$
+so long as $\mathbf{x}_*$ obeys a suitable row-space condition. (See the
+accompanying `intro-fastfrechet` vignette for details.) This is a quadratic
+programming (QP) problem, where the final projected vector
+$\widehat{\mathbf{q}}$ is monotone non-decreasing (i.e. $q_i \leq q_j$ for
+$i \leq j$) and obeys the same box constraints as the $\mathbf{y}$'s. While the
+`fastfrechet` package solves the Fréchet regression problem via the
+`frechetreg_univar2wass` function, it also implements a solver for the more
+general QP problem of finding the closest "monotone and bounded" vector(s) via
+the `monotoneQP` function.
 
 ## Example Utilization
 
-To first visualize what `monotoneQP` does, we specify a set of box constraints $b_L = 0.5$ and $b_U = 1.5$, and generate an example vector which does not obey those constraints and does not exhibit monotonicity.
+To first visualize what `monotoneQP` does, we specify a set of box constraints
+$b_L = 0.5$ and $b_U = 1.5$, and generate an example vector which does not obey
+those constraints and does not exhibit monotonicity.
 ```{r}
 # Set box constraints:
 lower <- 0.5
@@ -91,11 +114,28 @@ legend("topleft",
 
 ## Algorithm
 
-Solving for $\widehat{\mathbf{q}}$ is a quadratic programming (QP) problem, for which several approaches and solvers exist. We introduce a modification of the dual active-set method of @arnstrom_dual_2022 (Algorithm 1) which utilizes the sparse structure of $\mathbf{A}$ to avoid costly matrix multiplication and $LDL^{\top}$ decomposition steps. This algorithm is implemented in *C++* as a sub-routine in `fastfrechet` functions solving Fréchet mean problems for 2-Wasserstein space, and is also made available as a standalone QP solver in the `monotoneQP` function.
+Several approaches and solvers exist for general QP problems. We introduce a
+modification of the dual active-set method of @arnstrom_dual_2022 (Algorithm 1)
+which utilizes the sparse structure of $\mathbf{A}$ to avoid costly matrix
+multiplication and $LDL^{\top}$ decomposition steps. This algorithm is
+implemented in *C++* as a sub-routine in `fastfrechet` functions solving Fréchet
+mean problems for 2-Wasserstein space, and is also made available as a
+standalone QP solver in the `monotoneQP` function.
 
 ### Notation
 
-The dual active-set algorithm of @arnstrom_dual_2022 is for QP problems with general constraints. We translate it into our context with the following notation. Denote $[m] := \{1, \dots, m\}$, and let $\mathbf{d} := \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$. For iteration $k \geq 0$, let $W_k \subseteq \{1, \dots, m + 1\}$ be an index set in increasing order, and let $\bar{W}_k = [m+1] \setminus W_k$ be its similarly-ordered relative complement in $[m+1]$. Denote with $\mathbf{A}_k$ the sub-matrix of $\mathbf{A}$ consisting of the columns indexed by $W_k$ (when defined), and denote with $\bar{\mathbf{A}}_k$ the sub-matrix consisting of the remaining columns (also when defined). Similarly, let $\mathbf{d}_k$ be a vector consisting of the elements of $\mathbf{d}$ indexed by $W_k$, and $\bar{\mathbf{d}}_k$ be a vector consisting of the remaining elements.
+The dual active-set algorithm of @arnstrom_dual_2022 is for QP problems with
+general constraints. We translate it into our context with the following
+notation. Denote $[m] := \{1, \dots, m\}$, and let
+$\mathbf{d} := \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$. For iteration
+$k \geq 0$, let $W_k \subseteq \{1, \dots, m + 1\}$ be an index set in
+increasing order, and let $\bar{W}_k = [m+1] \setminus W_k$ be its
+similarly-ordered relative complement in $[m+1]$. Denote with $\mathbf{A}_k$ the
+sub-matrix of $\mathbf{A}$ consisting of the columns indexed by $W_k$ (when
+defined), and denote with $\bar{\mathbf{A}}_k$ the sub-matrix consisting of the
+remaining columns (also when defined). Similarly, let $\mathbf{d}_k$ be a vector
+consisting of the elements of $\mathbf{d}$ indexed by $W_k$, and
+$\bar{\mathbf{d}}_k$ be a vector consisting of the remaining elements.
 
 ### The algorithm
 
@@ -107,7 +147,11 @@ multiplier associated with the primal monotone QP problem.
 multiplier associated with the dual problem to the monotone QP problem.
 * $W_k$ ($\bar{W}_k$), the working index set identifying which entries of $\pmb{\eta}_k$ may be positive (must be zero).
 
-The full Algorithm 1 from @arnstrom_dual_2022 is given below, with applicable variable substitutions for our context. We also take advantage of two important facts about $\mathbf{A}$: first, $\mathbf{A}$ is full row-rank, but not full column rank; second, any sub-matrix of $\mathbf{A}$ defined by taking a strict subset of its columns is full column-rank.
+The full Algorithm 1 from @arnstrom_dual_2022 is given below, with applicable
+variable substitutions for our context. We also take advantage of two important
+facts about $\mathbf{A}$: first, $\mathbf{A}$ is full row-rank, but not full
+column rank; second, any sub-matrix of $\mathbf{A}$ defined by taking a strict
+subset of its columns is full column-rank.
 
 1. Initialize $k=0$, $\mathbf{d} = \mathbf{A}^{\top}\mathbf{y} - \mathbf{b}$,
 $\pmb{\eta}_0 = \pmb{0}_{m+1}$, $W_0 = \emptyset$, $\pmb{\mu}_0 =\pmb{0}_{m+1}$,
@@ -143,7 +187,18 @@ and $\mathbf{exit} = \verb+false+$.
 
 ### Matrix Simplifications
 
-The implementation of the dual active-set method from @arnstrom_dual_2022 involves iterative updates of the $LDL^{\top}$ decomposition of the $\mathbf{A}_k^{\top}\mathbf{A}_k$ matrix. The form of $\mathbf{A}$ allows us to avoid these decompositions entirely, and represent the matrix operations $-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$ and $\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$ with a simpler set of subtraction operations. Further, in steps subsequent to 2(b) above, the result is invariant to any choice of $\mathbf{p}_k$ satisfying the two given equations. The upshot is the matrix $\mathbf{A}$ does not need to be stored, nor do expressions involving it or its sub-matrices need to be evaluated explicitly. We give a brief overview of each simplification, but omit the complete details.
+The implementation of the dual active-set method from @arnstrom_dual_2022
+involves iterative updates of the $LDL^{\top}$ decomposition of the
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ matrix. The form of $\mathbf{A}$ allows us to
+avoid these decompositions entirely, and represent the matrix operations
+$-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$ and
+$\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$
+with a simpler set of subtraction operations. Further, in steps subsequent to
+2(b) above, the result is invariant to any choice of $\mathbf{p}_k$ satisfying
+the two given equations. The upshot is the matrix $\mathbf{A}$ does not need to
+be stored, nor do expressions involving it or its sub-matrices need to be
+evaluated explicitly. We give a brief overview of each simplification, but omit
+the complete details.
 
 #### Evaluating $-(\mathbf{A}_k^{\top}\mathbf{A}_k)^{-1}\mathbf{d}_k$
 
@@ -160,12 +215,25 @@ $$
    0 &  0 &  0 &  0 & \cdots &  0 & -1 & +1
 \end{pmatrix}.
 $$
-For $W_k \subset [m + 1]$ (strict subset), the matrix $\mathbf{A}_k^{\top}\mathbf{A}_k$ comprises the entries at the intersections of the columns/rows indexed by $W_k$, and so is also tridiagonal with possibly isolated diagonal entries. We implement a solver which incrementally searches along the indices in $W_k$ to identify isolated diagonal entries in $\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by indices $w \in W_k$ where $w+1 \notin W_k$ and $w-1\notin W_k$) where inversion reduces to a simple scalar division operation, or fully block tridiagonal entries in $\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by sequences of indices $(w, w+1, \dots, w + s) \subset W_k$) where we apply a simplified Thomas algorithm that takes advantage of the repeated diagonal entries of $\mathbf{A}^{\top}\mathbf{A}$.
+For $W_k \subset [m + 1]$ (strict subset), the matrix
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ comprises the entries at the intersections of
+the columns/rows indexed by $W_k$, and so is also tridiagonal with possibly
+isolated diagonal entries. We implement a solver which incrementally searches
+along the indices in $W_k$ to identify isolated diagonal entries in
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by indices $w \in W_k$ where
+$w+1 \notin W_k$ and $w-1\notin W_k$) where inversion reduces to a simple scalar
+division operation, or fully block tridiagonal entries in
+$\mathbf{A}_k^{\top}\mathbf{A}_k$ (given by sequences of indices
+$(w, w+1, \dots, w + s) \subset W_k$) where we apply a simplified Thomas
+algorithm that takes advantage of the repeated diagonal entries of
+$\mathbf{A}^{\top}\mathbf{A}$.
 
 
 #### Evaluating $\bar{\mathbf{A}}{}^{\top}_k\mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k} + \bar{\mathbf{d}}_k$
 
-As a preliminary matter, if $W_k = \emptyset$, we evaluate this expression to simply $\mathbf{d}$. For $W_k \notin \{\emptyset, [m+1]\}$, the matrix multiplication in the expression can be reduced to two steps:
+As a preliminary matter, if $W_k = \emptyset$, we evaluate this expression to
+simply $\mathbf{d}$. For $W_k \notin \{\emptyset, [m+1]\}$, the matrix
+multiplication in the expression can be reduced to two steps:
 
 1. solving $\mathbf{u} \leftarrow \mathbf{A}_k [\tilde{\pmb{\eta}}_k]_{W_k}$, and
 2. solving $\mathbf{v} \leftarrow \bar{\mathbf{A}}_k^{\top} \mathbf{u}$.
@@ -177,11 +245,14 @@ $W_k$), or in $\mathbf{u}$ (dictated by $\bar{W}_k$), respectively.
 
 #### Evaluating $\mathbf{A}^{\top}\mathbf{A}\mathbf{p}_k = \pmb{0}$ subject to $\mathbf{p}_k^{\top}\mathbf{d} < 0$
 
-Recalling $\mathbf{A}$ is full row rank, if $\mathbf{A}^{\top}\mathbf{A}\mathbf{p}_k = \pmb{0}$ then we can see
+Recalling $\mathbf{A}$ is full row rank, if
+$\mathbf{A}^{\top}\mathbf{A}\mathbf{p}_k = \pmb{0}$ then we can see
 $$
 \mathbf{A} \mathbf{p}_k = (\mathbf{A}\mathbf{A}^{\top})^{-1}\mathbf{A}\pmb{0} = \pmb{0},
 $$
-implying (by the form of $\mathbf{A}$) that $[\mathbf{p}_k]_i = [\mathbf{p}_k]_{i+1}$ for all $i < m + 1$. But then $\mathbf{p}_k = p \cdot \pmb{1}$ for some $p$, and the constraint is now written
+implying (by the form of $\mathbf{A}$) that
+$[\mathbf{p}_k]_i = [\mathbf{p}_k]_{i+1}$ for all $i < m + 1$. But then
+$\mathbf{p}_k = p \cdot \pmb{1}$ for some $p$, and the constraint is now written
 $$
 \mathbf{p}^{\top}\mathbf{d} < 0 \quad \iff \quad p \cdot \pmb{1}^{\top}\mathbf{d} < 0.
 $$

@@ -255,12 +255,9 @@ frechetreg_univar2wass <- function(X,
       # If lambda is not present (i.e. non-regularized regression)...
       if (is.null(lambda)) {
         # Evaluate the economical QR decomposition of (1 X) in order to perform
-        # fast projection, since
-        #
-        # Yhat = QQ'Y
-        QR <- qr_econ_getQR(cbind(1, Xc))
-
-        Yhat <- QR$Q %*% crossprod(QR$Q, Y)
+        # fast projection; details in qr_proj C++ function.
+        output <- qr_proj(cbind(1, Xc), Y, cbind(1, Xc), tol = Ztol)$Solution
+        Yhat <- output$Solution
       } else {
         # Scale Xc sqrt(n) to simplify algebra with ridge penalty:
         Xcn <- Xc / sqrt(n)

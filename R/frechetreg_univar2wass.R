@@ -256,8 +256,7 @@ frechetreg_univar2wass <- function(X,
       if (is.null(lambda)) {
         # Evaluate the economical QR decomposition of (1 X) in order to perform
         # fast projection; details in qr_proj C++ function.
-        output <- qr_proj(cbind(1, Xc), Y, cbind(1, Xc), tol = Ztol)$Solution
-        Yhat <- output$Solution
+        Yhat <- qr_proj(cbind(1, Xc), Y, cbind(1, Xc), tol = Ztol)$Solution
       } else {
         # Scale Xc sqrt(n) to simplify algebra with ridge penalty:
         Xcn <- Xc / sqrt(n)
